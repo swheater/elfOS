@@ -16,7 +16,7 @@ _start:
 	B	error
 	B	error
 
-reset:	MOV	SP,#1024
+reset:	LDR	SP,=stack
 	BL	loadBaseELF
 stop:
 	B	stop

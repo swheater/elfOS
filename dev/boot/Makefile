@@ -7,7 +7,9 @@ CFLAGS = -Wall -O2
 MAKE   = make
 RM     = rm
 
-all: BaseELFLoader.o
+all: all-arm BaseELFLoader.o
+
+all-arm:
 	$(MAKE) -C arm all
 
 BaseELFLoader.o: BaseELFLoader.c BaseELFLoader.h

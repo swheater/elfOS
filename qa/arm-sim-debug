@@ -1,3 +1,5 @@
 #!/bin/sh
 
-qemu-system-arm -cpu arm1136 -m 256m -display none -nographic -serial /dev/null -kernel elfOSBoot.img
+QEMU_SYSTEM_ARM=/opt/qemu-1.0/bin/qemu-system-arm
+
+${QEMU_SYSTEM_ARM} -cpu arm1136 -m 256m -display none -nographic -serial /dev/null -kernel elfOSBoot.img

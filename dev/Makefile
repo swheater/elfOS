@@ -8,13 +8,10 @@ OBJCOPY = arm-gp2x-linux-objcopy
 MAKE    = make
 RM      = rm
 
-all: all-boot all-elf elfOSBoot.img
+all: all-boot elfOSBoot.img
 
 all-boot:
 	$(MAKE) -C boot all
-
-all-elf:
-	$(MAKE) -C elf all
 
 elfOSBoot.img: elfOSBoot.elf
 	$(OBJCOPY) -O binary elfOSBoot.elf elfOSBoot.img
@@ -24,5 +21,4 @@ elfOSBoot.elf:
 
 clean:
 	$(MAKE) -C boot clean
-	$(MAKE) -C elf clean
 	$(RM) -f *~ *.elf *.img

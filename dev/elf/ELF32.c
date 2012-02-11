@@ -2,8 +2,4 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-#include "ELF.h"
-
-void loadBaseELF()
-{
-}
+#include "ELF32.h"

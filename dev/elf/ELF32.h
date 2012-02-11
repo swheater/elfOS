@@ -5,7 +5,7 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-#define ELF_HEADER_IDENTIFICATION = 16
+#define ELF_HEADER_IDENTIFICATION 16
 
 typedef struct
 {

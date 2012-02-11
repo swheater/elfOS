@@ -7,7 +7,7 @@ CFLAGS = -Wall -O2
 MAKE   = make
 RM     = rm
 
-all: all-arm BaseELFLoader.o
+all: all-elf all-arm BaseELFLoader.o
 
 all-arm:
 	$(MAKE) -C arm all
@@ -16,5 +16,6 @@ BaseELFLoader.o: BaseELFLoader.c BaseELFLoader.h
 	$(CC) $(CCFLAGS) -c BaseELFLoader.c
 
 clean:
+	$(MAKE) -C elf clean
 	$(MAKE) -C arm clean
 	$(RM) -f *~ *.o

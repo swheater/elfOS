@@ -64,7 +64,7 @@ typedef struct
 
 typedef struct
 {
-    unsigned long p_type;
+    unsigned long type;
     void          *offset;
     void          *vaddr;
     void          *paddr;

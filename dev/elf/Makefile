@@ -7,10 +7,10 @@ CFLAGS = -Wall -O2
 MAKE   = make
 RM     = rm
 
-all: ELF.o
+all: ELF32.o
 
-ELF.o: ELF.c ELF.h
-	$(CC) $(CCFLAGS) -c ELF.c
+ELF32.o: ELF32.c ELF32.h
+	$(CC) $(CCFLAGS) -c ELF32.c
 
 clean:
 	$(RM) -f *~ *.o

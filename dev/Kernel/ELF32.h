@@ -5,87 +5,89 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
+#include <StdTypes.h>
+
 #define ELF32_HEADER_MAGIC_LENGTH 4
 #define ELF32_HEADER_PADDING_LENGTH 9
 
 typedef struct
 {
-    char           magic[ELF32_HEADER_MAGIC_LENGTH];
-    unsigned char  fileClass;
-    unsigned char  byteOrder;
-    unsigned char  headerVersion;
-    char           padding[ELF32_HEADER_PADDING_LENGTH];
-    unsigned short type;
-    unsigned short machine;
-    unsigned long  version;
-    unsigned int   entry;
-    unsigned int   programHeaderOffset;
-    unsigned int   sectionHeaderOffset;
-    unsigned long  flags;
-    unsigned short headersize;
-    unsigned short programHeaderEntrySize;
-    unsigned short programHeaderNumber;
-    unsigned short sectionHeaderEntrySize;
-    unsigned short sectionHeaderEntryNumber;
-    unsigned short sectionHeaderTableIndex;
+    SignedByte     magic[ELF32_HEADER_MAGIC_LENGTH];
+    UnsignedByte   fileClass;
+    UnsignedByte   byteOrder;
+    UnsignedByte   headerVersion;
+    SignedByte     padding[ELF32_HEADER_PADDING_LENGTH];
+    UnsignedWord16 type;
+    UnsignedWord16 machine;
+    UnsignedWord32 version;
+    UnsignedWord32 entry;
+    UnsignedWord32 programHeaderOffset;
+    UnsignedWord32 sectionHeaderOffset;
+    UnsignedWord32 flags;
+    UnsignedWord16 headersize;
+    UnsignedWord16 programHeaderEntrySize;
+    UnsignedWord16 programHeaderNumber;
+    UnsignedWord16 sectionHeaderEntrySize;
+    UnsignedWord16 sectionHeaderEntryNumber;
+    UnsignedWord16 sectionHeaderTableIndex;
 } ELF32Header;
 
 typedef struct
 {
-    unsigned long name;
-    unsigned long type;
-    unsigned long flags;
-    unsigned int  addr;
-    unsigned int  offset;
-    unsigned long size;
-    unsigned long link;
-    unsigned long info;
-    unsigned long addressAlign;
-    unsigned long entrySize;
+    UnsignedWord32 name;
+    UnsignedWord32 type;
+    UnsignedWord32 flags;
+    UnsignedWord32 addr;
+    UnsignedWord32 offset;
+    UnsignedWord32 size;
+    UnsignedWord32 link;
+    UnsignedWord32 info;
+    UnsignedWord32 addressAlign;
+    UnsignedWord32 entrySize;
 } ELF32SectionHeader;
 
 typedef struct
 {
-    unsigned long  name;
-    unsigned int   value;
-    unsigned long  size;
-    unsigned char  info;
-    unsigned char  other;
-    unsigned short sectionHeaderTableIndex;
+    UnsignedWord32 name;
+    UnsignedWord32 value;
+    UnsignedWord32 size;
+    UnsignedByte   info;
+    UnsignedByte   other;
+    UnsignedWord16 sectionHeaderTableIndex;
 } ELF32SymbolEntry;
 
 typedef struct
 {
-    unsigned int  offset;
-    unsigned long info;
+    UnsignedWord32 offset;
+    UnsignedWord32 info;
 } ELF32_Rel;
 
 typedef struct
 {
-    unsigned int  offset;
-    unsigned long info;
-    long          addend;
+    UnsignedWord32 offset;
+    UnsignedWord32 info;
+    SignedWord32   addend;
 } ELF32_Rela;
 
 typedef struct
 {
-    unsigned long type;
-    unsigned int  offset;
-    unsigned int  vaddr;
-    unsigned int  paddr;
-    unsigned long fileSize;
-    unsigned long memSize;
-    unsigned long flags;
-    unsigned long align;
+    UnsignedWord32 type;
+    UnsignedWord32 offset;
+    UnsignedWord32 vaddr;
+    UnsignedWord32 paddr;
+    UnsignedWord32 fileSize;
+    UnsignedWord32 memSize;
+    UnsignedWord32 flags;
+    UnsignedWord32 align;
 } ELF32ProgramHeader;
 
 typedef struct
 {
-    long tag;
+    SignedWord32 tag;
     union
     {
-        unsigned long value;
-        unsigned int  pointer;
+        UnsignedWord32 value;
+        UnsignedWord32 pointer;
     } DynamicUnion;
 } ELF32Dynamic;
 

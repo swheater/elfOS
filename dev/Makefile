@@ -13,18 +13,18 @@ all: elfOSBoot.img
 	$(SIZE) elfOSBoot.elf
 
 all-boot:
-	$(MAKE) -C boot all
+	$(MAKE) -C Boot all
 
 all-kernel:
-	$(MAKE) -C kernel all
+	$(MAKE) -C Kernel all
 
 elfOSBoot.img: elfOSBoot.elf
 	$(OBJCOPY) -O binary elfOSBoot.elf elfOSBoot.img
 
 elfOSBoot.elf: all-boot all-kernel
-	$(LD) $(LDFLAGS) -T elfOSBoot.lds -o elfOSBoot.elf boot/arm/boot_zeropage.o kernel/init.o
+	$(LD) $(LDFLAGS) -T elfOSBoot.lds -o elfOSBoot.elf Boot/ARM/Boot_ZeroPage.o Kernel/Kernel_Init.o
 
 clean:
-	$(MAKE) -C boot clean
-	$(MAKE) -C kernel clean
+	$(MAKE) -C Boot clean
+	$(MAKE) -C Kernel clean
 	$(RM) -f *~ *.elf *.img

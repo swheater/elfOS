@@ -2,14 +2,14 @@
 # Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-CC      = arm-elf-gcc
-CCFLAGS = 
-RM      = rm
+MAKE   = make
+RM     = rm
 
-all: init.o
+all: all-arm
 
-init.o: init.c
-	$(CC) $(CCFLAGS) -c init.c
+all-arm:
+	$(MAKE) -C ARM all
 
 clean:
+	$(MAKE) -C ARM clean
 	$(RM) -f *~ *.o

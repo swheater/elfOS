@@ -24,7 +24,7 @@ typedef struct
     UnsignedWord32 programHeaderOffset;
     UnsignedWord32 sectionHeaderOffset;
     UnsignedWord32 flags;
-    UnsignedWord16 headersize;
+    UnsignedWord16 headerSize;
     UnsignedWord16 programHeaderEntrySize;
     UnsignedWord16 programHeaderNumber;
     UnsignedWord16 sectionHeaderEntrySize;

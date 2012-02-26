@@ -3,7 +3,7 @@
 #
 
 CC      = arm-elf-gcc
-CCFLAGS = 
+CCFLAGS = -I.
 RM      = rm
 
 KERNEL_OBJS = Kernel_Init.o

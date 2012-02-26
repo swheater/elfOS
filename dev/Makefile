@@ -21,10 +21,10 @@ all-kernel:
 elfOSBoot.img: elfOSBoot.elf
 	$(OBJCOPY) -O binary elfOSBoot.elf elfOSBoot.img
 
-elfOSBoot.elf: all-boot all-kernel
-	$(LD) $(LDFLAGS) -T elfOSBoot.lds -o elfOSBoot.elf Boot/ARM/Boot_ZeroPage.o Kernel/Kernel_Init.o
+elfOSBoot.elf elfOSBoot.map: all-boot all-kernel
+	$(LD) $(LDFLAGS) -T elfOSBoot.lds -o elfOSBoot.elf -Map elfOSBoot.map Boot/ARM/Boot_ZeroPage.o Kernel/Kernel_Init.o
 
 clean:
 	$(MAKE) -C Boot clean
 	$(MAKE) -C Kernel clean
-	$(RM) -f *~ *.elf *.img
+	$(RM) -f *~ *.elf *.img *.map

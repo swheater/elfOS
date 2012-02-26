@@ -29,7 +29,7 @@ typedef struct
     UnsignedWord16 programHeaderNumber;
     UnsignedWord16 sectionHeaderEntrySize;
     UnsignedWord16 sectionHeaderEntryNumber;
-    UnsignedWord16 sectionHeaderTableIndex;
+    UnsignedWord16 stringTableSectionHeaderIndex;
 } ELF32Header;
 
 typedef struct
@@ -60,14 +60,14 @@ typedef struct
 {
     UnsignedWord32 offset;
     UnsignedWord32 info;
-} ELF32_Rel;
+} ELF32Rel;
 
 typedef struct
 {
     UnsignedWord32 offset;
     UnsignedWord32 info;
     SignedWord32   addend;
-} ELF32_Rela;
+} ELF32Rela;
 
 typedef struct
 {
@@ -88,7 +88,7 @@ typedef struct
     {
         UnsignedWord32 value;
         UnsignedWord32 pointer;
-    } DynamicUnion;
+    } dynamicUnion;
 } ELF32Dynamic;
 
 #endif

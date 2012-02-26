@@ -1,11 +1,11 @@
-#ifndef _ELFOS_KERNEL_ELF32_H
-#define _ELFOS_KERNEL_ELF32_H 1
+#ifndef _ELF_ELF32_H
+#define _ELF_ELF32_H 1
 
 /*
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-#include <StdTypes.h>
+#include <Kernel/StdTypes.h>
 
 #define ELF32_HEADER_MAGIC_LENGTH 4
 #define ELF32_HEADER_PADDING_LENGTH 9
@@ -29,7 +29,7 @@ typedef struct
     UnsignedWord16 programHeaderNumber;
     UnsignedWord16 sectionHeaderEntrySize;
     UnsignedWord16 sectionHeaderEntryNumber;
-    UnsignedWord16 stringTableSectionHeaderIndex;
+    UnsignedWord16 sectionHeaderStringTableIndex;
 } ELF32Header;
 
 typedef struct

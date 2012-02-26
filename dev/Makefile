@@ -9,22 +9,20 @@ SIZE    = arm-elf-size
 MAKE    = make
 RM      = rm
 
+OBJS = Source/Boot/ARM/ZeroPage.o Source/Kernel/Init.o Source/ELF/ELF32.o Source/String/String.o
+
 all: elfOSBoot.img
 	$(SIZE) elfOSBoot.elf
 
-all-boot:
-	$(MAKE) -C Boot all
-
-all-kernel:
-	$(MAKE) -C Kernel all
+elfOSBoot.elf elfOSBoot.map:
+	$(MAKE) -C Headers all
+	$(MAKE) -C Source all
+	$(LD) $(LDFLAGS) -nostdlib -T elfOSBoot.lds -o elfOSBoot.elf -Map elfOSBoot.map $(OBJS)
 
 elfOSBoot.img: elfOSBoot.elf
 	$(OBJCOPY) -O binary elfOSBoot.elf elfOSBoot.img
 
-elfOSBoot.elf elfOSBoot.map: all-boot all-kernel
-	$(LD) $(LDFLAGS) -T elfOSBoot.lds -o elfOSBoot.elf -Map elfOSBoot.map Boot/ARM/Boot_ZeroPage.o Kernel/Kernel_Init.o
-
 clean:
-	$(MAKE) -C Boot clean
-	$(MAKE) -C Kernel clean
+	$(MAKE) -C Headers clean
+	$(MAKE) -C Source clean
 	$(RM) -f *~ *.elf *.img *.map

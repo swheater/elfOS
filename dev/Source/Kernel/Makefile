@@ -3,18 +3,15 @@
 #
 
 CC      = arm-elf-gcc
-CCFLAGS = -I.
+CCFLAGS = -I../../Headers
 RM      = rm
 
-KERNEL_OBJS = Kernel_Init.o
+OBJS = Init.o
 
-all: Kernel_Init.o ELF32.o
+all: $(OBJS)
 
 .c.o:
 	$(CC) $(CCFLAGS) -c $<
-
-ELF32.o: ELF32.c
-	$(CC) $(CCFLAGS) -c ELF32.c
 
 clean:
 	$(RM) -f *~ *.o

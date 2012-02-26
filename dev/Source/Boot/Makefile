@@ -12,4 +12,4 @@ all-arm:
 
 clean:
 	$(MAKE) -C ARM clean
-	$(RM) -f *~ *.o
+	$(RM) -f *~

@@ -2,7 +2,7 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-#include <Kernel.h>
+#include <Kernel/Kernel.h>
 
 void kernel_init()
 {

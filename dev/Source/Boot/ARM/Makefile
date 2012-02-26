@@ -6,10 +6,10 @@ AS      = arm-elf-as
 ASFLAGS = 
 RM      = rm
 
-all: Boot_ZeroPage.o
+all: ZeroPage.o
 
-Boot_ZeroPage.o: Boot_ZeroPage.s
-	$(AS) $(ASFLAGS) -o Boot_ZeroPage.o Boot_ZeroPage.s
+ZeroPage.o: ZeroPage.s
+	$(AS) $(ASFLAGS) -o ZeroPage.o ZeroPage.s
 
 clean:
 	$(RM) -f *~ *.o

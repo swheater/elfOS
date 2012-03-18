@@ -32,6 +32,19 @@ typedef struct
     UnsignedWord16 sectionHeaderStringTableIndex;
 } ELF32Header;
 
+#define SECTIONHEADERTYPE_NULL 0
+#define SECTIONHEADERTYPE_PROGBITS 1
+#define SECTIONHEADERTYPE_SYMTAB 2
+#define SECTIONHEADERTYPE_STRTAB 3
+#define SECTIONHEADERTYPE_RELA 4
+#define SECTIONHEADERTYPE_HASH 5
+#define SECTIONHEADERTYPE_DYNAMIC 6
+#define SECTIONHEADERTYPE_NOTE 7
+#define SECTIONHEADERTYPE_NOBITS 8
+#define SECTIONHEADERTYPE_REL 9
+#define SECTIONHEADERTYPE_SHLIB 10
+#define SECTIONHEADERTYPE_DYNSYM 11
+
 typedef struct
 {
     UnsignedWord32 name;
@@ -90,5 +103,9 @@ typedef struct
         UnsignedWord32 pointer;
     } dynamicUnion;
 } ELF32Dynamic;
+
+extern int elf_validateELF32File(const char *elf32File, const unsigned int elf32FileSize);
+extern int elf_validateELF32Header(const ELF32Header *elf32Header);
+extern int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader);
 
 #endif

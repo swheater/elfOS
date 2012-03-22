@@ -3,7 +3,7 @@
 #
 
 CC      = arm-elf-gcc
-CCFLAGS = -I../../Headers
+CCFLAGS = -Wall -fpic -I../../Headers
 RM      = rm
 
 OBJS = ELF32.o

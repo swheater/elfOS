@@ -3,6 +3,7 @@
  */
 
 #include <Kernel/StdTypes.h>
+#include <Kernel/MemoryDomains.h>
 #include <ELF/ELF32.h>
 
 int elf_validateELF32File(const char *elf32File, const unsigned int elf32FileSize)
@@ -78,4 +79,9 @@ int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader)
     }
 
     return valid;
+}
+
+void elf_extractMemoryDomainInfos(const MemoryDomainInfo (*memoryDomainInfos)[], unsigned int *numberOfMemoryDomainInfos)
+{
+    *numberOfMemoryDomainInfos = 0;
 }

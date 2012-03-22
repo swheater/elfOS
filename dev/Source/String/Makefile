@@ -3,7 +3,7 @@
 #
 
 CC      = arm-elf-gcc
-CCFLAGS = -fno-hosted -fno-builtin
+CCFLAGS = -Wall -fpic -I../../Headers
 RM      = rm
 
 OBJS = String.o
@@ -11,7 +11,7 @@ OBJS = String.o
 all: $(OBJS)
 
 .c.o:
-	$(CC) $(CCFLAGS) -I../../Headers -fPIC -c $<
+	$(CC) $(CCFLAGS) -c $<
 
 clean:
 	$(RM) -f *~ *.o *.elf

@@ -6,6 +6,7 @@
  */
 
 #include <Kernel/StdTypes.h>
+#include <Kernel/MemoryDomains.h>
 
 #define ELF32_HEADER_MAGIC_LENGTH 4
 #define ELF32_HEADER_PADDING_LENGTH 9
@@ -107,5 +108,7 @@ typedef struct
 extern int elf_validateELF32File(const char *elf32File, const unsigned int elf32FileSize);
 extern int elf_validateELF32Header(const ELF32Header *elf32Header);
 extern int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader);
+
+extern void elf_extractMemoryDomainInfos(const MemoryDomainInfo (*memoryDomainInfos)[], unsigned int *numberOfMemoryDomainInfos);
 
 #endif

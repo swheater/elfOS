@@ -5,6 +5,10 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
+#define FALSE 0
+#define TRUE 1
+typedef unsigned char Boolean;
+
 typedef unsigned char       UnsignedByte;
 typedef char                SignedByte;
 typedef unsigned short      UnsignedWord16;

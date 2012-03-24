@@ -10,8 +10,8 @@
 typedef struct
 {
     UnsignedWord32 size;
-    SignedByte     writeable;
-    SignedByte     executable;
+    Boolean        writable;
+    Boolean        executable;
 } MemoryDomainInfo;
 
 #endif

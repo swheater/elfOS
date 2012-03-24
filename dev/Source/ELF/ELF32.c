@@ -56,22 +56,22 @@ int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader)
 
     switch (elf32SectionHeader->type)
     {
-        case SECTIONHEADERTYPE_NULL:
+        case ELF32_SECTIONHEADERTYPE_NULL:
             valid = 1; 
 	    break;
-        case SECTIONHEADERTYPE_PROGBITS:
+        case ELF32_SECTIONHEADERTYPE_PROGBITS:
             valid = 1; 
 	    break;
-        case SECTIONHEADERTYPE_SYMTAB:
+        case ELF32_SECTIONHEADERTYPE_SYMTAB:
             valid = 1; 
 	    break;
-        case SECTIONHEADERTYPE_STRTAB:
+        case ELF32_SECTIONHEADERTYPE_STRTAB:
             valid = 1; 
 	    break;
-        case SECTIONHEADERTYPE_NOBITS:
+        case ELF32_SECTIONHEADERTYPE_NOBITS:
             valid = 1; 
 	    break;
-        case SECTIONHEADERTYPE_REL:
+        case ELF32_SECTIONHEADERTYPE_REL:
             valid = 1; 
 	    break;
         default:
@@ -81,7 +81,29 @@ int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader)
     return valid;
 }
 
-void elf_extractMemoryDomainInfos(const MemoryDomainInfo (*memoryDomainInfos)[], unsigned int *numberOfMemoryDomainInfos)
+unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders)
+{
+    unsigned int numberOfMemoryDomainInfos = 0;
+
+    unsigned int elf32SectionHeaderIndex;
+    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
+        if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
+            numberOfMemoryDomainInfos++;
+
+    return numberOfMemoryDomainInfos;
+}
+
+void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders, MemoryDomainInfo memoryDomainInfos[], unsigned int *numberOfMemoryDomainInfos)
 {
     *numberOfMemoryDomainInfos = 0;
+
+    unsigned int elf32SectionHeaderIndex;
+    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
+        if (((elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (elf32SectionHeaders[elf32SectionHeaderIndex].size > 0))
+	{
+            memoryDomainInfos[*numberOfMemoryDomainInfos].size       = elf32SectionHeaders[elf32SectionHeaderIndex].size;
+            memoryDomainInfos[*numberOfMemoryDomainInfos].writable   = (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_WRITABLE) ? TRUE: FALSE;
+            memoryDomainInfos[*numberOfMemoryDomainInfos].executable = (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_EXECUTABLE) ? TRUE: FALSE;
+            (*numberOfMemoryDomainInfos)++;
+	}
 }

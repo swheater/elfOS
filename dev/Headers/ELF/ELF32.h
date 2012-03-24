@@ -33,18 +33,22 @@ typedef struct
     UnsignedWord16 sectionHeaderStringTableIndex;
 } ELF32Header;
 
-#define SECTIONHEADERTYPE_NULL 0
-#define SECTIONHEADERTYPE_PROGBITS 1
-#define SECTIONHEADERTYPE_SYMTAB 2
-#define SECTIONHEADERTYPE_STRTAB 3
-#define SECTIONHEADERTYPE_RELA 4
-#define SECTIONHEADERTYPE_HASH 5
-#define SECTIONHEADERTYPE_DYNAMIC 6
-#define SECTIONHEADERTYPE_NOTE 7
-#define SECTIONHEADERTYPE_NOBITS 8
-#define SECTIONHEADERTYPE_REL 9
-#define SECTIONHEADERTYPE_SHLIB 10
-#define SECTIONHEADERTYPE_DYNSYM 11
+#define ELF32_SECTIONHEADERTYPE_NULL 0
+#define ELF32_SECTIONHEADERTYPE_PROGBITS 1
+#define ELF32_SECTIONHEADERTYPE_SYMTAB 2
+#define ELF32_SECTIONHEADERTYPE_STRTAB 3
+#define ELF32_SECTIONHEADERTYPE_RELA 4
+#define ELF32_SECTIONHEADERTYPE_HASH 5
+#define ELF32_SECTIONHEADERTYPE_DYNAMIC 6
+#define ELF32_SECTIONHEADERTYPE_NOTE 7
+#define ELF32_SECTIONHEADERTYPE_NOBITS 8
+#define ELF32_SECTIONHEADERTYPE_REL 9
+#define ELF32_SECTIONHEADERTYPE_SHLIB 10
+#define ELF32_SECTIONHEADERTYPE_DYNSYM 11
+
+#define ELF32_SECTIONHEADERFLAG_WRITABLE 0x1
+#define ELF32_SECTIONHEADERFLAG_ALLOCATE 0x2
+#define ELF32_SECTIONHEADERFLAG_EXECUTABLE 0x4
 
 typedef struct
 {
@@ -109,6 +113,7 @@ extern int elf_validateELF32File(const char *elf32File, const unsigned int elf32
 extern int elf_validateELF32Header(const ELF32Header *elf32Header);
 extern int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader);
 
-extern void elf_extractMemoryDomainInfos(const MemoryDomainInfo (*memoryDomainInfos)[], unsigned int *numberOfMemoryDomainInfos);
+extern unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders);
+extern void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders, MemoryDomainInfo memoryDomainInfos[], unsigned int *numberOfMemoryDomainInfos);
 
 #endif

@@ -109,11 +109,12 @@ typedef struct
     } dynamicUnion;
 } ELF32Dynamic;
 
-extern int elf_validateELF32File(const char *elf32File, const unsigned int elf32FileSize);
+extern int elf_validateELF32(const char *elf32, unsigned int elf32Size);
 extern int elf_validateELF32Header(const ELF32Header *elf32Header);
 extern int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader);
 
 extern unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders);
 extern void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders, MemoryDomainInfo memoryDomainInfos[], unsigned int *numberOfMemoryDomainInfos);
+extern void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, UnsignedByte *sections[], unsigned int numberOfSections);
 
 #endif

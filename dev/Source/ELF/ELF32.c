@@ -6,14 +6,16 @@
 #include <Kernel/MemoryDomains.h>
 #include <ELF/ELF32.h>
 
-int elf_validateELF32File(const char *elf32File, const unsigned int elf32FileSize)
+#include <stdio.h>
+
+int elf_validateELF32(const char *elf32, const unsigned int elf32Size)
 {
     int valid;
 
-    ELF32Header *elf32Header = (ELF32Header*) elf32File;
+    ELF32Header *elf32Header = (ELF32Header*) elf32;
     valid =  elf_validateELF32Header(elf32Header);
 
-    ELF32SectionHeader *elf32SectionHeader = (ELF32SectionHeader*) (elf32File + elf32Header->sectionHeaderOffset);
+    ELF32SectionHeader *elf32SectionHeader = (ELF32SectionHeader*) (elf32 + elf32Header->sectionHeaderOffset);
     int elf32SectionHeaderIndex;
     for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < elf32Header->sectionHeaderEntryNumber; elf32SectionHeaderIndex++)
         valid &= elf_validateELF32SectionHeader(&elf32SectionHeader[elf32SectionHeaderIndex]);
@@ -58,22 +60,22 @@ int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader)
     {
         case ELF32_SECTIONHEADERTYPE_NULL:
             valid = 1; 
-	    break;
+            break;
         case ELF32_SECTIONHEADERTYPE_PROGBITS:
             valid = 1; 
-	    break;
+            break;
         case ELF32_SECTIONHEADERTYPE_SYMTAB:
             valid = 1; 
-	    break;
+            break;
         case ELF32_SECTIONHEADERTYPE_STRTAB:
             valid = 1; 
-	    break;
+            break;
         case ELF32_SECTIONHEADERTYPE_NOBITS:
             valid = 1; 
-	    break;
+            break;
         case ELF32_SECTIONHEADERTYPE_REL:
             valid = 1; 
-	    break;
+            break;
         default:
             valid = 0; 
     }
@@ -100,10 +102,41 @@ void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsi
     unsigned int elf32SectionHeaderIndex;
     for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
         if (((elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (elf32SectionHeaders[elf32SectionHeaderIndex].size > 0))
-	{
+        {
             memoryDomainInfos[*numberOfMemoryDomainInfos].size       = elf32SectionHeaders[elf32SectionHeaderIndex].size;
             memoryDomainInfos[*numberOfMemoryDomainInfos].writable   = (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_WRITABLE) ? TRUE: FALSE;
             memoryDomainInfos[*numberOfMemoryDomainInfos].executable = (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_EXECUTABLE) ? TRUE: FALSE;
             (*numberOfMemoryDomainInfos)++;
-	}
+        }
+}
+
+void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, UnsignedByte *sections[], unsigned int numberOfSections)
+{
+    unsigned int sectionIndex = 0;
+    unsigned int sectionHeaderMapping[numberOfELF32SectionHeaders];
+
+    unsigned int elf32SectionHeaderIndex;
+    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
+        if (((elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (elf32SectionHeaders[elf32SectionHeaderIndex].size > 0))
+        {
+            if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
+            {
+                printf("PROGBITS %d\n", sectionIndex);
+                printf("         %d\n", elf32SectionHeaders[elf32SectionHeaderIndex].size);
+                unsigned int index;
+                for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
+                    sections[sectionIndex][index] = elf32 + elf32SectionHeaders[elf32SectionHeaderIndex].offset + index;
+            }
+            else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
+            {
+                printf("NOBITS %d\n", sectionIndex);
+                printf("       %d\n", elf32SectionHeaders[elf32SectionHeaderIndex].size);
+                unsigned int index;
+                for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
+                    sections[sectionIndex][index] = 0;
+            }
+
+            sectionHeaderMapping[elf32SectionHeaderIndex] = sectionIndex; 
+            sectionIndex++;
+        }
 }

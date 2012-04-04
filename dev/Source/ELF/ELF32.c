@@ -125,7 +125,7 @@ void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF
                 printf("         %d\n", elf32SectionHeaders[elf32SectionHeaderIndex].size);
                 unsigned int index;
                 for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
-                    sections[sectionIndex][index] = elf32 + elf32SectionHeaders[elf32SectionHeaderIndex].offset + index;
+                    sections[sectionIndex][index] = elf32[elf32SectionHeaders[elf32SectionHeaderIndex].offset + index];
             }
             else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
             {
@@ -139,4 +139,23 @@ void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF
             sectionHeaderMapping[elf32SectionHeaderIndex] = sectionIndex; 
             sectionIndex++;
         }
+
+    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
+        if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_REL)
+        {
+            ELF32Rel *elf32Rel = (ELF32Rel*) &elf32[elf32SectionHeaders[elf32SectionHeaderIndex].offset];
+
+            unsigned int elf32RelIndex;
+            unsigned int numberOfELF32Rel = elf32SectionHeaders[elf32SectionHeaderIndex].size / elf32SectionHeaders[elf32SectionHeaderIndex].entrySize;
+            for (elf32RelIndex = 0; elf32RelIndex < numberOfELF32Rel; elf32RelIndex++)
+            {
+                printf("REL %d\n", elf32RelIndex);
+                printf("  offset %d\n", elf32Rel[elf32RelIndex].offset);
+                printf("  info   %d\n", elf32Rel[elf32RelIndex].info);
+                printf("    sym  %d\n", elf32Rel[elf32RelIndex].info >> 8);
+                printf("    type %d\n", elf32Rel[elf32RelIndex].info & 0xFF);
+            }    
+        }
+        else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_RELA)
+            printf("RELA %d\n", elf32SectionHeaderIndex);
 }

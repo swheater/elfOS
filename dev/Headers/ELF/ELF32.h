@@ -80,12 +80,20 @@ typedef struct
     UnsignedWord32 info;
 } ELF32Rel;
 
+#define ELF32_REL_SYM(i) ((i) > >8)
+#define ELF32_REL_TYPE(i) ((unsigned char) (i))
+#define ELF32_REL_INFO(s,t) (((s) << 8) + (unsigned char) (t))
+
 typedef struct
 {
     UnsignedWord32 offset;
     UnsignedWord32 info;
     SignedWord32   addend;
-} ELF32Rela;
+} ELF32RelA;
+
+#define ELF32_RELA_SYM(i) ((i) > >8)
+#define ELF32_RELA_TYPE(i) ((unsigned char) (i))
+#define ELF32_RELA_INFO(s,t) (((s) << 8) + (unsigned char) (t))
 
 typedef struct
 {
@@ -116,5 +124,7 @@ extern int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32Section
 extern unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders);
 extern void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders, MemoryDomainInfo memoryDomainInfos[], unsigned int *numberOfMemoryDomainInfos);
 extern void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, UnsignedByte *sections[], unsigned int numberOfSections);
+extern void elf_sectionRelocation(UnsignedByte *section, ELF32Rel rels[], unsigned int numberOfRels, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols);
+extern void elf_sectionRelocationA(UnsignedByte *section, ELF32RelA relAs[], unsigned int numberOfRelAs, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols);
 
 #endif

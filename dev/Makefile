@@ -2,10 +2,10 @@
 # Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-LD      = arm-elf-ld
+LD      = arm-none-eabi-ld
 LDFLAGS = 
-OBJCOPY = arm-elf-objcopy
-SIZE    = arm-elf-size
+OBJCOPY = arm-none-eabi-objcopy
+SIZE    = arm-none-eabi-size
 MAKE    = make
 RM      = rm
 

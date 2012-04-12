@@ -2,11 +2,11 @@
 # Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-CC      = arm-elf-gcc
+CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall -fpic -I../../Headers
 RM      = rm
 
-OBJS = ELF32.o
+OBJS = ELF32.o ELF32_ARM_EABI.o
 
 all: $(OBJS)
 

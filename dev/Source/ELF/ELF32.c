@@ -6,8 +6,6 @@
 #include <Kernel/MemoryDomains.h>
 #include <ELF/ELF32.h>
 
-#include <stdio.h>
-
 unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders)
 {
     unsigned int numberOfMemoryDomainInfos = 0;
@@ -37,6 +35,9 @@ void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsi
 
 void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, UnsignedByte *sections[], unsigned int numberOfSections)
 {
+    unsigned int sectionIndex = 0;
+    unsigned int sectionMapping[numberOfELF32SectionHeaders];
+
     unsigned int elf32SectionHeaderIndex;
     for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
         if (((elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (elf32SectionHeaders[elf32SectionHeaderIndex].size > 0))
@@ -45,15 +46,19 @@ void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF
             {
                 unsigned int index;
                 for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
-                    sections[elf32SectionHeaderIndex][index] = elf32[elf32SectionHeaders[elf32SectionHeaderIndex].offset + index];
+                    sections[sectionIndex][index] = elf32[elf32SectionHeaders[elf32SectionHeaderIndex].offset + index];
             }
             else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
             {
                 unsigned int index;
                 for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
-                    sections[elf32SectionHeaderIndex][index] = 0;
+                    sections[sectionIndex][index] = 0;
             }
+            sectionMapping[elf32SectionHeaderIndex] = sectionIndex;
+            sectionIndex++;
         }
+        else
+            sectionMapping[elf32SectionHeaderIndex] = 0;
 
     for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
         if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_REL)
@@ -66,7 +71,7 @@ void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF
             ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[elf32SectionHeaders[sectionHeader.link].offset];
             unsigned int     numberOfSymbols = elf32SectionHeaders[sectionHeader.link].size / elf32SectionHeaders[sectionHeader.link].entrySize;
 
-            elf_sectionRelocation(sections[sectionIndex], rels, numberOfRels, symbols, numberOfSymbols);
+            elf_sectionRelocation(sections[sectionMapping[sectionIndex]], rels, numberOfRels, symbols, numberOfSymbols);
         }
         else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_RELA)
         {
@@ -78,23 +83,6 @@ void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF
             ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[elf32SectionHeaders[sectionHeader.link].offset];
             unsigned int     numberOfSymbols = elf32SectionHeaders[sectionHeader.link].size / elf32SectionHeaders[sectionHeader.link].entrySize;
 
-            elf_sectionRelocationA(sections[sectionIndex], relAs, numberOfRelAs, symbols, numberOfSymbols);
+            elf_sectionRelocationA(sections[sectionMapping[sectionIndex]], relAs, numberOfRelAs, symbols, numberOfSymbols);
         }
-}
-
-void elf_sectionRelocation(UnsignedByte *section, ELF32Rel rels[], unsigned int numberOfRels, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols)
-{
-    int relIndex;
-    for (relIndex = 0; relIndex < numberOfRels; relIndex++)
-    {
-        printf("REL %d\n", relIndex);
-        printf("  offset %d\n", rels[relIndex].offset);
-        printf("  info   %d\n", rels[relIndex].info);
-        printf("    sym  %d\n", rels[relIndex].info >> 8);
-        printf("    type %d\n", rels[relIndex].info & 0xFF);
-    }
-}
-
-void elf_sectionRelocationA(UnsignedByte *section, ELF32RelA relAs[], unsigned int numberOfRelAs, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols)
-{
 }

@@ -7,6 +7,8 @@
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 
+#include <stdio.h>
+
 int elf_validateELF32(const char *elf32, const unsigned int elf32Size)
 {
     int valid;
@@ -82,7 +84,57 @@ int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader)
             break;
         default:
             valid = 0; 
+            break;
     }
 
     return valid;
+}
+
+Boolean elf_sectionRelocation(UnsignedByte *section, ELF32Rel rels[], unsigned int numberOfRels, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols)
+{
+    Boolean done = FALSE;
+
+    int relIndex;
+    for (relIndex = 0; relIndex < numberOfRels; relIndex++)
+    {
+        printf("REL %d\n", relIndex);
+        printf("  offset %d\n", rels[relIndex].offset);
+        printf("  info   %d\n", rels[relIndex].info);
+        printf("    sym  %d\n", rels[relIndex].info >> 8);
+        printf("    type %d\n", rels[relIndex].info & 0xFF);
+        
+        switch (ELF32_REL_TYPE(rels[relIndex].info))
+        {
+            case ELF32_RELOCATIONTYPE_ARM_EABI_NONE:
+                break;
+            case ELF32_RELOCATIONTYPE_ARM_EABI_ABS32:
+	    {
+	        UnsignedWord32 *addr = (UnsignedWord32*) section;
+	        UnsignedWord32 word  = addr[rels[relIndex].offset / 4];
+                printf("  word   %x\n", word);
+                break;
+            }
+            case ELF32_RELOCATIONTYPE_ARM_EABI_REL32:
+                break;
+            case ELF32_RELOCATIONTYPE_ARM_EABI_CALL:
+	    {
+	        UnsignedWord32 *addr = (UnsignedWord32*) section;
+	        UnsignedWord32 word  = addr[rels[relIndex].offset / 4];
+                printf("  word   %x\n", word);
+                break;
+            }
+            case ELF32_RELOCATIONTYPE_ARM_EABI_V4BX:
+                break;
+            default:
+                
+                break;
+        }
+    }
+
+    return done;
+}
+
+Boolean elf_sectionRelocationA(UnsignedByte *section, ELF32RelA relAs[], unsigned int numberOfRelAs, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols)
+{
+    return FALSE;
 }

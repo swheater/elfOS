@@ -1,5 +1,5 @@
-#ifndef _KERNEL_MEMORYDOMAINS
-#define _KERNEL_MEMORYDOMAINS 1
+#ifndef _KERNEL_VIRTUALMEMORY
+#define _KERNEL_VIRTUALMEMORY 1
 
 /*
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
@@ -12,6 +12,12 @@ typedef struct
     UnsignedWord32 size;
     Boolean        writable;
     Boolean        executable;
-} MemoryDomainInfo;
+} VirtualMemorySegmentInfo;
+
+typedef struct
+{
+    UnsignedByte *physicalAddress;
+    UnsignedByte *virtualAddress;
+} VirtualMemorySegment;
 
 #endif

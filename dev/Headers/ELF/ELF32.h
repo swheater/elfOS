@@ -6,10 +6,10 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <Kernel/MemoryDomains.h>
+#include <Kernel/VirtualMemory.h>
 
-#define ELF32_HEADER_MAGIC_LENGTH 4
-#define ELF32_HEADER_PADDING_LENGTH 9
+#define ELF32_HEADER_MAGIC_LENGTH (4)
+#define ELF32_HEADER_PADDING_LENGTH (9)
 
 typedef struct
 {
@@ -33,22 +33,30 @@ typedef struct
     UnsignedWord16 sectionHeaderStringTableIndex;
 } ELF32Header;
 
-#define ELF32_SECTIONHEADERTYPE_NULL 0
-#define ELF32_SECTIONHEADERTYPE_PROGBITS 1
-#define ELF32_SECTIONHEADERTYPE_SYMTAB 2
-#define ELF32_SECTIONHEADERTYPE_STRTAB 3
-#define ELF32_SECTIONHEADERTYPE_RELA 4
-#define ELF32_SECTIONHEADERTYPE_HASH 5
-#define ELF32_SECTIONHEADERTYPE_DYNAMIC 6
-#define ELF32_SECTIONHEADERTYPE_NOTE 7
-#define ELF32_SECTIONHEADERTYPE_NOBITS 8
-#define ELF32_SECTIONHEADERTYPE_REL 9
-#define ELF32_SECTIONHEADERTYPE_SHLIB 10
-#define ELF32_SECTIONHEADERTYPE_DYNSYM 11
+#define ELF32_SECTIONHEADERINDEX_UNDEF (0x0000)
+#define ELF32_SECTIONHEADERINDEX_LOWRESERVE (0xFF00)
+#define ELF32_SECTIONHEADERINDEX_LOwPROC (0xFF00)
+#define ELF32_SECTIONHEADERINDEX_HIGHPROC (0xFF1F)
+#define ELF32_SECTIONHEADERINDEX_ABSOLUTE (0xFFF1)
+#define ELF32_SECTIONHEADERINDEX_COMMON (0xFFF2)
+#define ELF32_SECTIONHEADERINDEX_HIGHRESERVE (0xFFFF)
 
-#define ELF32_SECTIONHEADERFLAG_WRITABLE 0x1
-#define ELF32_SECTIONHEADERFLAG_ALLOCATE 0x2
-#define ELF32_SECTIONHEADERFLAG_EXECUTABLE 0x4
+#define ELF32_SECTIONHEADERTYPE_NULL (0)
+#define ELF32_SECTIONHEADERTYPE_PROGBITS (1)
+#define ELF32_SECTIONHEADERTYPE_SYMTAB (2)
+#define ELF32_SECTIONHEADERTYPE_STRTAB (3)
+#define ELF32_SECTIONHEADERTYPE_RELA (4)
+#define ELF32_SECTIONHEADERTYPE_HASH (5)
+#define ELF32_SECTIONHEADERTYPE_DYNAMIC (6)
+#define ELF32_SECTIONHEADERTYPE_NOTE (7)
+#define ELF32_SECTIONHEADERTYPE_NOBITS (8)
+#define ELF32_SECTIONHEADERTYPE_REL (9)
+#define ELF32_SECTIONHEADERTYPE_SHLIB (10)
+#define ELF32_SECTIONHEADERTYPE_DYNSYM (11)
+
+#define ELF32_SECTIONHEADERFLAG_WRITABLE (0x1)
+#define ELF32_SECTIONHEADERFLAG_ALLOCATE (0x2)
+#define ELF32_SECTIONHEADERFLAG_EXECUTABLE (0x4)
 
 typedef struct
 {
@@ -64,6 +72,12 @@ typedef struct
     UnsignedWord32 entrySize;
 } ELF32SectionHeader;
 
+#define ELF32_SYMBOLTYPE_NOTYPE (0)
+#define ELF32_SYMBOLTYPE_OBJECT (1)
+#define ELF32_SYMBOLTYPE_FUNCTION (2)
+#define ELF32_SYMBOLTYPE_SECTION (3)
+#define ELF32_SYMBOLTYPE_FILE (4)
+
 typedef struct
 {
     UnsignedWord32 name;
@@ -74,13 +88,17 @@ typedef struct
     UnsignedWord16 sectionHeaderTableIndex;
 } ELF32SymbolEntry;
 
+#define ELF32_SYMBOL_BINDING(i) ((i) >> 4)
+#define ELF32_SYMBOL_TYPE(i) ((i) & 0x0F)
+#define ELF32_SYMBOL_INFO(b,t) (((b) << 4) + ((t) & 0x0F))
+
 typedef struct
 {
     UnsignedWord32 offset;
     UnsignedWord32 info;
 } ELF32Rel;
 
-#define ELF32_REL_SYM(i) ((UnsignedByte ((i) >> 8))
+#define ELF32_REL_SYMBOL(i) ((UnsignedByte) ((i) >> 8))
 #define ELF32_REL_TYPE(i) ((UnsignedByte) ((i) & 0xFF))
 #define ELF32_REL_INFO(s,t) (((s) << 8) + ((t) & 0xFF))
 
@@ -91,7 +109,7 @@ typedef struct
     SignedWord32   addend;
 } ELF32RelA;
 
-#define ELF32_RELA_SYM(i) ((i) > >8)
+#define ELF32_RELA_SYM(i) ((i) >> 8)
 #define ELF32_RELA_TYPE(i) ((unsigned char) (i))
 #define ELF32_RELA_INFO(s,t) (((s) << 8) + (unsigned char) (t))
 
@@ -117,14 +135,8 @@ typedef struct
     } dynamicUnion;
 } ELF32Dynamic;
 
-extern int elf_validateELF32(const char *elf32, unsigned int elf32Size);
-extern int elf_validateELF32Header(const ELF32Header *elf32Header);
-extern int elf_validateELF32SectionHeader(const ELF32SectionHeader *elf32SectionHeader);
-
-extern unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders);
-extern void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders, MemoryDomainInfo memoryDomainInfos[], unsigned int *numberOfMemoryDomainInfos);
-extern void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, UnsignedByte *sections[], unsigned int numberOfSections);
-extern Boolean elf_sectionRelocation(UnsignedByte *section, ELF32Rel rels[], unsigned int numberOfRels, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols);
-extern Boolean elf_sectionRelocationA(UnsignedByte *section, ELF32RelA relAs[], unsigned int numberOfRelAs, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols);
+extern unsigned int elf32_numberOfVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders);
+extern void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, VirtualMemorySegmentInfo virtualMemorySegmentInfos[], unsigned int *numberOfVirtualMemorySegmentInfos);
+extern void elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments);
 
 #endif

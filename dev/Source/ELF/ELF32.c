@@ -3,86 +3,87 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <Kernel/MemoryDomains.h>
+#include <Kernel/VirtualMemory.h>
 #include <ELF/ELF32.h>
+#include <ELF/ELF32_ARM_EABI.h>
 
-unsigned int elf_numberOfMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders)
+unsigned int elf32_numberOfVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders)
 {
     unsigned int numberOfMemoryDomainInfos = 0;
 
-    unsigned int elf32SectionHeaderIndex;
-    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
-        if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
+    unsigned int sectionHeaderIndex;
+    for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
+        if (((sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (sectionHeaders[sectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (sectionHeaders[sectionHeaderIndex].size > 0))
             numberOfMemoryDomainInfos++;
 
     return numberOfMemoryDomainInfos;
 }
 
-void elf_extractMemoryDomainInfos(ELF32SectionHeader elf32SectionHeaders[], unsigned int numberOfELF32SectionHeaders, MemoryDomainInfo memoryDomainInfos[], unsigned int *numberOfMemoryDomainInfos)
+void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, VirtualMemorySegmentInfo virtualMemorySegmentInfos[], unsigned int *numberOfVirtualMemorySegmentInfos)
 {
-    *numberOfMemoryDomainInfos = 0;
+    *numberOfVirtualMemorySegmentInfos = 0;
 
-    unsigned int elf32SectionHeaderIndex;
-    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
-        if (((elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (elf32SectionHeaders[elf32SectionHeaderIndex].size > 0))
+    unsigned int sectionHeaderIndex;
+    for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
+        if (((sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (sectionHeaders[sectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (sectionHeaders[sectionHeaderIndex].size > 0))
         {
-            memoryDomainInfos[*numberOfMemoryDomainInfos].size       = elf32SectionHeaders[elf32SectionHeaderIndex].size;
-            memoryDomainInfos[*numberOfMemoryDomainInfos].writable   = (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_WRITABLE) ? TRUE: FALSE;
-            memoryDomainInfos[*numberOfMemoryDomainInfos].executable = (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_EXECUTABLE) ? TRUE: FALSE;
-            (*numberOfMemoryDomainInfos)++;
+            virtualMemorySegmentInfos[*numberOfVirtualMemorySegmentInfos].size       = sectionHeaders[sectionHeaderIndex].size;
+            virtualMemorySegmentInfos[*numberOfVirtualMemorySegmentInfos].writable   = (sectionHeaders[sectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_WRITABLE) ? TRUE: FALSE;
+            virtualMemorySegmentInfos[*numberOfVirtualMemorySegmentInfos].executable = (sectionHeaders[sectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_EXECUTABLE) ? TRUE: FALSE;
+            (*numberOfVirtualMemorySegmentInfos)++;
         }
 }
 
-void elf_sectionsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *elf32SectionHeaders, unsigned int numberOfELF32SectionHeaders, UnsignedByte *sections[], unsigned int numberOfSections)
+void elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
 {
     unsigned int sectionIndex = 0;
-    unsigned int sectionMapping[numberOfELF32SectionHeaders];
+    unsigned int sectionMapping[numberOfSectionHeaders];
 
-    unsigned int elf32SectionHeaderIndex;
-    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
-        if (((elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (elf32SectionHeaders[elf32SectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (elf32SectionHeaders[elf32SectionHeaderIndex].size > 0))
+    unsigned int sectionHeaderIndex;
+    for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
+        if (((sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (sectionHeaders[sectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (sectionHeaders[sectionHeaderIndex].size > 0))
         {
-            if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
+            if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
             {
                 unsigned int index;
-                for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
-                    sections[sectionIndex][index] = elf32[elf32SectionHeaders[elf32SectionHeaderIndex].offset + index];
+                for (index = 0; index < sectionHeaders[sectionHeaderIndex].size; index++)
+                    virtualMemorySegments[sectionIndex].physicalAddress[index] = elf32[sectionHeaders[sectionHeaderIndex].offset + index];
             }
-            else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
+            else if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
             {
                 unsigned int index;
-                for (index = 0; index < elf32SectionHeaders[elf32SectionHeaderIndex].size; index++)
-                    sections[sectionIndex][index] = 0;
+                for (index = 0; index < sectionHeaders[sectionHeaderIndex].size; index++)
+                    virtualMemorySegments[sectionIndex].physicalAddress[index] = 0;
             }
-            sectionMapping[elf32SectionHeaderIndex] = sectionIndex;
+            sectionMapping[sectionHeaderIndex] = sectionIndex;
             sectionIndex++;
         }
         else
-            sectionMapping[elf32SectionHeaderIndex] = 0;
+            sectionMapping[sectionHeaderIndex] = 0;
 
-    for (elf32SectionHeaderIndex = 0; elf32SectionHeaderIndex < numberOfELF32SectionHeaders; elf32SectionHeaderIndex++)
-        if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_REL)
+    for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
+        if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_REL)
         {
-            ELF32SectionHeader sectionHeader = elf32SectionHeaders[elf32SectionHeaderIndex];
+            ELF32SectionHeader sectionHeader = sectionHeaders[sectionHeaderIndex];
 
             ELF32Rel         *rels           = (ELF32Rel*) &elf32[sectionHeader.offset];
             unsigned int     numberOfRels    = sectionHeader.size / sectionHeader.entrySize;
             unsigned int     sectionIndex    = sectionHeader.info;
-            ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[elf32SectionHeaders[sectionHeader.link].offset];
-            unsigned int     numberOfSymbols = elf32SectionHeaders[sectionHeader.link].size / elf32SectionHeaders[sectionHeader.link].entrySize;
+            ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[sectionHeaders[sectionHeader.link].offset];
+            unsigned int     numberOfSymbols = sectionHeaders[sectionHeader.link].size / sectionHeaders[sectionHeader.link].entrySize;
 
-            elf_sectionRelocation(sections[sectionMapping[sectionIndex]], rels, numberOfRels, symbols, numberOfSymbols);
+            elf32_sectionRelocation(virtualMemorySegments[sectionMapping[sectionIndex]], rels, numberOfRels, symbols, numberOfSymbols);
         }
-        else if (elf32SectionHeaders[elf32SectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_RELA)
+        else if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_RELA)
         {
-            ELF32SectionHeader sectionHeader = elf32SectionHeaders[elf32SectionHeaderIndex];
+            ELF32SectionHeader sectionHeader = sectionHeaders[sectionHeaderIndex];
 
             ELF32RelA        *relAs          = (ELF32RelA*) &elf32[sectionHeader.offset];
             unsigned int     numberOfRelAs   = sectionHeader.size / sectionHeader.entrySize;
             unsigned int     sectionIndex    = sectionHeader.info;
-            ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[elf32SectionHeaders[sectionHeader.link].offset];
-            unsigned int     numberOfSymbols = elf32SectionHeaders[sectionHeader.link].size / elf32SectionHeaders[sectionHeader.link].entrySize;
+            ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[sectionHeaders[sectionHeader.link].offset];
+            unsigned int     numberOfSymbols = sectionHeaders[sectionHeader.link].size / sectionHeaders[sectionHeader.link].entrySize;
 
-            elf_sectionRelocationA(sections[sectionMapping[sectionIndex]], relAs, numberOfRelAs, symbols, numberOfSymbols);
+            elf32_sectionRelocationA(virtualMemorySegments[sectionMapping[sectionIndex]], relAs, numberOfRelAs, symbols, numberOfSymbols);
         }
 }

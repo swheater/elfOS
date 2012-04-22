@@ -18,4 +18,11 @@
 #define ELF32_RELOCATIONTYPE_ARM_EABI_CALL  28
 #define ELF32_RELOCATIONTYPE_ARM_EABI_V4BX  40
 
+extern int elf32_validate(const char *elf32, unsigned int elf32Size);
+extern int elf32_validateHeader(const ELF32Header *elf32Header);
+extern int elf32_validateSectionHeader(const ELF32SectionHeader *elf32SectionHeader);
+
+extern Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32Rel rels[], unsigned int numberOfRels, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols);
+extern Boolean elf32_sectionRelocationA(VirtualMemorySegment virtualMemorySegment, ELF32RelA relAs[], unsigned int numberOfRelAs, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols);
+
 #endif

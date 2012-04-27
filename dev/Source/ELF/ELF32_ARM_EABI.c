@@ -106,8 +106,7 @@ Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32
             case ELF32_RELOCATIONTYPE_ARM_EABI_ABS32:
             {
                 printf("  offset %d\n", rels[relIndex].offset);
-                UnsignedWord32 *addr = (UnsignedWord32*) virtualMemorySegment.physicalAddress;
-                UnsignedWord32 word  = addr[rels[relIndex].offset / 4];
+                UnsignedWord32 word = *(UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
                 printf("      word    %x\n", word);
                 printf("  sym  %d\n", ELF32_REL_SYMBOL(rels[relIndex].info));
                 ELF32SymbolEntry symbol = symbols[ELF32_REL_SYMBOL(rels[relIndex].info)];
@@ -118,17 +117,19 @@ Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32
                 printf("        type    %d\n", ELF32_SYMBOL_TYPE(symbol.info));
                 printf("      other   %d\n", symbol.other);
                 printf("      shtI    %d\n", symbol.sectionHeaderTableIndex);
-                done = TRUE;
+
+                if (ELF32_SYMBOL_TYPE(symbol.info) == ELF32_SYMBOLTYPE_SECTION)
+	        {
+                    done = TRUE;
+		}
                 break;
             }
             case ELF32_RELOCATIONTYPE_ARM_EABI_REL32:
                 break;
             case ELF32_RELOCATIONTYPE_ARM_EABI_CALL:
             {
-                UnsignedWord32 *addr = (UnsignedWord32*) virtualMemorySegment.physicalAddress;
-                UnsignedWord32 word  = addr[rels[relIndex].offset / 4];
+                UnsignedWord32 word = *(UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
                 printf("  word   %x\n", word);
-                done = FALSE;
                 break;
             }
             case ELF32_RELOCATIONTYPE_ARM_EABI_V4BX:

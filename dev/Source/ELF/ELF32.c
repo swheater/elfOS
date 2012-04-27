@@ -34,7 +34,7 @@ void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[],
         }
 }
 
-void elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
+Boolean elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
 {
     unsigned int sectionIndex = 0;
     unsigned int sectionMapping[numberOfSectionHeaders];
@@ -61,6 +61,7 @@ void elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const E
         else
             sectionMapping[sectionHeaderIndex] = 0;
 
+    Boolean valid = TRUE; 
     for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
         if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_REL)
         {
@@ -68,11 +69,11 @@ void elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const E
 
             ELF32Rel         *rels           = (ELF32Rel*) &elf32[sectionHeader.offset];
             unsigned int     numberOfRels    = sectionHeader.size / sectionHeader.entrySize;
-            unsigned int     sectionIndex    = sectionHeader.info;
+            unsigned int     segmentIndex    = sectionHeader.info;
             ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[sectionHeaders[sectionHeader.link].offset];
             unsigned int     numberOfSymbols = sectionHeaders[sectionHeader.link].size / sectionHeaders[sectionHeader.link].entrySize;
 
-            elf32_sectionRelocation(virtualMemorySegments[sectionMapping[sectionIndex]], rels, numberOfRels, symbols, numberOfSymbols);
+            valid &= elf32_sectionRelocation(virtualMemorySegments[sectionMapping[segmentIndex]], rels, numberOfRels, symbols, numberOfSymbols);
         }
         else if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_RELA)
         {
@@ -80,10 +81,12 @@ void elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const E
 
             ELF32RelA        *relAs          = (ELF32RelA*) &elf32[sectionHeader.offset];
             unsigned int     numberOfRelAs   = sectionHeader.size / sectionHeader.entrySize;
-            unsigned int     sectionIndex    = sectionHeader.info;
+            unsigned int     segmentIndex    = sectionHeader.info;
             ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[sectionHeaders[sectionHeader.link].offset];
             unsigned int     numberOfSymbols = sectionHeaders[sectionHeader.link].size / sectionHeaders[sectionHeader.link].entrySize;
 
-            elf32_sectionRelocationA(virtualMemorySegments[sectionMapping[sectionIndex]], relAs, numberOfRelAs, symbols, numberOfSymbols);
+            valid &= elf32_sectionRelocationA(virtualMemorySegments[sectionMapping[segmentIndex]], relAs, numberOfRelAs, symbols, numberOfSymbols);
         }
+
+    return valid;
 }

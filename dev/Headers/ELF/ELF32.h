@@ -98,7 +98,7 @@ typedef struct
     UnsignedWord32 info;
 } ELF32Rel;
 
-#define ELF32_REL_SYMBOL(i) ((UnsignedByte) ((i) >> 8))
+#define ELF32_REL_SYMBOL(i) ((i) >> 8)
 #define ELF32_REL_TYPE(i) ((UnsignedByte) ((i) & 0xFF))
 #define ELF32_REL_INFO(s,t) (((s) << 8) + ((t) & 0xFF))
 
@@ -110,8 +110,8 @@ typedef struct
 } ELF32RelA;
 
 #define ELF32_RELA_SYM(i) ((i) >> 8)
-#define ELF32_RELA_TYPE(i) ((unsigned char) (i))
-#define ELF32_RELA_INFO(s,t) (((s) << 8) + (unsigned char) (t))
+#define ELF32_RELA_TYPE(i) ((UnsignedByte) (i))
+#define ELF32_RELA_INFO(s,t) (((s) << 8) + (UnsignedByte) (t))
 
 typedef struct
 {

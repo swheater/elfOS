@@ -7,8 +7,6 @@
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 
-#include <stdio.h>
-
 int elf32_validate(const char *elf32, const unsigned int elf32Size)
 {
     int valid;
@@ -90,46 +88,31 @@ int elf32_validateSectionHeader(const ELF32SectionHeader *elf32SectionHeader)
     return valid;
 }
 
-Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32Rel rels[], unsigned int numberOfRels, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols)
+Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32Rel rels[], unsigned int numberOfRels, UnsignedWord32 symbolValues[], unsigned int numberOfSymbolValues)
 {
     Boolean done = FALSE;
 
     int relIndex;
     for (relIndex = 0; relIndex < numberOfRels; relIndex++)
     {
-        printf("REL %d, type %d\n", relIndex, ELF32_REL_TYPE(rels[relIndex].info));
-        
         switch (ELF32_REL_TYPE(rels[relIndex].info))
         {
             case ELF32_RELOCATIONTYPE_ARM_EABI_NONE:
                 break;
             case ELF32_RELOCATIONTYPE_ARM_EABI_ABS32:
             {
-                printf("  offset %d\n", rels[relIndex].offset);
-                UnsignedWord32 word = *(UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
-                printf("      word    %x\n", word);
-                printf("  sym  %d\n", ELF32_REL_SYMBOL(rels[relIndex].info));
-                ELF32SymbolEntry symbol = symbols[ELF32_REL_SYMBOL(rels[relIndex].info)];
-                printf("      value   %d\n", symbol.value);
-                printf("      size    %d\n", symbol.size);
-                printf("      info    %d\n", symbol.info);
-                printf("        binding %d\n", ELF32_SYMBOL_BINDING(symbol.info));
-                printf("        type    %d\n", ELF32_SYMBOL_TYPE(symbol.info));
-                printf("      other   %d\n", symbol.other);
-                printf("      shtI    %d\n", symbol.sectionHeaderTableIndex);
-
-                if (ELF32_SYMBOL_TYPE(symbol.info) == ELF32_SYMBOLTYPE_SECTION)
-	        {
-                    done = TRUE;
-		}
+                virtualMemorySegment.physicalAddress[rels[relIndex].offset] += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)];
+                done = TRUE;
                 break;
             }
             case ELF32_RELOCATIONTYPE_ARM_EABI_REL32:
+                virtualMemorySegment.physicalAddress[rels[relIndex].offset] += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) virtualMemorySegment.physicalAddress;
+                done = TRUE;
                 break;
             case ELF32_RELOCATIONTYPE_ARM_EABI_CALL:
             {
-                UnsignedWord32 word = *(UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
-                printf("  word   %x\n", word);
+                virtualMemorySegment.physicalAddress[rels[relIndex].offset] += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) virtualMemorySegment.physicalAddress;
+                done = TRUE;
                 break;
             }
             case ELF32_RELOCATIONTYPE_ARM_EABI_V4BX:
@@ -142,7 +125,7 @@ Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32
     return done;
 }
 
-Boolean elf32_sectionRelocationA(VirtualMemorySegment virtualMemorySegment, ELF32RelA relAs[], unsigned int numberOfRelAs, ELF32SymbolEntry symbols[], unsigned int numberOfSymbols)
+Boolean elf32_sectionRelocationA(VirtualMemorySegment virtualMemorySegment, ELF32RelA relAs[], unsigned int numberOfRelAs, UnsignedWord32 symbolValues[], unsigned int numberOfSymbolValues)
 {
     return FALSE;
 }

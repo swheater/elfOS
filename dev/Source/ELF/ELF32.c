@@ -77,7 +77,7 @@ Boolean elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, cons
             unsigned int symbolIndex;
             for (symbolIndex = 0; symbolIndex < numberOfSymbolValues; symbolIndex++)
                 if (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE)
-                    symbolValues[symbolIndex] = &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
+                    symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
                 else
                     symbolValues[symbolIndex] = 0;
 
@@ -97,7 +97,7 @@ Boolean elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, cons
             unsigned int symbolIndex;
             for (symbolIndex = 0; symbolIndex < numberOfSymbolValues; symbolIndex++)
                 if (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE)
-                    symbolValues[symbolIndex] = &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
+                    symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
                 else
                     symbolValues[symbolIndex] = 0;
 

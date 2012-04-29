@@ -9,7 +9,7 @@ SIZE    = arm-none-eabi-size
 MAKE    = make
 RM      = rm
 
-OBJS = Source/Boot/ARM/ZeroPage.o Source/Kernel/Init.o Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o Source/String/String.o
+OBJS = Source/Boot/ARM/ZeroPage.o Source/Kernel/Init.o Source/StdLibrary/AEABI.o Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o Source/String/String.o
 
 all: elfOSBoot.img
 	$(SIZE) elfOSBoot.elf

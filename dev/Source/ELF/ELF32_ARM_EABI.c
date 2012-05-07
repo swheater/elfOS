@@ -101,17 +101,22 @@ Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32
                 break;
             case ELF32_RELOCATIONTYPE_ARM_EABI_ABS32:
             {
-                virtualMemorySegment.physicalAddress[rels[relIndex].offset] += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)];
+                UnsignedWord32 *relAddr = (UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
+		*relAddr += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)];
                 done = TRUE;
                 break;
             }
             case ELF32_RELOCATIONTYPE_ARM_EABI_REL32:
-                virtualMemorySegment.physicalAddress[rels[relIndex].offset] += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) virtualMemorySegment.physicalAddress;
+	    {
+                UnsignedWord32 *relAddr = (UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
+		*relAddr += (symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) relAddr) / 4;
                 done = TRUE;
                 break;
+	    }
             case ELF32_RELOCATIONTYPE_ARM_EABI_CALL:
             {
-                virtualMemorySegment.physicalAddress[rels[relIndex].offset] += symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) virtualMemorySegment.physicalAddress;
+                UnsignedWord32 *relAddr = (UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
+                *relAddr += (symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) relAddr) / 4;
                 done = TRUE;
                 break;
             }

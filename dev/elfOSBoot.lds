@@ -9,10 +9,16 @@ SECTIONS
 	{
 		* (.text);
 	}
+	.rodata :
+	{
+		* (.rodata);
+	}
 	.data :
 	{
 		* (.data);
 	}
+        _elf32Appl = .;
+        . += 0x00004000;
 	.bss :
 	{
 		* (.bss);

@@ -3,4 +3,4 @@
 QEMU_DIR=/opt/qemu-1.0.1/bin
 QEMU_SYSTEM_ARM=${QEMU_DIR}/qemu-system-arm
 
-${QEMU_SYSTEM_ARM} -cpu arm1176 -m 256m -display none -nographic -serial /dev/null -kernel elfOSBoot.img
+${QEMU_SYSTEM_ARM} -cpu arm1176 -m 256m -display none -nographic -serial /dev/null -kernel qa.img

@@ -3,10 +3,10 @@
 #
 
 CC      = arm-none-eabi-gcc
-CCFLAGS = -Wall -I../../Headers
+CCFLAGS = -Wall
 RM      = rm
 
-OBJS = Init.o
+OBJS = Test1Appl.o Test2Appl.o
 
 all: $(OBJS)
 

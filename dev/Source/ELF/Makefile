@@ -3,7 +3,7 @@
 #
 
 CC      = arm-none-eabi-gcc
-CCFLAGS = -Wall -fpic -I../../Headers
+CCFLAGS = -Wall -I../../Headers
 RM      = rm
 
 OBJS = ELF32.o ELF32_ARM_EABI.o

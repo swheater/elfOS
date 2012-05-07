@@ -4,6 +4,7 @@
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/VirtualMemory.h>
+#include <String/String.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 
@@ -34,7 +35,7 @@ void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[],
         }
 }
 
-Boolean elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
+Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
 {
     unsigned int sectionIndex = 0;
     unsigned int sectionMapping[numberOfSectionHeaders];
@@ -76,10 +77,12 @@ Boolean elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, cons
 
             unsigned int symbolIndex;
             for (symbolIndex = 0; symbolIndex < numberOfSymbolValues; symbolIndex++)
+	    {
                 if (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE)
                     symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
                 else
                     symbolValues[symbolIndex] = 0;
+	    }
 
             valid &= elf32_sectionRelocation(virtualMemorySegments[sectionMapping[segmentIndex]], rels, numberOfRels, symbolValues, numberOfSymbolValues);
         }
@@ -105,4 +108,47 @@ Boolean elf32_segmentsInitialize(const char *elf32, unsigned int elf32Size, cons
         }
 
     return valid;
+}
+
+void* elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
+{
+    void (*func)(void) = 0;
+
+    unsigned int sectionIndex = 0;
+    unsigned int sectionMapping[numberOfSectionHeaders];
+
+    unsigned int sectionHeaderIndex;
+    for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
+        if (((sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS) || (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)) && (sectionHeaders[sectionHeaderIndex].flags & ELF32_SECTIONHEADERFLAG_ALLOCATE) && (sectionHeaders[sectionHeaderIndex].size > 0))
+        {
+            sectionMapping[sectionHeaderIndex] = sectionIndex;
+            sectionIndex++;
+        }
+        else
+            sectionMapping[sectionHeaderIndex] = 0;
+
+    for (sectionHeaderIndex = 0; sectionHeaderIndex < numberOfSectionHeaders; sectionHeaderIndex++)
+        if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_SYMTAB)
+        {
+            ELF32SectionHeader sectionHeader = sectionHeaders[sectionHeaderIndex];
+
+            ELF32SymbolEntry *symbolEntries      = (ELF32SymbolEntry*) &elf32[sectionHeader.offset];
+            unsigned int     numberOfSymbolEntry = sectionHeader.size / sectionHeader.entrySize;
+            const char       *stringTable        = &elf32[sectionHeaders[sectionHeader.link].offset];
+   
+            int symbolEntryIndex;
+            for (symbolEntryIndex = 0; symbolEntryIndex < numberOfSymbolEntry; symbolEntryIndex++)
+            {
+                ELF32SymbolEntry *symbolEntry = &symbolEntries[symbolEntryIndex];
+
+                if (ELF32_SYMBOL_TYPE(symbolEntry->info) == ELF32_SYMBOLTYPE_FUNCTION)
+                {
+                    const char *name = &stringTable[symbolEntry->name];
+                    if (string_equal(functionName, name))
+                        func = &(virtualMemorySegments[sectionMapping[symbolEntry->sectionHeaderTableIndex]].virtualAddress[symbolEntry->value]);
+                }
+            }
+        }
+
+    return func;
 }

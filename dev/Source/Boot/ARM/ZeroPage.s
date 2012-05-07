@@ -38,5 +38,5 @@ fastInterruptRequestHandler:
 
 	.bss
 
-	.space	1024
+	.space	32768
 stack:

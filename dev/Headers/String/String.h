@@ -5,6 +5,9 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
+#include <Kernel/StdTypes.h>
+
 extern unsigned int string_length(const char *string);
+extern Boolean string_equal(const char *string1, const char *string2);
 
 #endif

@@ -6,7 +6,7 @@ CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall
 RM      = rm
 
-OBJS = Test1Appl.o Test2Appl.o
+OBJS = Test1Appl.o Test2Appl.o Test3Appl.o
 
 all: $(OBJS)
 

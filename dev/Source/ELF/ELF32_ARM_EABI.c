@@ -116,7 +116,7 @@ Boolean elf32_sectionRelocation(VirtualMemorySegment virtualMemorySegment, ELF32
             case ELF32_RELOCATIONTYPE_ARM_EABI_CALL:
             {
                 UnsignedWord32 *relAddr = (UnsignedWord32*) &(virtualMemorySegment.physicalAddress[rels[relIndex].offset]);
-                *relAddr += (symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) relAddr) / 4;
+                *relAddr = (*relAddr & 0xFF000000) | ((*relAddr + (symbolValues[ELF32_REL_SYMBOL(rels[relIndex].info)] - (UnsignedWord32) relAddr) / 4) & 0x00FFFFFF);
                 done = TRUE;
                 break;
             }

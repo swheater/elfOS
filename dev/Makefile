@@ -20,7 +20,7 @@ elfOSBoot.elf elfOSBoot.map:
 	$(LD) $(LDFLAGS) -nostdlib -T elfOSBoot.lds -o elfOSBoot.elf -Map elfOSBoot.map $(OBJS)
 
 elfOSBoot.img: elfOSBoot.elf
-	$(OBJCOPY) -O binary --strip-all --strip-debug  elfOSBoot.elf elfOSBoot.img
+	$(OBJCOPY) -O binary elfOSBoot.elf elfOSBoot.img
 
 clean:
 	$(MAKE) -C Headers clean

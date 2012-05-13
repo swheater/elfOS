@@ -7,6 +7,7 @@
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/VirtualMemory.h>
+#include <Kernel/Symbol.h>
 
 #define ELF32_HEADER_MAGIC_LENGTH (4)
 #define ELF32_HEADER_PADDING_LENGTH (9)
@@ -143,6 +144,6 @@ typedef struct
 
 extern unsigned int elf32_numberOfVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders);
 extern void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, VirtualMemorySegmentInfo virtualMemorySegmentInfos[], unsigned int *numberOfVirtualMemorySegmentInfos);
-extern Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments);
-extern void (*elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments))(void);
+extern Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, Symbol globalSymbols[], unsigned int numberOfGlobalSymbols, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments);
+extern void (*elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments))(void);
 #endif

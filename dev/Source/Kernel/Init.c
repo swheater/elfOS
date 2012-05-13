@@ -4,7 +4,9 @@
 
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
+#include <Kernel/Symbol.h>
 #include <ELF/ELF32.h>
+#include <elfOS/Threading.h>
 
 extern char _elf32Appl;
 
@@ -23,6 +25,11 @@ void kernel_init()
 
     elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
 
+    unsigned int numberOfGlobalSymbols = 1;
+    Symbol       globalSymbols[numberOfGlobalSymbols];
+    globalSymbols[0].name  = "elfOS_yield";
+    globalSymbols[0].value = (UnsignedWord32) elfOS_yield;
+
     unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
     VirtualMemorySegment segments[numberOfSegments];
 
@@ -33,7 +40,7 @@ void kernel_init()
         segments[segmentIndex].virtualAddress  = (UnsignedByte*) (segmentIndex * 0x10000) + 0x40000;
     }
 
-    if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments))
+    if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))
     {
         res = 0x09;
 

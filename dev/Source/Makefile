@@ -11,6 +11,7 @@ all:
 	$(MAKE) -C ELF all
 	$(MAKE) -C String all
 	$(MAKE) -C StdLibrary all
+	$(MAKE) -C elfOS all
 
 clean:
 	$(MAKE) -C Boot clean
@@ -18,4 +19,5 @@ clean:
 	$(MAKE) -C ELF clean
 	$(MAKE) -C String clean
 	$(MAKE) -C StdLibrary clean
+	$(MAKE) -C elfOS clean
 	$(RM) -f *~

@@ -4,6 +4,7 @@
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/VirtualMemory.h>
+#include <Kernel/Symbol.h>
 #include <String/String.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
@@ -35,7 +36,41 @@ void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[],
         }
 }
 
-Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
+Boolean findGlobalSymbolValue(const char *symbolName, UnsignedWord32 *symbolValue, Symbol globalSymbols[], unsigned int numberOfGlobalSymbols)
+{
+    Boolean valid = FALSE;
+
+    unsigned int globalSymbolIndex;
+    for (globalSymbolIndex = 0; globalSymbolIndex < numberOfGlobalSymbols; globalSymbolIndex++)
+        if (string_equal(symbolName, (char*) globalSymbols[globalSymbolIndex].name))
+	{
+            *symbolValue = globalSymbols[globalSymbolIndex].value;
+            valid = TRUE;
+	}
+
+    return valid;
+}
+
+Boolean populateSymbolValues(UnsignedWord32 symbolValues[], unsigned int numberOfSymbolValues, ELF32SymbolEntry *symbols, const char* stringTable, unsigned int sectionMapping[], Symbol globalSymbols[], unsigned int numberOfGlobalSymbols, VirtualMemorySegment virtualMemorySegments[])
+{
+    Boolean valid = TRUE;
+
+    unsigned int symbolIndex;
+    for (symbolIndex = 0; symbolIndex < numberOfSymbolValues; symbolIndex++)
+        if ((ELF32_SYMBOL_BINDING(symbols[symbolIndex].info) == ELF32_SYMBOLBINDING_GLOBAL) && (symbols[symbolIndex].sectionHeaderTableIndex == ELF32_SECTIONHEADERINDEX_UNDEFINED))
+        {
+            const char *name = &stringTable[symbols[symbolIndex].name];
+	    valid &= findGlobalSymbolValue(name, &symbolValues[symbolIndex], globalSymbols, numberOfGlobalSymbols);
+        }
+        else if ((symbols[symbolIndex].sectionHeaderTableIndex != ELF32_SECTIONHEADERINDEX_UNDEFINED) && (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE))
+            symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
+        else
+            symbolValues[symbolIndex] = 0;
+
+    return valid;
+}
+
+Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, Symbol globalSymbols[], unsigned int numberOfGlobalSymbols, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
 {
     unsigned int sectionIndex = 0;
     unsigned int sectionMapping[numberOfSectionHeaders];
@@ -73,19 +108,10 @@ Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *se
             unsigned int     segmentIndex    = sectionHeader.info;
             unsigned int     numberOfSymbolValues = sectionHeaders[sectionHeader.link].size / sectionHeaders[sectionHeader.link].entrySize;
             UnsignedWord32   symbolValues[numberOfSymbolValues];
+            const char       *stringTable    = &elf32[sectionHeaders[sectionHeaders[sectionHeader.link].link].offset];
             ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[sectionHeaders[sectionHeader.link].offset];
 
-            unsigned int symbolIndex;
-            for (symbolIndex = 0; symbolIndex < numberOfSymbolValues; symbolIndex++)
-                if ((ELF32_SYMBOL_BINDING(symbols[symbolIndex].info) == ELF32_SYMBOLBINDING_GLOBAL) && (symbols[symbolIndex].sectionHeaderTableIndex == ELF32_SECTIONHEADERINDEX_UNDEFINED))
-                {
-                    symbolValues[symbolIndex] = 0x1111111;
-                    valid = FALSE;
-                }
-                else if ((symbols[symbolIndex].sectionHeaderTableIndex != ELF32_SECTIONHEADERINDEX_UNDEFINED) && (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE))
-                    symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
-                else
-                    symbolValues[symbolIndex] = 0;
+            valid &= populateSymbolValues(symbolValues, numberOfSymbolValues, symbols, stringTable, sectionMapping, globalSymbols, numberOfGlobalSymbols, virtualMemorySegments);
 
             valid &= elf32_sectionRelocation(virtualMemorySegments[sectionMapping[segmentIndex]], rels, numberOfRels, symbolValues, numberOfSymbolValues);
         }
@@ -98,19 +124,10 @@ Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *se
             unsigned int     segmentIndex    = sectionHeader.info;
             unsigned int     numberOfSymbolValues = sectionHeaders[sectionHeader.link].size / sectionHeaders[sectionHeader.link].entrySize;
             UnsignedWord32   symbolValues[numberOfSymbolValues];
+            const char       *stringTable    = &elf32[sectionHeaders[sectionHeaders[sectionHeader.link].link].offset];
             ELF32SymbolEntry *symbols        = (ELF32SymbolEntry*) &elf32[sectionHeaders[sectionHeader.link].offset];
 
-            unsigned int symbolIndex;
-            for (symbolIndex = 0; symbolIndex < numberOfSymbolValues; symbolIndex++)
-                if ((ELF32_SYMBOL_BINDING(symbols[symbolIndex].info) == ELF32_SYMBOLBINDING_GLOBAL) && (symbols[symbolIndex].sectionHeaderTableIndex == ELF32_SECTIONHEADERINDEX_UNDEFINED))
-                {
-                    symbolValues[symbolIndex] = 0x1111111;
-                    valid = FALSE;
-                }
-                else if ((symbols[symbolIndex].sectionHeaderTableIndex != ELF32_SECTIONHEADERINDEX_UNDEFINED) && (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE))
-                    symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
-                else
-                    symbolValues[symbolIndex] = 0;
+            valid &= populateSymbolValues(symbolValues, numberOfSymbolValues, symbols, stringTable, sectionMapping, globalSymbols, numberOfGlobalSymbols, virtualMemorySegments);
 
             valid &= elf32_sectionRelocationA(virtualMemorySegments[sectionMapping[segmentIndex]], relAs, numberOfRelAs, symbolValues, numberOfSymbolValues);
         }
@@ -118,7 +135,7 @@ Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *se
     return valid;
 }
 
-void (*elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments))(void)
+void (*elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments))(void)
 {
     void (*func)(void) = 0;
 

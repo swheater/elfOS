@@ -3,10 +3,10 @@
 #
 
 CC      = arm-none-eabi-gcc
-CCFLAGS = -Wall
+CCFLAGS = -Wall -I ../dev/Headers
 RM      = rm
 
-OBJS = Test1Appl.o Test2Appl.o Test3Appl.o Test4Appl.o
+OBJS = Test1Appl.o Test2Appl.o Test3Appl.o Test4Appl.o Test5Appl.o
 
 all: $(OBJS)
 

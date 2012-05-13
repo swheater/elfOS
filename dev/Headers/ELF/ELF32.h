@@ -33,7 +33,7 @@ typedef struct
     UnsignedWord16 sectionHeaderStringTableIndex;
 } ELF32Header;
 
-#define ELF32_SECTIONHEADERINDEX_UNDEF (0x0000)
+#define ELF32_SECTIONHEADERINDEX_UNDEFINED (0x0000)
 #define ELF32_SECTIONHEADERINDEX_LOWRESERVE (0xFF00)
 #define ELF32_SECTIONHEADERINDEX_LOwPROC (0xFF00)
 #define ELF32_SECTIONHEADERINDEX_HIGHPROC (0xFF1F)
@@ -71,6 +71,12 @@ typedef struct
     UnsignedWord32 addressAlign;
     UnsignedWord32 entrySize;
 } ELF32SectionHeader;
+
+#define ELF32_SYMBOLBINDING_LOCAL (0)
+#define ELF32_SYMBOLBINDING_GLOBAL (1)
+#define ELF32_SYMBOLBINDING_WEAK (2)
+#define ELF32_SYMBOLBINDING_LOPROC (13)
+#define ELF32_SYMBOLBINDING_HIPROC (15)
 
 #define ELF32_SYMBOLTYPE_NOTYPE (0)
 #define ELF32_SYMBOLTYPE_OBJECT (1)
@@ -138,5 +144,5 @@ typedef struct
 extern unsigned int elf32_numberOfVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders);
 extern void elf32_extractVirtualMemorySegmentInfos(ELF32SectionHeader sectionHeaders[], unsigned int numberOfSectionHeaders, VirtualMemorySegmentInfo virtualMemorySegmentInfos[], unsigned int *numberOfVirtualMemorySegmentInfos);
 extern Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments);
-extern void* elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments);
+extern void (*elf32_findFunction(const char *functionName, const char *elf32, const ELF32SectionHeader *sectionHeaders, unsigned int numberOfSectionHeaders, VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments))(void);
 #endif

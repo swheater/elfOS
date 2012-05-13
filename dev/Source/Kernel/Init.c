@@ -8,7 +8,7 @@
 
 extern char _elf32Appl;
 
-static Boolean res = -1;
+static int res = -1;
 
 void kernel_init()
 {
@@ -29,16 +29,25 @@ void kernel_init()
     int segmentIndex;
     for (segmentIndex = 0; segmentIndex < numberOfSegments; segmentIndex++)
     {
-        segments[segmentIndex].physicalAddress = (UnsignedByte*) ((segmentIndex + 2) * 0x10000);
-        segments[segmentIndex].virtualAddress  = (UnsignedByte*) ((segmentIndex + 2) * 0x10000);
+        segments[segmentIndex].physicalAddress = (UnsignedByte*) (segmentIndex * 0x10000) + 0x40000;
+        segments[segmentIndex].virtualAddress  = (UnsignedByte*) (segmentIndex * 0x10000) + 0x40000;
     }
 
-    res = elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments);
+    if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments))
+    {
+        res = 0x09;
 
-    void (*runFunction)(void) = elf32_findFunction("run", elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments);
+        void (*runFunction)(void) = elf32_findFunction("run", elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments);
 
-    if (runFunction != 0)
-        (*runFunction)();
+        if (runFunction != 0)
+	{
+            res = 0x19;
+            (*runFunction)();
+            res = 0x29;
+	}
+        else
+            res = 0x39;
+    }
     else
-        res = 99;
+        res = 0x49;
 }

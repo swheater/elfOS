@@ -12,12 +12,12 @@ RM      = rm
 OBJS = Source/Boot/ARM/ZeroPage.o Source/Kernel/Init.o Source/StdLibrary/AEABI.o Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o Source/String/String.o
 
 all: elfOSBoot.img
-	$(SIZE) elfOSBoot.elf
 
 elfOSBoot.elf elfOSBoot.map:
 	$(MAKE) -C Headers all
 	$(MAKE) -C Source all
 	$(LD) $(LDFLAGS) -nostdlib -T elfOSBoot.lds -o elfOSBoot.elf -Map elfOSBoot.map $(OBJS)
+	$(SIZE) elfOSBoot.elf
 
 elfOSBoot.img: elfOSBoot.elf
 	$(OBJCOPY) -O binary elfOSBoot.elf elfOSBoot.img

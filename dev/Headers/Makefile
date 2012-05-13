@@ -10,10 +10,12 @@ all:
 	$(MAKE) -C String all
 	$(MAKE) -C ELF all
 	$(MAKE) -C StdLibrary all
+	$(MAKE) -C elfOS all
 
 clean:
 	$(MAKE) -C Kernel clean
 	$(MAKE) -C String clean
 	$(MAKE) -C ELF clean
 	$(MAKE) -C StdLibrary clean
+	$(MAKE) -C elfOS clean
 	$(RM) -f *~

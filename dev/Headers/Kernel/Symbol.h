@@ -1,0 +1,16 @@
+#ifndef _KERNEL_SYMBOL
+#define _KERNEL_SYMBOL 1
+
+/*
+ * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+ */
+
+#include <Kernel/StdTypes.h>
+
+typedef struct
+{
+    UnsignedByte   *name;
+    UnsignedWord32 value;
+} Symbol;
+
+#endif

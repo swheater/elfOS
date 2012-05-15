@@ -6,10 +6,12 @@ AS      = arm-none-eabi-as
 ASFLAGS = 
 RM      = rm
 
-all: ZeroPage.o
+OBJS = Start.o ZeroPage.o
 
-ZeroPage.o: ZeroPage.s
-	$(AS) $(ASFLAGS) -o ZeroPage.o ZeroPage.s
+all: $(OBJS)
+
+.s.o:
+	$(AS) $(ASFLAGS) -o $@ $<
 
 clean:
 	$(RM) -f *~ *.o

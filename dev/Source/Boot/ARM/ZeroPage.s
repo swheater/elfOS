@@ -4,9 +4,10 @@
 
 	.text
 
-	.global	_start
+	.global	_zeroPageStart
+	.global	_zeroPageEnd
 
-_start:
+_zeroPageStart:
 	B	resetHandler
 	B	undefinedInstructionHandler
 	B	softwareInterruptHandler
@@ -17,10 +18,7 @@ _start:
 	B	fastInterruptRequestHandler
 
 resetHandler:
-	LDR	SP,=stack
-	BL	kernel_init
-stop:
-	B	stop
+	B	resetHandler
 undefinedInstructionHandler:
 	B	undefinedInstructionHandler
 softwareInterruptHandler:
@@ -35,8 +33,4 @@ interruptRequestHandler:
 	B	interruptRequestHandler
 fastInterruptRequestHandler:
 	B	fastInterruptRequestHandler
-
-	.bss
-
-	.space	32768
-stack:
+_zeroPageEnd:

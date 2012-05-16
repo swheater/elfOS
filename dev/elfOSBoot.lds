@@ -18,7 +18,8 @@ SECTIONS
 		* (.data);
 	}
         _elf32Appl = .;
-        . += 0x00014000;
+        . = ALIGN(0x10000);
+        . += 0x00010000;
 	.bss :
 	{
 		* (.bss);

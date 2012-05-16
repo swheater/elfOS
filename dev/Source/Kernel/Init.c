@@ -8,12 +8,19 @@
 #include <ELF/ELF32.h>
 #include <elfOS/Threading.h>
 
+extern char _zeroPageStart;
+extern char _zeroPageEnd;
 extern char _elf32Appl;
 
 static int res = -1;
 
 void kernel_init()
 {
+    char *zeroPageSource = &_zeroPageStart;
+    char *zeroPageDestination = 0x0;
+    while (zeroPageSource < &_zeroPageEnd)
+        *zeroPageDestination++ = *zeroPageSource++;
+
     const char* elf32 = &_elf32Appl;
 
     ELF32Header        *header                           = (ELF32Header*) elf32;

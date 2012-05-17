@@ -8,20 +8,20 @@
 #include <ELF/ELF32.h>
 #include <elfOS/Threading.h>
 
-extern char _zeroPageStart;
-extern char _zeroPageEnd;
-extern char _elf32Appl;
+extern char zeroPageStart;
+extern char zeroPageEnd;
+extern char elf32Appl;
 
 static int res = -1;
 
 void kernel_init()
 {
-    char *zeroPageSource = &_zeroPageStart;
+    char *zeroPageSource = &zeroPageStart;
     char *zeroPageDestination = 0x0;
-    while (zeroPageSource < &_zeroPageEnd)
+    while (zeroPageSource < &zeroPageEnd)
         *zeroPageDestination++ = *zeroPageSource++;
 
-    const char* elf32 = &_elf32Appl;
+    const char* elf32 = &elf32Appl;
 
     ELF32Header        *header                           = (ELF32Header*) elf32;
     ELF32SectionHeader *sectionHeaders                   = (ELF32SectionHeader*) &(elf32[header->sectionHeaderOffset]);
@@ -43,8 +43,8 @@ void kernel_init()
     int segmentIndex;
     for (segmentIndex = 0; segmentIndex < numberOfSegments; segmentIndex++)
     {
-        segments[segmentIndex].physicalAddress = (UnsignedByte*) (segmentIndex * 0x10000) + 0x40000;
-        segments[segmentIndex].virtualAddress  = (UnsignedByte*) (segmentIndex * 0x10000) + 0x40000;
+        segments[segmentIndex].physicalAddress = (UnsignedByte*) (segmentIndex * 0x10000) + 0x80000;
+        segments[segmentIndex].virtualAddress  = (UnsignedByte*) (segmentIndex * 0x10000) + 0x80000;
     }
 
     if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))

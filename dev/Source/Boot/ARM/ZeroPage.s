@@ -4,10 +4,10 @@
 
 	.text
 
-	.global	_zeroPageStart
-	.global	_zeroPageEnd
+	.global	zeroPageStart
+	.global	zeroPageEnd
 
-_zeroPageStart:
+zeroPageStart:
 	B	resetHandler
 	B	undefinedInstructionHandler
 	B	softwareInterruptHandler
@@ -33,4 +33,4 @@ interruptRequestHandler:
 	B	interruptRequestHandler
 fastInterruptRequestHandler:
 	B	fastInterruptRequestHandler
-_zeroPageEnd:
+zeroPageEnd:

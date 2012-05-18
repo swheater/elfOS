@@ -13,6 +13,7 @@ SECTIONS
 	{
 		* (.rodata);
 	}
+        . = ALIGN(0x10000);
 	.data :
 	{
 		* (.data);

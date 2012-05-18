@@ -4,10 +4,12 @@
 
 #include <elfOS/Threading.h>
 
-static int value = 0;
+static int value1 = -1;
+static int value2 = -1;
 
 void run(void)
 {
-    value += 1;
+    value1 = 1;
     elfOS_yield();
+    value2 = 1;
 }

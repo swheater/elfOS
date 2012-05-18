@@ -6,7 +6,7 @@ CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall -I../../Headers
 RM      = rm
 
-OBJS = Init.o
+OBJS = Init.o Handlers.o
 
 all: $(OBJS)
 

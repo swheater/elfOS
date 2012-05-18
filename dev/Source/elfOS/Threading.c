@@ -6,5 +6,5 @@
 
 void elfOS_yield(void)
 {
-    asm("swi\t#0x000019");
+    asm("swi\t#0x190019");
 }

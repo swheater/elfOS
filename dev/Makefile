@@ -10,7 +10,7 @@ MAKE    = make
 RM      = rm
 
 OBJS = Source/Boot/ARM/Start.o Source/Boot/ARM/ZeroPage.o \
-       Source/Kernel/Init.o \
+       Source/Kernel/Init.o Source/Kernel/Handlers.o \
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \

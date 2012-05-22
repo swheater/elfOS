@@ -5,6 +5,8 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-extern void elfOS_yield();
+extern void elfOS_processYield();
+
+extern void elfOS_processStop();
 
 #endif

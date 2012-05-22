@@ -6,8 +6,6 @@ MAKE = make
 RM   = rm
 
 all:
-	$(MAKE) -C ARM all
 
 clean:
-	$(MAKE) -C ARM clean
 	$(RM) -f *~

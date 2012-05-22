@@ -5,8 +5,10 @@
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
 #include <Kernel/Symbol.h>
+#include <Kernel/Process.h>
+#include <Kernel/Handlers.h>
 #include <ELF/ELF32.h>
-#include <elfOS/Threading.h>
+#include <elfOS/Process.h>
 
 extern char zeroPageStart;
 extern char zeroPageEnd;
@@ -14,12 +16,21 @@ extern char elf32Appl;
 
 static int res = -1;
 
+static void swHandler(UnsignedWord32 operand)
+{
+    res = 0xff00ff00 + operand;
+}
+
 void kernel_init()
 {
     char *zeroPageSource = &zeroPageStart;
     char *zeroPageDestination = 0x0;
     while (zeroPageSource < &zeroPageEnd)
         *zeroPageDestination++ = *zeroPageSource++;
+
+    softwareInterruptHandler = &swHandler;
+
+    initProcesses();
 
     const char* elf32 = &elf32Appl;
 
@@ -32,10 +43,12 @@ void kernel_init()
 
     elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
 
-    unsigned int numberOfGlobalSymbols = 1;
+    unsigned int numberOfGlobalSymbols = 2;
     Symbol       globalSymbols[numberOfGlobalSymbols];
-    globalSymbols[0].name  = "elfOS_yield";
-    globalSymbols[0].value = (UnsignedWord32) elfOS_yield;
+    globalSymbols[0].name  = "elfOS_processYield";
+    globalSymbols[0].value = (UnsignedWord32) elfOS_processYield;
+    globalSymbols[1].name  = "elfOS_processStop";
+    globalSymbols[1].value = (UnsignedWord32) elfOS_processStop;
 
     unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
     VirtualMemorySegment segments[numberOfSegments];
@@ -56,7 +69,7 @@ void kernel_init()
         if (runFunction != 0)
 	{
             res = 0x19;
-            (*runFunction)();
+            currentProcessControlBlock = createProcess(runFunction, (UnsignedByte*) 0x100000);
             res = 0x29;
 	}
         else

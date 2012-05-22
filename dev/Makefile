@@ -10,11 +10,11 @@ MAKE    = make
 RM      = rm
 
 OBJS = Source/Boot/ARM/Start.o Source/Boot/ARM/ZeroPage.o \
-       Source/Kernel/Init.o Source/Kernel/Handlers.o \
+       Source/Kernel/Init.o Source/Kernel/Handlers.o Source/Kernel/ARM/Process.o \
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
-       Source/elfOS/Threading.o
+       Source/elfOS/Process.o
 
 all: elfOSBoot.img
 
@@ -23,8 +23,6 @@ $(OBJS):
 	$(MAKE) -C Source all
 
 elfOSBoot.elf elfOSBoot.map: elfOSBoot.lds $(OBJS)
-	$(MAKE) -C Headers all
-	$(MAKE) -C Source all
 	$(LD) $(LDFLAGS) -nostdlib -T elfOSBoot.lds -o elfOSBoot.elf -Map elfOSBoot.map $(OBJS)
 	$(SIZE) elfOSBoot.elf
 

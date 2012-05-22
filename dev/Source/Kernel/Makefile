@@ -9,9 +9,11 @@ RM      = rm
 OBJS = Init.o Handlers.o
 
 all: $(OBJS)
+	$(MAKE) -C ARM all
 
 .c.o:
 	$(CC) $(CCFLAGS) -c $<
 
 clean:
+	$(MAKE) -C ARM clean
 	$(RM) -f *~ *.o

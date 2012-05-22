@@ -8,29 +8,52 @@
 	.global	zeroPageEnd
 
 zeroPageStart:
-	B	resetHandler
-	B	undefinedInstructionHandler
-	B	softwareInterruptHandler
-	B	prefetchAbortHandler
-	B	dataAbortHandler
-	B	reservedHandler
-	B	interruptRequestHandler
-	B	fastInterruptRequestHandler
+	B	resetRedirector
+	B	undefinedInstructionRedirector
+	B	softwareInterruptRedirector
+	B	prefetchAbortRedirector
+	B	dataAbortRedirector
+	B	reservedRedirector
+	B	interruptRequestRedirector
+	B	fastInterruptRequestRedirector
 
-resetHandler:
-	B	resetHandler
-undefinedInstructionHandler:
-	B	undefinedInstructionHandler
-softwareInterruptHandler:
-	B	softwareInterruptHandler
-prefetchAbortHandler:
-	B	prefetchAbortHandler
-dataAbortHandler:
-	B	dataAbortHandler
-reservedHandler:
-	B	reservedHandler
-interruptRequestHandler:
-	B	interruptRequestHandler
-fastInterruptRequestHandler:
-	B	fastInterruptRequestHandler
+resetRedirector:
+	B	resetRedirector
+
+undefinedInstructionRedirector:
+	B	undefinedInstructionRedirector
+
+softwareInterruptRedirector:
+	PUSH	{R0,R1,LR}
+	LDR	R0,=softwareInterruptHandler
+	LDR	R1,[R0]
+	CMP	R1,#0x00000000
+	BEQ	softwareInterruptRedirectSkip
+	LDR	R0,[LR,#-0x04]
+	BIC	R0,R0,#0xFF000000
+	MOV	LR,PC
+	BX	R1
+softwareInterruptRedirectSkip:	
+	POP	{R0,R1,LR}
+	MOVS	PC,LR
+	
+prefetchAbortRedirector:
+	SUBS	PC,LR,#0x04
+
+dataAbortRedirector:
+	SUBS	PC,LR,#0x08
+
+reservedRedirector:
+	B	reservedRedirector
+
+interruptRequestRedirector:
+	SUBS	PC,LR,#0x04
+
+fastInterruptRequestRedirector:
+	SUBS	PC,LR,#0x04
+
+	.ltorg
+
 zeroPageEnd:
+
+	.end

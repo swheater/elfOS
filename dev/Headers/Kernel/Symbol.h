@@ -9,7 +9,7 @@
 
 typedef struct
 {
-    UnsignedByte   *name;
+    SignedByte     *name;
     UnsignedWord32 value;
 } Symbol;
 

@@ -8,7 +8,7 @@
 	.equ	USER_MODE,  0x10	
 	.equ	FIQ_MODE,   0x11
 	.equ	IRQ_MODE,   0x12
-	.equ	SUP_MODE,   0x13
+	.equ	SVC_MODE,   0x13
 	.equ	ABT_MODE,   0x17
 	.equ	UNDEF_MODE, 0x1B
 
@@ -34,9 +34,9 @@ start:
 	LDR     SP,=abtStack
 
 	BIC     R0,R0,#MODE_MASK
-	ORR     R0,R0,#SUP_MODE
+	ORR     R0,R0,#SVC_MODE
 	MSR     CPSR_csfx,R0
-	LDR     SP,=supStack
+	LDR     SP,=svcStack
 
 	BIC     R0,R0,#MODE_MASK
 	ORR     R0,R0,#UNDEF_MODE
@@ -52,12 +52,16 @@ stop:
 	.bss
 
 	.space	32768
+userStack:
+	.space	32768
 fiqStack:
 	.space	32768
 irqStack:
 	.space	32768
-supStack:
+svcStack:
 	.space	32768
 abtStack:
 	.space	32768
 undefStack:
+
+	.end

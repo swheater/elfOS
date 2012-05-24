@@ -70,6 +70,7 @@ void kernel_init()
 	{
             res = 0x19;
             currentProcessControlBlock = createProcess(runFunction, (UnsignedByte*) 0x100000);
+            continueProcess(currentProcessControlBlock);
             res = 0x29;
 	}
         else

@@ -5,10 +5,12 @@
 #include <Kernel/StdTypes.h>
 #include <Kernel/Process.h>
 
+#define USERMODE_PROCESSSTATUS (0x10)
+#define PROCESSCONTROLBLOCKS_LENGTH (16)
+
 ProcessControlBlock *currentProcessControlBlock;
 
-static const unsigned int  processControlBlocksLength = 16;
-static ProcessControlBlock processControlBlocks[16];
+static ProcessControlBlock processControlBlocks[PROCESSCONTROLBLOCKS_LENGTH];
 static ProcessControlBlock *idleProcessControlBlock;
 
 static void clearProcess(ProcessControlBlock *processControlBlock)
@@ -26,6 +28,8 @@ static void clearProcess(ProcessControlBlock *processControlBlock)
     processControlBlock->r10         = 0x0;
     processControlBlock->r11         = 0x0;
     processControlBlock->r12         = 0x0;
+    processControlBlock->sp          = 0x0;
+    processControlBlock->lr          = 0x0;
     processControlBlock->pc          = 0x0;
     processControlBlock->cpsr        = 0x0;
     processControlBlock->blockStatus = FREE;
@@ -34,7 +38,7 @@ static void clearProcess(ProcessControlBlock *processControlBlock)
 void initProcesses(void)
 {
     unsigned int processControlBlockIndex;
-    for (processControlBlockIndex = 0; processControlBlockIndex < processControlBlocksLength; processControlBlockIndex++)
+    for (processControlBlockIndex = 0; processControlBlockIndex < PROCESSCONTROLBLOCKS_LENGTH; processControlBlockIndex++)
         clearProcess(&processControlBlocks[processControlBlockIndex]);
 }
 
@@ -43,7 +47,7 @@ ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stac
     ProcessControlBlock *choosenProcessControlBlock = 0;
 
     int processControlBlockIndex = 0;
-    while ((choosenProcessControlBlock == 0) && (processControlBlockIndex < processControlBlocksLength))
+    while ((choosenProcessControlBlock == 0) && (processControlBlockIndex < PROCESSCONTROLBLOCKS_LENGTH))
     {
         if (processControlBlocks[processControlBlockIndex].blockStatus == FREE)
             choosenProcessControlBlock = &processControlBlocks[processControlBlockIndex];
@@ -52,8 +56,9 @@ ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stac
 
     if (choosenProcessControlBlock != 0)
     {
-        choosenProcessControlBlock->pc = (UnsignedWord32) runFunction;
-        choosenProcessControlBlock->sp = (UnsignedWord32) stack;
+        choosenProcessControlBlock->cpsr = USERMODE_PROCESSSTATUS;
+        choosenProcessControlBlock->sp   = (UnsignedWord32) stack;
+        choosenProcessControlBlock->pc   = (UnsignedWord32) runFunction;
     }
 
     return choosenProcessControlBlock;

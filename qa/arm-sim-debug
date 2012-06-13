@@ -4,7 +4,7 @@
 # Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-QEMU_DIR=/opt/qemu-1.0.1/bin
+QEMU_DIR=/opt/qemu-1.1.0/bin
 QEMU_SYSTEM_ARM=${QEMU_DIR}/qemu-system-arm
 
 ${QEMU_SYSTEM_ARM} -cpu arm1176 -m 256m -display none -vga none -nographic -vnc none -net none -serial none -parallel none -kernel qa.img

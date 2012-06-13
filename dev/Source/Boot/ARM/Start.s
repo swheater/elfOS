@@ -17,6 +17,11 @@
 start:
 	MRS     R1,CPSR
 	MRS     R0,CPSR
+	
+@	BIC     R0,R0,#MODE_MASK
+@	ORR     R0,R0,#USER_MODE
+@	MSR     CPSR_csfx,R0
+@	LDR     SP,=userStack
 
 	BIC     R0,R0,#MODE_MASK
 	ORR     R0,R0,#FIQ_MODE

@@ -5,6 +5,8 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
+#include <Kernel/StdTypes.h>
+
 extern void uartInit();
 extern void uartOutput(UnsignedByte ch);
 

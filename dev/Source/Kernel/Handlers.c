@@ -1,6 +1,3 @@
-#ifndef _KERNEL_HANDLERS
-#define _KERNEL_HANDLERS 1
-
 /*
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
@@ -16,5 +13,3 @@ void (*dataAbortHandler)(void);
 void (*reservedHandler)(void);
 void (*interruptRequestHandler)(void);
 void (*fastInterruptRequestHandler)(void);
-
-#endif

@@ -3,7 +3,7 @@
 #
 
 CC      = arm-none-eabi-gcc
-CCFLAGS = -Wall -I../../Headers
+CCFLAGS = -Wall -O -I../../Headers
 RM      = rm
 
 OBJS = Process.o

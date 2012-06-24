@@ -6,8 +6,8 @@
 #include <Kernel/Handlers.h>
 
 void (*resetHandler)(void);
-void (*undefinedInstructionHandler)(void);
-void (*softwareInterruptHandler)(UnsignedWord32 operand);
+void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress);
+void (*softwareInterruptHandler)(UnsignedWord32 opcode, UnsignedWord32 param);
 void (*prefetchAbortHandler)(void);
 void (*dataAbortHandler)(void);
 void (*reservedHandler)(void);

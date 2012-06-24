@@ -8,8 +8,8 @@
 #include <Kernel/StdTypes.h>
 
 extern void (*resetHandler)(void);
-extern void (*undefinedInstructionHandler)(void);
-extern void (*softwareInterruptHandler)(UnsignedWord32 operand);
+extern void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress);
+extern void (*softwareInterruptHandler)(UnsignedWord32 opcode, UnsignedWord32 param);
 extern void (*prefetchAbortHandler)(void);
 extern void (*dataAbortHandler)(void);
 extern void (*reservedHandler)(void);

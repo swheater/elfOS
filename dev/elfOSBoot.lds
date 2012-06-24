@@ -4,7 +4,7 @@
 
 SECTIONS
 {
-	. = 0x00010000;
+	. = 0x00000000;
 	.text :
 	{
 		* (.text);
@@ -13,16 +13,17 @@ SECTIONS
 	{
 		* (.rodata);
 	}
-        . = ALIGN(0x10000);
 	.data :
 	{
 		* (.data);
 	}
-        elf32Appl = .;
-        . = ALIGN(0x10000);
-        . += 0x00010000;
+	elfAppl = .;
+	. = ALIGN(0x10000);
+	. += 0x00010000;
+	bssStart = .;
 	.bss :
 	{
 		* (.bss);
 	}
+	bssEnd = .;
 }

@@ -5,7 +5,6 @@
 	.text
 
 	.equ	MODE_MASK,  0x1F
-	.equ	USER_MODE,  0x10	
 	.equ	FIQ_MODE,   0x11
 	.equ	IRQ_MODE,   0x12
 	.equ	SVC_MODE,   0x13
@@ -13,15 +12,15 @@
 	.equ	UNDEF_MODE, 0x1B
 
 	.global	start
+	.global	fiqStack
+	.global	irqStack
+	.global	svcStack
+	.global	abtStack
+	.global	undefStack
 
 start:
 	MRS     R1,CPSR
 	MRS     R0,CPSR
-	
-@	BIC     R0,R0,#MODE_MASK
-@	ORR     R0,R0,#USER_MODE
-@	MSR     CPSR_csfx,R0
-@	LDR     SP,=userStack
 
 	BIC     R0,R0,#MODE_MASK
 	ORR     R0,R0,#FIQ_MODE
@@ -41,7 +40,7 @@ start:
 	BIC     R0,R0,#MODE_MASK
 	ORR     R0,R0,#SVC_MODE
 	MSR     CPSR_csfx,R0
-	LDR     SP,=svcStack
+	LDR	SP,=svcStack
 
 	BIC     R0,R0,#MODE_MASK
 	ORR     R0,R0,#UNDEF_MODE
@@ -54,10 +53,12 @@ start:
 stop:
 	B	stop
 
-	.bss
+	.ltorg
 
 	.space	32768
-userStack:
+
+	.bss
+
 	.space	32768
 fiqStack:
 	.space	32768

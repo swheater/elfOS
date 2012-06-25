@@ -11,7 +11,6 @@
 ProcessControlBlock *currentProcessControlBlock;
 
 static ProcessControlBlock processControlBlocks[PROCESSCONTROLBLOCKS_LENGTH];
-static ProcessControlBlock *idleProcessControlBlock;
 
 static void clearProcess(ProcessControlBlock *processControlBlock)
 {
@@ -56,9 +55,10 @@ ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stac
 
     if (choosenProcessControlBlock != 0)
     {
-        choosenProcessControlBlock->cpsr = USERMODE_PROCESSSTATUS;
-        choosenProcessControlBlock->sp   = (UnsignedWord32) stack;
-        choosenProcessControlBlock->pc   = (UnsignedWord32) runFunction;
+        choosenProcessControlBlock->cpsr        = USERMODE_PROCESSSTATUS;
+        choosenProcessControlBlock->sp          = (UnsignedWord32) stack;
+        choosenProcessControlBlock->pc          = (UnsignedWord32) runFunction;
+        choosenProcessControlBlock->blockStatus = USED;
     }
 
     return choosenProcessControlBlock;
@@ -66,12 +66,26 @@ ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stac
 
 void destroyProcess(ProcessControlBlock *processControlBlock)
 {
-    if (processControlBlock != idleProcessControlBlock)
+    if (processControlBlock != 0)
     {
         if (processControlBlock == currentProcessControlBlock)
-            currentProcessControlBlock = idleProcessControlBlock;
+            currentProcessControlBlock = 0;
 
-        if (processControlBlock)
-            clearProcess(processControlBlock);
+        clearProcess(processControlBlock);
     }
+}
+
+ProcessControlBlock *findRunnableProcess(void)
+{
+    ProcessControlBlock *choosenProcessControlBlock = 0;
+
+    int processControlBlockIndex = 0;
+    while ((choosenProcessControlBlock == 0) && (processControlBlockIndex < PROCESSCONTROLBLOCKS_LENGTH))
+    {
+        if (processControlBlocks[processControlBlockIndex].blockStatus == USED)
+            choosenProcessControlBlock = &processControlBlocks[processControlBlockIndex];
+	processControlBlockIndex++;
+    }
+
+    return choosenProcessControlBlock;
 }

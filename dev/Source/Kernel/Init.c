@@ -55,12 +55,7 @@ static void swHandler(UnsignedWord32 opcode, UnsignedWord32 param)
     logUnsignedWord32Hex(param);
     logMessage("\r\n");
 
-    logMessage("    SCR: ");
-    UnsignedWord32 scr;
-    asm("mrc\tp15, 0, %0, c1, c1, 0": "=r" (scr));
-    logUnsignedWord32Hex(scr);
-
-    logMessage("\r\n    SP: ");
+    logMessage("    SP: ");
     UnsignedWord32 sp;
     asm("mov\t%0, sp": "=r" (sp));
     logUnsignedWord32Hex(sp);
@@ -71,7 +66,21 @@ static void swHandler(UnsignedWord32 opcode, UnsignedWord32 param)
     logUnsignedWord32Hex(cpsr);
     logMessage("\r\n");
 
-    gpioSetOutput(21);
+
+    if (opcode == 2)
+    {
+        destroyProcess(currentProcessControlBlock);
+        currentProcessControlBlock = findRunnableProcess();
+
+        if (currentProcessControlBlock != 0)
+            continueProcess(currentProcessControlBlock);
+        else
+	{
+            gpioSetOutput(21);
+            hereAndNow1:
+            goto hereAndNow1;
+	}
+    }
 }
 
 void kernel_init()
@@ -101,6 +110,7 @@ void kernel_init()
     gpioClearOutput(18);
     gpioClearOutput(21);
     gpioClearOutput(22);
+
     gpioSetOutput(17);
 
     UnsignedWord32 cpuInfo;
@@ -175,6 +185,10 @@ void kernel_init()
             logMessage("\r\n\r\n");
 
             currentProcessControlBlock = createProcess(runFunction, (UnsignedByte*) 0x100000);
+            createProcess(runFunction, (UnsignedByte*) 0x110000);
+            createProcess(runFunction, (UnsignedByte*) 0x120000);
+            createProcess(runFunction, (UnsignedByte*) 0x130000);
+
             continueProcess(currentProcessControlBlock);
 
             gpioSetOutput(22);
@@ -187,6 +201,6 @@ void kernel_init()
 
 
     logMessage("==== done ====\r\n");
-    hereAndNow:
-    goto hereAndNow;
+    hereAndNow2:
+    goto hereAndNow2;
 }

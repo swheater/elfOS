@@ -6,13 +6,13 @@
 
 void elfOS_processYield(void)
 {
-    asm("mov\tr0,#1": : : "r0");
+    asm("mov\tr0,#0": : : "r0");
     asm("swi\t#0x000001");
 }
 
 void elfOS_processStop(void)
 {
-    asm("mov\tr0,#2": : : "r0");
+    asm("mov\tr0,#0": : : "r0");
     asm("swi\t#0x000002");
 }
 

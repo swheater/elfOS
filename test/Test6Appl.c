@@ -8,9 +8,9 @@ void run(void)
 {
     int i;
     elfOS_processYield();
+    elfOS_processLogging((int) &i);
     elfOS_processStop();
     elfOS_processLogging(0x1212);
-    elfOS_processLogging((int) &i);
     hereAndNow:
     goto hereAndNow;
 }

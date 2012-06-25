@@ -14,5 +14,6 @@ extern void                initProcesses(void);
 extern ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stack);
 extern void                continueProcess(ProcessControlBlock *processControlBlock);
 extern void                destroyProcess(ProcessControlBlock *processControlBlock);
+extern ProcessControlBlock *findRunnableProcess(void);
 
 #endif

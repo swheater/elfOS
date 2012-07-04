@@ -27,7 +27,7 @@ Boolean string_equal(const char *string1, const char *string2)
     else
     {
         unsigned int index = 0;
-        while ((string1[index] != 0) && (string2[index] != 0))
+        while ((string1[index] != 0) && (string2[index] != 0) && (string1[index] == string2[index]))
             index++;
 
         return (string1[index] == 0) && (string2[index] == 0);

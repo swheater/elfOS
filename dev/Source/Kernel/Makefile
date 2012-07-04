@@ -6,7 +6,7 @@ CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall -O -I../../Headers
 RM      = rm
 
-OBJS = Init.o Handlers.o Logging.o
+OBJS = Init.o Handlers.o Logging.o KDebug.o
 
 all: $(OBJS)
 	$(MAKE) -C ARM all

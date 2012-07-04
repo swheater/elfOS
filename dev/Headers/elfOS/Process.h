@@ -9,6 +9,4 @@ extern void elfOS_processYield();
 
 extern void elfOS_processStop();
 
-extern void elfOS_processLogging(int param);
-
 #endif

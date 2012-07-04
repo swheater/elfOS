@@ -81,14 +81,18 @@ Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader sec
         {
             if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
             {
+  	        virtualMemorySegments[sectionIndex].size = sectionHeaders[sectionHeaderIndex].size;
+
                 unsigned int index;
-                for (index = 0; index < sectionHeaders[sectionHeaderIndex].size; index++)
+                for (index = 0; index < virtualMemorySegments[sectionIndex].size; index++)
                     virtualMemorySegments[sectionIndex].physicalAddress[index] = elf32[sectionHeaders[sectionHeaderIndex].offset + index];
             }
             else if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
             {
+  	        virtualMemorySegments[sectionIndex].size = sectionHeaders[sectionHeaderIndex].size;
+
                 unsigned int index;
-                for (index = 0; index < sectionHeaders[sectionHeaderIndex].size; index++)
+                for (index = 0; index < virtualMemorySegments[sectionIndex].size; index++)
                     virtualMemorySegments[sectionIndex].physicalAddress[index] = 0;
             }
             sectionMapping[sectionHeaderIndex] = sectionIndex;

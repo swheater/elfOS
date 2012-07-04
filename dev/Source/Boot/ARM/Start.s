@@ -19,35 +19,35 @@
 	.global	undefStack
 
 start:
-	MRS     R1,CPSR
-	MRS     R0,CPSR
+	MRS	R1,CPSR
+	MRS	R0,CPSR
 
-	BIC     R0,R0,#MODE_MASK
-	ORR     R0,R0,#FIQ_MODE
-	MSR     CPSR_csfx,R0
-	LDR     SP,=fiqStack
+	BIC	R0,R0,#MODE_MASK
+	ORR	R0,R0,#FIQ_MODE
+	MSR	CPSR_csfx,R0
+	LDR	SP,=fiqStack
 
-	BIC     R0,R0,#MODE_MASK
-	ORR     R0,R0,#IRQ_MODE
-	MSR     CPSR_csfx,R0
-	LDR     SP,=irqStack
+	BIC	R0,R0,#MODE_MASK
+	ORR	R0,R0,#IRQ_MODE
+	MSR	CPSR_csfx,R0
+	LDR	SP,=irqStack
 
-	BIC     R0,R0,#MODE_MASK
-	ORR     R0,R0,#ABT_MODE
-	MSR     CPSR_csfx,R0
-	LDR     SP,=abtStack
+	BIC	R0,R0,#MODE_MASK
+	ORR	R0,R0,#ABT_MODE
+	MSR	CPSR_csfx,R0
+	LDR	SP,=abtStack
 
-	BIC     R0,R0,#MODE_MASK
-	ORR     R0,R0,#SVC_MODE
-	MSR     CPSR_csfx,R0
+	BIC	R0,R0,#MODE_MASK
+	ORR	R0,R0,#SVC_MODE
+	MSR	CPSR_csfx,R0
 	LDR	SP,=svcStack
 
-	BIC     R0,R0,#MODE_MASK
-	ORR     R0,R0,#UNDEF_MODE
-	MSR     CPSR_csfx,R0
-	LDR     SP,=undefStack
+	BIC	R0,R0,#MODE_MASK
+	ORR	R0,R0,#UNDEF_MODE
+	MSR	CPSR_csfx,R0
+	LDR	SP,=undefStack
 
-	MSR     CPSR_csfx,R1
+	MSR	CPSR_csfx,R1
 
 	BL	kernel_init
 stop:

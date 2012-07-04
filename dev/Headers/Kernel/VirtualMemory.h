@@ -16,8 +16,9 @@ typedef struct
 
 typedef struct
 {
-    UnsignedByte *physicalAddress;
-    UnsignedByte *virtualAddress;
+    UnsignedByte  *physicalAddress;
+    UnsignedByte  *virtualAddress;
+    UnsignedWord32 size;
 } VirtualMemorySegment;
 
 #endif

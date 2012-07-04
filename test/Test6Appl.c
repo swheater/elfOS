@@ -3,14 +3,15 @@
  */
 
 #include <elfOS/Process.h>
+#include <elfOS/Log.h>
 
 void run(void)
 {
-    int i;
+    elfOS_logMessage("Before Yield\r\n");
     elfOS_processYield();
-    elfOS_processLogging((int) &i);
+    elfOS_logMessage("Between Yield and Stop\r\n");
     elfOS_processStop();
-    elfOS_processLogging(0x1212);
+    elfOS_logMessage("After Stop\r\n");
     hereAndNow:
     goto hereAndNow;
 }

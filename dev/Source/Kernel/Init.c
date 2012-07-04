@@ -8,6 +8,7 @@
 #include <Kernel/Process.h>
 #include <Kernel/Handlers.h>
 #include <Kernel/Logging.h>
+#include <Kernel/KDebug.h>
 #include <Device/RaspPi_GPIO.h>
 #include <Device/RaspPi_UART.h>
 #include <ELF/ELF32.h>
@@ -26,60 +27,40 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
     logUnsignedWord32Hex((UnsignedWord32) undefinedInstructionAddress);
     logMessage(" (ui: ");
     logUnsignedWord32Hex(*undefinedInstructionAddress);
-    logMessage(")\r\n");
-
-    logMessage("    SCR: ");
+    logMessage("), SCR: ");
     UnsignedWord32 scr;
     asm("mrc\tp15, 0, %0, c1, c1, 0": "=r" (scr));
     logUnsignedWord32Hex(scr);
     logMessage("\r\n");
 
-    logMessage("    SP: ");
-    UnsignedWord32 sp;
-    asm("mov\t%0, sp": "=r" (sp));
-    logUnsignedWord32Hex(sp);
-    logMessage(", CPSR: ");
-    UnsignedWord32 cpsr;
-    asm("mrs\t%0, cpsr": "=r" (cpsr));
-    logUnsignedWord32Hex(cpsr);
-    logMessage("\r\n");
+    kDebugCurrentProcess();
 
     gpioSetOutput(22);
+
+    hereAndNow0:
+    goto hereAndNow0;
 }
 
-static void swHandler(UnsignedWord32 opcode, UnsignedWord32 param)
+static void swHandler(UnsignedWord32 opcode, ProcessControlBlock *processControlBlock)
 {
     logMessage("SWHandler: opcode=");
     logUnsignedWord32Hex(opcode);
-    logMessage(", param=");
-    logUnsignedWord32Hex(param);
+    logMessage(", sp=");
+    logUnsignedWord32Hex(processControlBlock->sp);
     logMessage("\r\n");
 
-    logMessage("    SP: ");
-    UnsignedWord32 sp;
-    asm("mov\t%0, sp": "=r" (sp));
-    logUnsignedWord32Hex(sp);
+    kDebugCurrentProcess();
 
-    logMessage(", CPSR: ");
-    UnsignedWord32 cpsr;
-    asm("mrs\t%0, cpsr": "=r" (cpsr));
-    logUnsignedWord32Hex(cpsr);
-    logMessage("\r\n");
+    if (opcode == 1)
+        yieldProcess();
+    else if (opcode == 2)
+        destroyProcess(processControlBlock);
 
-
-    if (opcode == 2)
+    if (currentProcessControlBlock == 0)
     {
-        destroyProcess(currentProcessControlBlock);
-        currentProcessControlBlock = findRunnableProcess();
-
-        if (currentProcessControlBlock != 0)
-            continueProcess(currentProcessControlBlock);
-        else
-	{
-            gpioSetOutput(21);
-            hereAndNow1:
-            goto hereAndNow1;
-	}
+        gpioSetOutput(21);
+        hereAndNow1:
+        goto hereAndNow1;
     }
 }
 
@@ -97,6 +78,15 @@ void kernel_init()
     gpioInit();
     uartInit();
 
+    resetHandler                = &defaultResetHandler;
+    undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
+    softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
+    prefetchAbortHandler        = &defaultSoftwareInterruptHandler;
+    dataAbortHandler            = &defaultPrefetchAbortHandler;
+    reservedHandler             = &defaultReservedHandler;
+    interruptRequestHandler     = &defaultInterruptRequestHandler;
+    fastInterruptRequestHandler = &defaultFastInterruptRequestHandler;
+
     undefinedInstructionHandler = &uiHandler;
     softwareInterruptHandler    = &swHandler;
 
@@ -113,25 +103,7 @@ void kernel_init()
 
     gpioSetOutput(17);
 
-    UnsignedWord32 cpuInfo;
-    UnsignedWord32 scr;
-    UnsignedWord32 sp;
-    UnsignedWord32 cpsr;
-    asm("mrc\tp15, 0, %0, c0, c0, 0": "=r" (cpuInfo));
-    asm("mrc\tp15, 0, %0, c1, c1, 0": "=r" (scr));
-    asm("mov\t%0, sp": "=r" (sp));
-    asm("mrs\t%0, cpsr": "=r" (cpsr));
-
-    logMessage("Init:\r\n");
-    logMessage("    CPU Info: ");
-    logUnsignedWord32Hex(cpuInfo);
-    logMessage(", SCR: ");
-    logUnsignedWord32Hex(scr);
-    logMessage("\r\n    SP: ");
-    logUnsignedWord32Hex(sp);
-    logMessage(", CPSR: ");
-    logUnsignedWord32Hex(cpsr);
-    logMessage("\r\n\r\n");
+    kDebugCPUState();
 
     gpioSetOutput(18);
 
@@ -153,14 +125,18 @@ void kernel_init()
 
     elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
 
-    unsigned int numberOfGlobalSymbols = 4;
+    unsigned int numberOfGlobalSymbols = 5;
     Symbol       globalSymbols[numberOfGlobalSymbols];
     globalSymbols[0].name  = "elfOS_processYield";
     globalSymbols[0].value = (UnsignedWord32) elfOS_processYield;
     globalSymbols[1].name  = "elfOS_processStop";
     globalSymbols[1].value = (UnsignedWord32) elfOS_processStop;
-    globalSymbols[2].name  = "elfOS_processLogging";
-    globalSymbols[2].value = (UnsignedWord32) elfOS_processLogging;
+    globalSymbols[2].name  = "elfOS_logUnsignedWord32Hex";
+    globalSymbols[2].value = (UnsignedWord32) logUnsignedWord32Hex;
+    globalSymbols[3].name  = "elfOS_logMessage";
+    globalSymbols[3].value = (UnsignedWord32) logMessage;
+    globalSymbols[4].name  = "elfOS_logNewLine";
+    globalSymbols[4].value = (UnsignedWord32) logNewLine;
 
     unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
     VirtualMemorySegment segments[numberOfSegments];
@@ -170,37 +146,40 @@ void kernel_init()
     {
         segments[segmentIndex].physicalAddress = (UnsignedByte*) (segmentIndex * 0x10000) + 0x80000;
         segments[segmentIndex].virtualAddress  = (UnsignedByte*) (segmentIndex * 0x10000) + 0x80000;
+        segments[segmentIndex].size            = 0;
     }
 
     if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))
     {
         void (*runFunction)(void) = elf32_findFunction("run", elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments);
 
-        initProcesses();
+        logMessage("    runFunction: ");
+        logUnsignedWord32Hex((UnsignedWord32) runFunction);
+        logMessage("\r\n\r\n");
+
+//        kDebugVirtualMemorySegments(segments, numberOfSegments);
+//        kDebugVirtualMemorySegments(segments, numberOfSegments);
 
         if (runFunction != 0)
         {
-            logMessage("    runFunction: ");
-            logUnsignedWord32Hex((UnsignedWord32) runFunction);
-            logMessage("\r\n\r\n");
+            initProcesses();
 
-            currentProcessControlBlock = createProcess(runFunction, (UnsignedByte*) 0x100000);
+            createProcess(runFunction, (UnsignedByte*) 0x100000);
             createProcess(runFunction, (UnsignedByte*) 0x110000);
             createProcess(runFunction, (UnsignedByte*) 0x120000);
             createProcess(runFunction, (UnsignedByte*) 0x130000);
 
-            continueProcess(currentProcessControlBlock);
-
-            gpioSetOutput(22);
+            startProcesses();
 	}
         else
             logMessage("**** no runFunction ****\r\n");
     }
     else
-        logMessage("**** no init ****\r\n");
+        logMessage("**** init failed ****\r\n");
 
+    gpioSetOutput(22);
 
-    logMessage("==== done ====\r\n");
+    logMessage("**** stopped ****\r\n");
     hereAndNow2:
     goto hereAndNow2;
 }

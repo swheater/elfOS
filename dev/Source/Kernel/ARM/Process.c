@@ -8,6 +8,7 @@
 #define USERMODE_PROCESSSTATUS (0x10)
 #define PROCESSCONTROLBLOCKS_LENGTH (16)
 
+static int          currentProcessControlBlockIndex;
 ProcessControlBlock *currentProcessControlBlock;
 
 static ProcessControlBlock processControlBlocks[PROCESSCONTROLBLOCKS_LENGTH];
@@ -41,7 +42,7 @@ void initProcesses(void)
         clearProcess(&processControlBlocks[processControlBlockIndex]);
 }
 
-ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stack)
+void createProcess(void (*runFunction)(void), UnsignedByte *stack)
 {
     ProcessControlBlock *choosenProcessControlBlock = 0;
 
@@ -50,7 +51,8 @@ ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stac
     {
         if (processControlBlocks[processControlBlockIndex].blockStatus == FREE)
             choosenProcessControlBlock = &processControlBlocks[processControlBlockIndex];
-	processControlBlockIndex++;
+        else
+            processControlBlockIndex++;
     }
 
     if (choosenProcessControlBlock != 0)
@@ -61,31 +63,40 @@ ProcessControlBlock *createProcess(void (*runFunction)(void), UnsignedByte *stac
         choosenProcessControlBlock->blockStatus = USED;
     }
 
-    return choosenProcessControlBlock;
+    if (currentProcessControlBlock == 0)
+    {
+        currentProcessControlBlockIndex = processControlBlockIndex;
+        currentProcessControlBlock      = choosenProcessControlBlock;
+    }
+}
+
+ProcessControlBlock *getCurrentProcessControlBlock(void)
+{
+    return currentProcessControlBlock;
+}
+
+void yieldProcess(void)
+{
+    currentProcessControlBlock = 0;
+
+    int index = 0;
+    while ((currentProcessControlBlock == 0) && (index < PROCESSCONTROLBLOCKS_LENGTH))
+    {
+        currentProcessControlBlockIndex = (currentProcessControlBlockIndex + 1) & 0x0000000F;
+        if (processControlBlocks[currentProcessControlBlockIndex].blockStatus == USED)
+            currentProcessControlBlock = &processControlBlocks[currentProcessControlBlockIndex];
+        else
+            index++;
+    }
 }
 
 void destroyProcess(ProcessControlBlock *processControlBlock)
 {
     if (processControlBlock != 0)
     {
-        if (processControlBlock == currentProcessControlBlock)
-            currentProcessControlBlock = 0;
-
         clearProcess(processControlBlock);
+
+        if (processControlBlock == currentProcessControlBlock)
+            yieldProcess();
     }
-}
-
-ProcessControlBlock *findRunnableProcess(void)
-{
-    ProcessControlBlock *choosenProcessControlBlock = 0;
-
-    int processControlBlockIndex = 0;
-    while ((choosenProcessControlBlock == 0) && (processControlBlockIndex < PROCESSCONTROLBLOCKS_LENGTH))
-    {
-        if (processControlBlocks[processControlBlockIndex].blockStatus == USED)
-            choosenProcessControlBlock = &processControlBlocks[processControlBlockIndex];
-	processControlBlockIndex++;
-    }
-
-    return choosenProcessControlBlock;
 }

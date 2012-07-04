@@ -43,14 +43,6 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
 
 static void swHandler(UnsignedWord32 opcode, ProcessControlBlock *processControlBlock)
 {
-    logMessage("SWHandler: opcode=");
-    logUnsignedWord32Hex(opcode);
-    logMessage(", sp=");
-    logUnsignedWord32Hex(processControlBlock->sp);
-    logMessage("\r\n");
-
-    kDebugCurrentProcess();
-
     if (opcode == 1)
         yieldProcess();
     else if (opcode == 2)

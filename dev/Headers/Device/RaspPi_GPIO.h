@@ -5,7 +5,7 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-extern void gpioInit();
+extern void gpioInit(void);
 extern void gpioSetOutput(int gpioIndex);
 extern void gpioClearOutput(int gpioIndex);
 

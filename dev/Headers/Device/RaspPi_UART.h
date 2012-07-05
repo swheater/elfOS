@@ -7,7 +7,7 @@
 
 #include <Kernel/StdTypes.h>
 
-extern void uartInit();
+extern void uartInit(void);
 extern void uartOutput(UnsignedByte ch);
 
 #endif

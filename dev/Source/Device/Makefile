@@ -6,7 +6,7 @@ CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall -O -I../../Headers
 RM      = rm
 
-OBJS = RaspPi_UART.o RaspPi_GPIO.o
+OBJS = RaspPi_UART.o RaspPi_GPIO.o RaspPi_Timer.o 
 
 all: $(OBJS)
 

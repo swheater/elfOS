@@ -11,6 +11,7 @@
 #include <Kernel/KDebug.h>
 #include <Device/RaspPi_GPIO.h>
 #include <Device/RaspPi_UART.h>
+#include <Device/RaspPi_Timer.h>
 #include <ELF/ELF32.h>
 #include <elfOS/Process.h>
 
@@ -67,20 +68,23 @@ void kernel_init()
     while (bssAddress < &bssEnd)
         *bssAddress++ = 0;
 
-    gpioInit();
-    uartInit();
-
     resetHandler                = &defaultResetHandler;
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
-    prefetchAbortHandler        = &defaultSoftwareInterruptHandler;
-    dataAbortHandler            = &defaultPrefetchAbortHandler;
+    prefetchAbortHandler        = &defaultPrefetchAbortHandler;
+    dataAbortHandler            = &defaultDataAbortHandler;
     reservedHandler             = &defaultReservedHandler;
     interruptRequestHandler     = &defaultInterruptRequestHandler;
     fastInterruptRequestHandler = &defaultFastInterruptRequestHandler;
 
     undefinedInstructionHandler = &uiHandler;
     softwareInterruptHandler    = &swHandler;
+
+    gpioInit();
+    uartInit();
+    timerInit(127, 100, TRUE);
+
+    timerDebug();
 
     gpioSetOutput(17);
     gpioSetOutput(18);
@@ -95,7 +99,9 @@ void kernel_init()
 
     gpioSetOutput(17);
 
-    kDebugCPUState();
+    timerDebug();
+
+//    kDebugCPUState();
 
     gpioSetOutput(18);
 
@@ -104,14 +110,6 @@ void kernel_init()
     ELF32SectionHeader *sectionHeaders                   = (ELF32SectionHeader*) &(elf32[header->sectionHeaderOffset]);
     unsigned int       numberOfSectionHeaders            = header->sectionHeaderEntryNumber;
     unsigned int       numberOfVirtualMemorySegmentInfos = elf32_numberOfVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders);
-
-    logMessage("elfAppl:\r\n    SectionHeader:   ");
-    logUnsignedWord32Hex(numberOfSectionHeaders);
-    logMessage("\r\n");
-
-    logMessage("    VirtMemSegmInfo: ");
-    logUnsignedWord32Hex(numberOfVirtualMemorySegmentInfos);
-    logMessage("\r\n");
 
     VirtualMemorySegmentInfo virtualMemorySegmentInfos[numberOfVirtualMemorySegmentInfos];
 

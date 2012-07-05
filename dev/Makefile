@@ -15,7 +15,7 @@ OBJS = Source/Boot/ARM/Start.o Source/Boot/ARM/ZeroPage.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
        Source/elfOS/Process.o \
-       Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o
+       Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o Source/Device/RaspPi_Timer.o
 
 all: elfOSBoot.img
 

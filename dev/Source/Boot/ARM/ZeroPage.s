@@ -64,8 +64,8 @@ softwareInterruptRedirector:
 	LDR	R1,[R1]
 	MOV	LR,PC
 	BX	R2
-softwareInterruptRedirectSkip:
 
+softwareInterruptRedirectSkip:
 	LDR	SP,=currentProcessControlBlock
 	LDR	SP,[SP]
 	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
@@ -108,16 +108,30 @@ reservedRedirectSkip:
 	POP	{R0,LR}
 
 interruptRequestRedirector:
-	PUSH	{R0,LR}
+	LDR	SP,=currentProcessControlBlock
+	LDR	SP,[SP]
+	STMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
+	NOP
+	SUB	LR,LR,#0x04
+	STMIA	SP!,{LR}
+	NOP
+	MRS	R2,SPSR
+	STMIA	SP!,{R2}
+
+	LDR	SP,=irqStack
 	LDR	R0,=interruptRequestHandler
 	LDR	R0,[R0]
 	CMP	R0,#0x00000000
 	BEQ	interruptRequestRedirectSkip
 	MOV	LR,PC
 	BX	R0
+
 interruptRequestRedirectSkip:
-	POP	{R0,LR}
-	SUBS	PC,LR,#0x04
+	LDR	SP,=currentProcessControlBlock
+	LDR	SP,[SP]
+	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
+	NOP
+	LDMIA	SP,{PC}^
 
 fastInterruptRequestRedirector:
 	PUSH	{R0,LR}

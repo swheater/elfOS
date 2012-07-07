@@ -13,6 +13,7 @@
 #include <Device/RaspPi_UART.h>
 #include <Device/RaspPi_Timer.h>
 #include <ELF/ELF32.h>
+#include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Process.h>
 
 extern char start;
@@ -57,6 +58,16 @@ static void swHandler(UnsignedWord32 opcode, ProcessControlBlock *processControl
     }
 }
 
+static void irqHandler(void)
+{
+    uartOutput('.');
+
+    if (currentProcessControlBlock != 0)
+        yieldProcess();
+
+    timerClearInterruptRequest();
+}
+
 void kernel_init()
 {
     char *zeroPageSource      = &zeroPageStart;
@@ -79,12 +90,13 @@ void kernel_init()
 
     undefinedInstructionHandler = &uiHandler;
     softwareInterruptHandler    = &swHandler;
+    interruptRequestHandler     = &irqHandler;
 
     gpioInit();
     uartInit();
-    timerInit(127, 100, TRUE);
+    timerInit(127, 100000, TRUE);
 
-    timerDebug();
+//    timerDebug();
 
     gpioSetOutput(17);
     gpioSetOutput(18);
@@ -99,21 +111,11 @@ void kernel_init()
 
     gpioSetOutput(17);
 
-    timerDebug();
+//    timerDebug();
 
 //    kDebugCPUState();
 
-    gpioSetOutput(18);
-
-    const char         *elf32                            = (char*) &elfAppl;
-    ELF32Header        *header                           = (ELF32Header*) elf32;
-    ELF32SectionHeader *sectionHeaders                   = (ELF32SectionHeader*) &(elf32[header->sectionHeaderOffset]);
-    unsigned int       numberOfSectionHeaders            = header->sectionHeaderEntryNumber;
-    unsigned int       numberOfVirtualMemorySegmentInfos = elf32_numberOfVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders);
-
-    VirtualMemorySegmentInfo virtualMemorySegmentInfos[numberOfVirtualMemorySegmentInfos];
-
-    elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
+    initProcesses();
 
     unsigned int numberOfGlobalSymbols = 5;
     Symbol       globalSymbols[numberOfGlobalSymbols];
@@ -128,44 +130,60 @@ void kernel_init()
     globalSymbols[4].name  = "elfOS_logNewLine";
     globalSymbols[4].value = (UnsignedWord32) logNewLine;
 
-    unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
-    VirtualMemorySegment segments[numberOfSegments];
+    UnsignedByte *nextSegment = (UnsignedByte*) 0x80000;
 
-    int segmentIndex;
-    for (segmentIndex = 0; segmentIndex < numberOfSegments; segmentIndex++)
+    const char *elf32 = (char*) &elfAppl;
+
+    int valid = elf32_validate(elf32, 1032);
+    while (valid)
     {
-        segments[segmentIndex].physicalAddress = (UnsignedByte*) (segmentIndex * 0x10000) + 0x80000;
-        segments[segmentIndex].virtualAddress  = (UnsignedByte*) (segmentIndex * 0x10000) + 0x80000;
-        segments[segmentIndex].size            = 0;
-    }
+        ELF32Header        *header                           = (ELF32Header*) elf32;
+        ELF32SectionHeader *sectionHeaders                   = (ELF32SectionHeader*) &(elf32[header->sectionHeaderOffset]);
+        unsigned int       numberOfSectionHeaders            = header->sectionHeaderEntryNumber;
+        unsigned int       numberOfVirtualMemorySegmentInfos = elf32_numberOfVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders);
 
-    if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))
-    {
-        void (*runFunction)(void) = elf32_findFunction("run", elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments);
+        VirtualMemorySegmentInfo virtualMemorySegmentInfos[numberOfVirtualMemorySegmentInfos];
 
-        logMessage("    runFunction: ");
-        logUnsignedWord32Hex((UnsignedWord32) runFunction);
-        logMessage("\r\n\r\n");
+        elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
 
-//        kDebugVirtualMemorySegments(segments, numberOfSegments);
-//        kDebugVirtualMemorySegments(segments, numberOfSegments);
+        unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
+        VirtualMemorySegment segments[numberOfSegments];
 
-        if (runFunction != 0)
+        int segmentIndex;
+        for (segmentIndex = 0; segmentIndex < numberOfSegments; segmentIndex++)
         {
-            initProcesses();
+            segments[segmentIndex].physicalAddress = nextSegment;
+            segments[segmentIndex].virtualAddress  = nextSegment;
+            segments[segmentIndex].size            = 0;
+            nextSegment += 0x10000;
+        }
 
-            createProcess(runFunction, (UnsignedByte*) 0x100000);
-            createProcess(runFunction, (UnsignedByte*) 0x110000);
-            createProcess(runFunction, (UnsignedByte*) 0x120000);
-            createProcess(runFunction, (UnsignedByte*) 0x130000);
+        if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))
+        {
+            void (*runFunction)(void) = elf32_findFunction("run", elf32, sectionHeaders, numberOfSectionHeaders, segments, numberOfSegments);
 
-            startProcesses();
-	}
+            logMessage("runFunction: ");
+            logUnsignedWord32Hex((UnsignedWord32) runFunction);
+            logMessage("\r\n");
+
+            if (runFunction != 0)
+	    {
+                createProcess(runFunction, nextSegment);
+                nextSegment += 0x10000;
+	    }
+            else
+                logMessage("**** no runFunction ****\r\n");
+        }
         else
-            logMessage("**** no runFunction ****\r\n");
+            logMessage("**** init failed ****\r\n");
+
+        elf32 += 1032;
+        valid = elf32_validate(elf32, 1032);
     }
-    else
-        logMessage("**** init failed ****\r\n");
+
+    gpioSetOutput(18);
+
+    startProcesses();
 
     gpioSetOutput(22);
 

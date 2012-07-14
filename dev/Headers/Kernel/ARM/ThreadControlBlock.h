@@ -1,5 +1,5 @@
-#ifndef _KERNEL_PROCESSCONTROLBLOCK
-#define _KERNEL_PROCESSCONTROLBLOCK 1
+#ifndef _KERNEL_THREADCONTROLBLOCK
+#define _KERNEL_THREADCONTROLBLOCK 1
 
 /*
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
@@ -30,6 +30,6 @@ typedef struct
     UnsignedWord32 cpsr;
 
     BlockStatus blockStatus;
-} ProcessControlBlock;
+} ThreadControlBlock;
 
 #endif

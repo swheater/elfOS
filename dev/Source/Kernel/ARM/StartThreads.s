@@ -6,12 +6,12 @@
 
 	.equ	NONSECURE_BIT, 0x01
 
-	.global	startProcesses
-	.type	startProcesses,%function
+	.global	startThreads
+	.type	startThreads,%function
 
-startProcesses:
+startThreads:
 	@ TODO: Disable Interupts
-	LDR	SP,=currentProcessControlBlock
+	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
 	LDR	R1,[SP,#0x40]
 	MSR	SPSR_csfx,R1

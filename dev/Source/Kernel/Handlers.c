@@ -9,7 +9,7 @@
 
 void (*resetHandler)(void);
 void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress);
-void (*softwareInterruptHandler)(UnsignedWord32 opcode, ProcessControlBlock *processControlBlock);
+void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock);
 void (*prefetchAbortHandler)(void);
 void (*dataAbortHandler)(void);
 void (*reservedHandler)(void);
@@ -40,7 +40,7 @@ void defaultUndefinedInstructionHandler(UnsignedWord32* undefinedInstructionAddr
     signalError();
 }
 
-void defaultSoftwareInterruptHandler(UnsignedWord32 opcode, ProcessControlBlock *processControlBlock)
+void defaultSoftwareInterruptHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
     logMessage("Problem: Default Software Interrupt Handler\r\n");
     signalError();

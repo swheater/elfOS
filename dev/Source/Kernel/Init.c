@@ -5,7 +5,8 @@
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
 #include <Kernel/Symbol.h>
-#include <Kernel/Process.h>
+#include <Kernel/Thread.h>
+#include <Kernel/ARMv6/MemoryManagement.h>
 #include <Kernel/Handlers.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
@@ -14,7 +15,7 @@
 #include <Device/RaspPi_Timer.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
-#include <elfOS/Process.h>
+#include <elfOS/Thread.h>
 
 extern char start;
 extern char zeroPageStart;
@@ -35,7 +36,7 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
     logUnsignedWord32Hex(scr);
     logMessage("\r\n");
 
-    kDebugCurrentProcess();
+    kDebugCurrentThread();
 
     gpioSetOutput(22);
 
@@ -43,14 +44,14 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
     goto hereAndNow0;
 }
 
-static void swHandler(UnsignedWord32 opcode, ProcessControlBlock *processControlBlock)
+static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
     if (opcode == 1)
-        yieldProcess();
+        yieldThread();
     else if (opcode == 2)
-        destroyProcess(processControlBlock);
+        destroyThread(threadControlBlock);
 
-    if (currentProcessControlBlock == 0)
+    if (currentThreadControlBlock == 0)
     {
         gpioSetOutput(21);
         hereAndNow1:
@@ -62,8 +63,8 @@ static void irqHandler(void)
 {
     uartOutput('.');
 
-    if (currentProcessControlBlock != 0)
-        yieldProcess();
+    if (currentThreadControlBlock != 0)
+        yieldThread();
 
     timerClearInterruptRequest();
 }
@@ -96,14 +97,12 @@ void kernel_init()
     uartInit();
     timerInit(127, 100000, TRUE);
 
-//    timerDebug();
-
     gpioSetOutput(17);
     gpioSetOutput(18);
     gpioSetOutput(21);
     gpioSetOutput(22);
     volatile int v;
-    for (v = 0; v < 2000000; v++);
+    for (v = 0; v < 5000000; v++);
     gpioClearOutput(17);
     gpioClearOutput(18);
     gpioClearOutput(21);
@@ -111,18 +110,18 @@ void kernel_init()
 
     gpioSetOutput(17);
 
-//    timerDebug();
+    kernelARMv6_init();
 
-//    kDebugCPUState();
+    gpioSetOutput(18);
 
-    initProcesses();
-
+    initThreads();
+ 
     unsigned int numberOfGlobalSymbols = 5;
     Symbol       globalSymbols[numberOfGlobalSymbols];
-    globalSymbols[0].name  = "elfOS_processYield";
-    globalSymbols[0].value = (UnsignedWord32) elfOS_processYield;
-    globalSymbols[1].name  = "elfOS_processStop";
-    globalSymbols[1].value = (UnsignedWord32) elfOS_processStop;
+    globalSymbols[0].name  = "elfOS_threadYield";
+    globalSymbols[0].value = (UnsignedWord32) elfOS_threadYield;
+    globalSymbols[1].name  = "elfOS_threadStop";
+    globalSymbols[1].value = (UnsignedWord32) elfOS_threadStop;
     globalSymbols[2].name  = "elfOS_logUnsignedWord32Hex";
     globalSymbols[2].value = (UnsignedWord32) logUnsignedWord32Hex;
     globalSymbols[3].name  = "elfOS_logMessage";
@@ -168,7 +167,7 @@ void kernel_init()
 
             if (runFunction != 0)
 	    {
-                createProcess(runFunction, nextSegment);
+                createThread(runFunction, nextSegment);
                 nextSegment += 0x10000;
 	    }
             else
@@ -183,7 +182,7 @@ void kernel_init()
 
     gpioSetOutput(18);
 
-    startProcesses();
+    startThreads();
 
     gpioSetOutput(22);
 

@@ -3,8 +3,8 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <Kernel/ARM/ProcessControlBlock.h>
-#include <Kernel/Process.h>
+#include <Kernel/ARM/ThreadControlBlock.h>
+#include <Kernel/Thread.h>
 #include <Device/RaspPi_UART.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
@@ -44,42 +44,42 @@ void kDebugCPUState(void)
     logMessage("\r\n");
 }
 
-void kDebugCurrentProcess(void)
+void kDebugCurrentThread(void)
 {
     logMessage("\r\nRegisters:\r\n      r0=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r0);
+    logUnsignedWord32Hex(currentThreadControlBlock->r0);
     logMessage(",   r1=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r1);
+    logUnsignedWord32Hex(currentThreadControlBlock->r1);
     logMessage(",   r2=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r2);
+    logUnsignedWord32Hex(currentThreadControlBlock->r2);
     logMessage(",   r3=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r3);
+    logUnsignedWord32Hex(currentThreadControlBlock->r3);
     logMessage("\r\n      r4=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r4);
+    logUnsignedWord32Hex(currentThreadControlBlock->r4);
     logMessage(",   r5=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r5);
+    logUnsignedWord32Hex(currentThreadControlBlock->r5);
     logMessage(",   r6=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r6);
+    logUnsignedWord32Hex(currentThreadControlBlock->r6);
     logMessage(",   r7=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r7);
+    logUnsignedWord32Hex(currentThreadControlBlock->r7);
     logMessage("\r\n      r8=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r8);
+    logUnsignedWord32Hex(currentThreadControlBlock->r8);
     logMessage(",   r9=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r9);
+    logUnsignedWord32Hex(currentThreadControlBlock->r9);
     logMessage(",  r10=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r10);
+    logUnsignedWord32Hex(currentThreadControlBlock->r10);
     logMessage(",  r11=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r11);
+    logUnsignedWord32Hex(currentThreadControlBlock->r11);
     logMessage("\r\n     r12=");
-    logUnsignedWord32Hex(currentProcessControlBlock->r12);
+    logUnsignedWord32Hex(currentThreadControlBlock->r12);
     logMessage(",   sp=");
-    logUnsignedWord32Hex(currentProcessControlBlock->sp);
+    logUnsignedWord32Hex(currentThreadControlBlock->sp);
     logMessage(",   lr=");
-    logUnsignedWord32Hex(currentProcessControlBlock->lr);
+    logUnsignedWord32Hex(currentThreadControlBlock->lr);
     logMessage(",   pc=");
-    logUnsignedWord32Hex(currentProcessControlBlock->pc);
+    logUnsignedWord32Hex(currentThreadControlBlock->pc);
     logMessage("\r\n    cpsr=");
-    logUnsignedWord32Hex(currentProcessControlBlock->cpsr);
+    logUnsignedWord32Hex(currentThreadControlBlock->cpsr);
     logMessage("\r\n");
 }
 

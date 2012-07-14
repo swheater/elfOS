@@ -3,7 +3,7 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <elfOS/Process.h>
+#include <elfOS/Thread.h>
 #include <elfOS/Log.h>
 
 void run(void)
@@ -12,7 +12,7 @@ void run(void)
     while (TRUE)
     {
         elfOS_logMessage("y");
-        elfOS_processYield();
+        elfOS_threadYield();
         for (v = 0; v < 200000; v++);
     }
 }

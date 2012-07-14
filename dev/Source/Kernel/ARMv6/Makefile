@@ -3,10 +3,10 @@
 #
 
 CC      = arm-none-eabi-gcc
-CCFLAGS = -Wall -O -I../../Headers
+CCFLAGS = -Wall -O -I../../../Headers
 RM      = rm
 
-OBJS = Container.o Thread.o Segment.o
+OBJS = CPUInfo.o MemoryManagement.o
 
 all: $(OBJS)
 

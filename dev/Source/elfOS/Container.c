@@ -2,16 +2,16 @@
  * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-#include <elfOS/Process.h>
+#include <elfOS/Container.h>
 
-void elfOS_processYield(void)
+void elfOS_containerCreate(void)
 {
     asm("mov\tr0,#0": : : "r0");
-    asm("swi\t#0x000001");
+    asm("swi\t#0x000011");
 }
 
-void elfOS_processStop(void)
+void elfOS_containerDestroy(void)
 {
     asm("mov\tr0,#0": : : "r0");
-    asm("swi\t#0x000002");
+    asm("swi\t#0x000012");
 }

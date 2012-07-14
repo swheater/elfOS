@@ -10,11 +10,13 @@ MAKE    = make
 RM      = rm
 
 OBJS = Source/Boot/ARM/Start.o Source/Boot/ARM/ZeroPage.o \
-       Source/Kernel/Init.o Source/Kernel/Handlers.o Source/Kernel/Logging.o Source/Kernel/KDebug.o Source/Kernel/ARM/Process.o Source/Kernel/ARM/ProcessSwitcher.o \
+       Source/Kernel/Init.o Source/Kernel/Handlers.o Source/Kernel/Logging.o Source/Kernel/KDebug.o \
+       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o \
+       Source/Kernel/ARMv6/CPUInfo.o Source/Kernel/ARMv6/MemoryManagement.o \
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
-       Source/elfOS/Process.o \
+       Source/elfOS/Container.o Source/elfOS/Thread.o \
        Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o Source/Device/RaspPi_Timer.o
 
 all: elfOSBoot.img

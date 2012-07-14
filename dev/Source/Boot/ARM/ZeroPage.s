@@ -44,7 +44,7 @@ undefinedInstructionRedirectSkip:
 	MOVS	PC,LR
 
 softwareInterruptRedirector:
-	LDR	SP,=currentProcessControlBlock
+	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
 	STMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
@@ -60,13 +60,13 @@ softwareInterruptRedirector:
 	BEQ	softwareInterruptRedirectSkip
 	LDR	R0,[LR,#-0x04]
 	BIC	R0,R0,#0xFF000000
-	LDR	R1,=currentProcessControlBlock
+	LDR	R1,=currentThreadControlBlock
 	LDR	R1,[R1]
 	MOV	LR,PC
 	BX	R2
 
 softwareInterruptRedirectSkip:
-	LDR	SP,=currentProcessControlBlock
+	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
 	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
@@ -108,7 +108,7 @@ reservedRedirectSkip:
 	POP	{R0,LR}
 
 interruptRequestRedirector:
-	LDR	SP,=currentProcessControlBlock
+	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
 	STMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
@@ -127,7 +127,7 @@ interruptRequestRedirector:
 	BX	R0
 
 interruptRequestRedirectSkip:
-	LDR	SP,=currentProcessControlBlock
+	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
 	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP

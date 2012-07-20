@@ -11,14 +11,14 @@
 	.equ	ABT_MODE,   0x17
 	.equ	UNDEF_MODE, 0x1B
 
-	.global	start
+	.global	kernelStart
 	.global	fiqStack
 	.global	irqStack
 	.global	svcStack
 	.global	abtStack
 	.global	undefStack
 
-start:
+kernelStart:
 	MRS	R1,CPSR
 	MRS	R0,CPSR
 
@@ -50,12 +50,10 @@ start:
 	MSR	CPSR_csfx,R1
 
 	BL	kernel_init
-stop:
-	B	stop
+kernelStop:
+	B	kernelStop
 
 	.ltorg
-
-	.space	32768
 
 	.bss
 

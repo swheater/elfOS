@@ -15,12 +15,12 @@
 #define READONLY_ACCESSCONTROL  (0x2 << 10)
 #define READWRITE_ACCESSCONTROL (0x3 << 10)
 
-#define TRANSLATIONTABLE_BOUNDARYSIZE (0x1)
-#define KERNEL_TRANSLATIONTABLESIZE (32)
-#define CLIENT_TRANSLATIONTABLESIZE (2048)
+#define TRANSLATIONTABLE_BOUNDARYSIZE  (0x1)
+#define KERNEL_TRANSLATIONTABLESIZE    (32)
+#define CONTAINER_TRANSLATIONTABLESIZE (2048)
 
 extern UnsignedWord32 kernelTranslationTable[KERNEL_TRANSLATIONTABLESIZE];
-extern UnsignedWord32 clientTranslationTable[CLIENT_TRANSLATIONTABLESIZE];
+extern UnsignedWord32 containerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE];
 
 void kernelARMv6_initKernelTranslationTable(UnsignedWord32 *kernelTranslationTable)
 {
@@ -33,14 +33,14 @@ void kernelARMv6_initKernelTranslationTable(UnsignedWord32 *kernelTranslationTab
         kernelTranslationTable[index] = (index << 20) | READWRITE_ACCESSCONTROL | SECTION_L1DESCTYPE;
 }
 
-void kernelARMv6_initClientTranslationTable(UnsignedWord32 *clientTranslationTable)
+void kernelARMv6_initContainerTranslationTable(UnsignedWord32 *containerTranslationTable)
 {
-    logMessage("clientKernelTranslationTable: clientTranslationTable=");
-    logUnsignedWord32Hex((UnsignedWord32) clientTranslationTable);
+    logMessage("containerKernelTranslationTable: containerTranslationTable=");
+    logUnsignedWord32Hex((UnsignedWord32) containerTranslationTable);
     logMessage("\r\n");
     int index;
-    for (index = 0; index < CLIENT_TRANSLATIONTABLESIZE; index++)
-        clientTranslationTable[index] = (index << 20) | READWRITE_ACCESSCONTROL | SECTION_L1DESCTYPE;
+    for (index = 0; index < CONTAINER_TRANSLATIONTABLESIZE; index++)
+        containerTranslationTable[index] = (index << 20) | READWRITE_ACCESSCONTROL | SECTION_L1DESCTYPE;
 }
 
 void kernelARMv6_setKernelTranslationTable(UnsignedWord32 *kernelTranslationTable)
@@ -50,11 +50,11 @@ void kernelARMv6_setKernelTranslationTable(UnsignedWord32 *kernelTranslationTabl
     asm("mcr\tp15, 0, %0, c2, c0, 1": : "r" (kernelTranslationTable));
 }
 
-void kernelARMv6_setClientTranslationTable(UnsignedWord32 *clientTranslationTable)
+void kernelARMv6_setContainerTranslationTable(UnsignedWord32 *containerTranslationTable)
 {
-    logMessage("Set Translation Table Base Register 0, Client\r\n");
-    // Set Translation Table Base Register 0, Client
-    asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (clientTranslationTable));
+    logMessage("Set Translation Table Base Register 0, Container\r\n");
+    // Set Translation Table Base Register 0, Container
+    asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (containerTranslationTable));
 }
 
 void kernelARMv6_enableMemoryManagement(void)
@@ -132,8 +132,8 @@ void kernelARMv6_init(void)
     asm("mcr\tp15, 0, %0, c2, c0, 2": : "r" (translationTableBaseControl));
 
     kernelARMv6_initKernelTranslationTable(kernelTranslationTable);
-    kernelARMv6_initClientTranslationTable(clientTranslationTable);
+    kernelARMv6_initContainerTranslationTable(containerTranslationTable);
     kernelARMv6_setKernelTranslationTable(kernelTranslationTable);
-    kernelARMv6_setClientTranslationTable(clientTranslationTable);
+    kernelARMv6_setContainerTranslationTable(containerTranslationTable);
     kernelARMv6_enableMemoryManagement();
 }

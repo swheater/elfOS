@@ -7,7 +7,6 @@
 #include <Device/RaspPi_GPIO.h>
 #include <Kernel/Handlers.h>
 
-void (*resetHandler)(void);
 void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress);
 void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock);
 void (*prefetchAbortHandler)(void);
@@ -26,12 +25,6 @@ static void signalError(void)
         gpioClearOutput(22);
         for (count = 0; count < 2000000; count++);
     }
-}
-
-void defaultResetHandler(void)
-{
-    logMessage("Problem: Default Reset Handler\r\n");
-    signalError();
 }
 
 void defaultUndefinedInstructionHandler(UnsignedWord32* undefinedInstructionAddress)

@@ -4,19 +4,14 @@
 
 AS      = arm-none-eabi-as
 ASFLAGS = 
-CC      = arm-none-eabi-gcc
-CCFLAGS = -Wall -O -I../../../Headers
 RM      = rm
 
-OBJS = Start.o Thread.o StartThreads.o
+OBJS = ZeroPage.o
 
 all: $(OBJS)
 
 .s.o:
 	$(AS) $(ASFLAGS) -o $@ $<
-
-.c.o:
-	$(CC) $(CCFLAGS) -c $<
 
 clean:
 	$(RM) -f *~ *.o

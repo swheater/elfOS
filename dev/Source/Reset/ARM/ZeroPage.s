@@ -4,11 +4,8 @@
 
 	.text
 
-	.global	zeroPageStart
-	.global	zeroPageEnd
-
-zeroPageStart:
-	B	resetRedirector
+resetStart:
+	B	resetHandler
 	B	undefinedInstructionRedirector
 	B	softwareInterruptRedirector
 	B	prefetchAbortRedirector
@@ -17,18 +14,10 @@ zeroPageStart:
 	B	interruptRequestRedirector
 	B	fastInterruptRequestRedirector
 
-resetRedirector:
-	PUSH	{R0,LR}
-	LDR	R0,=resetHandler
-	LDR	R0,[R0]
-	CMP	R0,#0x00000000
-	BEQ	resetRedirectSkip
-	MOV	LR,PC
-	BX	R0
-resetRedirectSkip:
-	POP	{R0,LR}
-resetRedirectStop:
-	B	resetRedirectStop
+resetHandler:
+	LDR	SP,=resetStack
+	BL	reset_init
+	B	kernelStart
 
 undefinedInstructionRedirector:
 	PUSH	{R0,R1,LR}
@@ -146,7 +135,5 @@ fastInterruptRequestRedirectSkip:
 	SUBS	PC,LR,#0x04
 
 	.ltorg
-
-zeroPageEnd:
 
 	.end

@@ -4,10 +4,10 @@
 
 CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall -O -I../../Headers
-MAKE	= make
+MAKE    = make
 RM      = rm
 
-OBJS = Init.o Handlers.o Logging.o KDebug.o
+OBJS = UART.o
 
 all: $(OBJS)
 	$(MAKE) -C ARM all

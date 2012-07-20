@@ -8,7 +8,6 @@
 #include <Kernel/StdTypes.h>
 #include <Kernel/Thread.h>
 
-extern void (*resetHandler)(void);
 extern void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress);
 extern void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock);
 extern void (*prefetchAbortHandler)(void);
@@ -17,7 +16,6 @@ extern void (*reservedHandler)(void);
 extern void (*interruptRequestHandler)(void);
 extern void (*fastInterruptRequestHandler)(void);
 
-extern void defaultResetHandler(void);
 extern void defaultUndefinedInstructionHandler(UnsignedWord32* undefinedInstructionAddress);
 extern void defaultSoftwareInterruptHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock);
 extern void defaultPrefetchAbortHandler(void);

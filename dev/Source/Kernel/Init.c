@@ -18,10 +18,10 @@
 #include <elfOS/Thread.h>
 
 extern char start;
-extern char zeroPageStart;
-extern char zeroPageEnd;
-extern char bssStart;
-extern char bssEnd;
+extern char resetSectionStart;
+extern char resetSectionEnd;
+extern char kernelBSSSectionStart;
+extern char kernelBSSSectionEnd;
 extern char elfAppl;
 
 static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
@@ -71,16 +71,18 @@ static void irqHandler(void)
 
 void kernel_init()
 {
-    char *zeroPageSource      = &zeroPageStart;
-    char *zeroPageDestination = 0x0;
-    while (zeroPageSource < &zeroPageEnd)
-        *zeroPageDestination++ = *zeroPageSource++;
+    if (resetSectionStart == 0)
+    {
+        char *resetSectionSource      = &resetSectionStart;
+        char *resetSectionDestination = 0x0;
+        while (resetSectionSource < &resetSectionEnd)
+            *resetSectionDestination++ = *resetSectionSource++;
+    }
 
-    char *bssAddress = &bssStart;
-    while (bssAddress < &bssEnd)
-        *bssAddress++ = 0;
+    char *bssSectionAddress = &kernelBSSSectionStart;
+    while (bssSectionAddress < &kernelBSSSectionEnd)
+        *bssSectionAddress++ = 0;
 
-    resetHandler                = &defaultResetHandler;
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
     prefetchAbortHandler        = &defaultPrefetchAbortHandler;
@@ -97,6 +99,8 @@ void kernel_init()
     uartInit();
     timerInit(127, 100000, TRUE);
 
+    uartOutput('A');
+
     gpioSetOutput(17);
     gpioSetOutput(18);
     gpioSetOutput(21);
@@ -110,12 +114,12 @@ void kernel_init()
 
     gpioSetOutput(17);
 
-    kernelARMv6_init();
-
-    gpioSetOutput(18);
+    uartOutput('B');
 
     initThreads();
  
+    uartOutput('C');
+
     unsigned int numberOfGlobalSymbols = 5;
     Symbol       globalSymbols[numberOfGlobalSymbols];
     globalSymbols[0].name  = "elfOS_threadYield";
@@ -133,6 +137,8 @@ void kernel_init()
 
     const char *elf32 = (char*) &elfAppl;
 
+    uartOutput('D');
+
     int valid = elf32_validate(elf32, 1032);
     while (valid)
     {
@@ -141,9 +147,13 @@ void kernel_init()
         unsigned int       numberOfSectionHeaders            = header->sectionHeaderEntryNumber;
         unsigned int       numberOfVirtualMemorySegmentInfos = elf32_numberOfVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders);
 
+        uartOutput('E');
+
         VirtualMemorySegmentInfo virtualMemorySegmentInfos[numberOfVirtualMemorySegmentInfos];
 
         elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
+
+        uartOutput('F');
 
         unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
         VirtualMemorySegment segments[numberOfSegments];
@@ -156,6 +166,9 @@ void kernel_init()
             segments[segmentIndex].size            = 0;
             nextSegment += 0x10000;
         }
+
+        uartOutput('G');
+        gpioSetOutput(18);
 
         if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))
         {

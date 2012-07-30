@@ -3,4 +3,4 @@ elfOS
 
 elfOS is a platform for deploying and execution ELF (Executable and Linkable Format) files.
 
-The primary target, at present, is the Raspberry Pi.
+The primary target platform, at present, is the Raspberry Pi.

@@ -9,7 +9,7 @@ SIZE    = arm-none-eabi-size
 MAKE    = make
 RM      = rm
 
-OBJS = Source/Reset/ARM/ZeroPage.o Source/Reset/ARMv6/Init.o Source/Reset/UART.o \
+OBJS = Source/Reset/ARM/ZeroPage.o Source/Reset/ARMv6/Init.o \
        \
        Source/Kernel/ARM/Start.o Source/Kernel/Init.o \
        Source/Kernel/Handlers.o \
@@ -20,7 +20,6 @@ OBJS = Source/Reset/ARM/ZeroPage.o Source/Reset/ARMv6/Init.o Source/Reset/UART.o
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
-       Source/elfOS/Container.o Source/elfOS/Thread.o \
        Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o Source/Device/RaspPi_Timer.o
 
 all: elfOS.img

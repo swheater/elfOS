@@ -11,6 +11,7 @@ void run(void)
     volatile int v;
     while (TRUE)
     {
+        elfOS_threadYield();
         elfOS_logMessage("x");
         elfOS_threadYield();
         for (v = 0; v < 200000; v++);

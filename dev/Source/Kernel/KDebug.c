@@ -5,6 +5,7 @@
 #include <Kernel/StdTypes.h>
 #include <Kernel/ARM/ThreadControlBlock.h>
 #include <Kernel/Thread.h>
+#include <Kernel/Handlers.h>
 #include <Device/RaspPi_UART.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
@@ -46,41 +47,46 @@ void kDebugCPUState(void)
 
 void kDebugCurrentThread(void)
 {
-    logMessage("\r\nRegisters:\r\n      r0=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r0);
-    logMessage(",   r1=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r1);
-    logMessage(",   r2=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r2);
-    logMessage(",   r3=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r3);
-    logMessage("\r\n      r4=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r4);
-    logMessage(",   r5=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r5);
-    logMessage(",   r6=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r6);
-    logMessage(",   r7=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r7);
-    logMessage("\r\n      r8=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r8);
-    logMessage(",   r9=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r9);
-    logMessage(",  r10=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r10);
-    logMessage(",  r11=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r11);
-    logMessage("\r\n     r12=");
-    logUnsignedWord32Hex(currentThreadControlBlock->r12);
-    logMessage(",   sp=");
-    logUnsignedWord32Hex(currentThreadControlBlock->sp);
-    logMessage(",   lr=");
-    logUnsignedWord32Hex(currentThreadControlBlock->lr);
-    logMessage(",   pc=");
-    logUnsignedWord32Hex(currentThreadControlBlock->pc);
-    logMessage("\r\n    cpsr=");
-    logUnsignedWord32Hex(currentThreadControlBlock->cpsr);
-    logMessage("\r\n");
+    if (currentThreadControlBlock != 0)
+    {
+        logMessage("\r\nRegisters:\r\n      r0=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r0);
+        logMessage(",   r1=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r1);
+        logMessage(",   r2=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r2);
+        logMessage(",   r3=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r3);
+        logMessage("\r\n      r4=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r4);
+        logMessage(",   r5=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r5);
+        logMessage(",   r6=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r6);
+        logMessage(",   r7=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r7);
+        logMessage("\r\n      r8=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r8);
+        logMessage(",   r9=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r9);
+        logMessage(",  r10=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r10);
+        logMessage(",  r11=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r11);
+        logMessage("\r\n     r12=");
+        logUnsignedWord32Hex(currentThreadControlBlock->r12);
+        logMessage(",   sp=");
+        logUnsignedWord32Hex(currentThreadControlBlock->sp);
+        logMessage(",   lr=");
+        logUnsignedWord32Hex(currentThreadControlBlock->lr);
+        logMessage(",   pc=");
+        logUnsignedWord32Hex(currentThreadControlBlock->pc);
+        logMessage("\r\n    cpsr=");
+        logUnsignedWord32Hex(currentThreadControlBlock->cpsr);
+        logMessage("\r\n");
+    }
+    else
+        logMessage("No Current Thread\r\n");
 }
 
 void kDebugVirtualMemorySegments(VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments)
@@ -116,5 +122,24 @@ void kDebugVirtualMemorySegment(VirtualMemorySegment* virtualMemorySegment)
         logMessage(" ");
         logUnsignedByteASCII((UnsignedByte) virtualMemorySegment->physicalAddress[index]);
     }
+    logMessage("\r\n");
+}
+
+void kDebugHandlers(void)
+{
+    logMessage("undefinedInstructionHandler = ");
+    logUnsignedWord32Hex((UnsignedWord32) *undefinedInstructionHandler);
+    logMessage("\r\nsoftwareInterruptHandler    = ");
+    logUnsignedWord32Hex((UnsignedWord32) *softwareInterruptHandler);
+    logMessage("\r\nprefetchAbortHandler        = ");
+    logUnsignedWord32Hex((UnsignedWord32) *prefetchAbortHandler);
+    logMessage("\r\ndataAbortHandler            = ");
+    logUnsignedWord32Hex((UnsignedWord32) *dataAbortHandler);
+    logMessage("\r\nreservedHandler             = ");
+    logUnsignedWord32Hex((UnsignedWord32) *reservedHandler);
+    logMessage("\r\ninterruptRequestHandler     = ");
+    logUnsignedWord32Hex((UnsignedWord32) *interruptRequestHandler);
+    logMessage("\r\nfastInterruptRequestHandler = ");
+    logUnsignedWord32Hex((UnsignedWord32) *fastInterruptRequestHandler);
     logMessage("\r\n");
 }

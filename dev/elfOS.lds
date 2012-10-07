@@ -4,11 +4,12 @@
 
 EXTERN(resetStack kernelTranslationTable containerTranslationTable)
 EXTERN(kernelBSSSectionStart kernelSectionStart kernelBSSSectionEnd kernelSectionEnd)
+EXTERN(elfAppl)
 
 MEMORY
 {
 	reset :		org = 0x00000000, len = 2048M
-	kernel :	org = 0x80000000, len = 2048M
+	kernel :	org = 0x80006000, len = 2048M
 }
 
 SECTIONS
@@ -20,7 +21,6 @@ SECTIONS
 		resetSectionStart = .;
                 Source/Reset/ARM/ZeroPage.o (.text);
 		Source/Reset/ARMv6/Init.o (.text);
-		Source/Reset/UART.o (.text);
 	} > reset
 	.bss.reset :
 	{
@@ -35,7 +35,6 @@ SECTIONS
 	.text : AT (resetSectionEnd - resetSectionStart)
 	{
 		kernelSectionStart = .;
-		. = . + resetSectionEnd - resetSectionStart;
                 * (.text);
 	} > kernel
 	.rodata :

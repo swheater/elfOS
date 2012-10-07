@@ -7,13 +7,13 @@
 #include <Device/RaspPi_GPIO.h>
 #include <Kernel/Handlers.h>
 
-void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress);
-void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock);
-void (*prefetchAbortHandler)(void);
-void (*dataAbortHandler)(void);
-void (*reservedHandler)(void);
-void (*interruptRequestHandler)(void);
-void (*fastInterruptRequestHandler)(void);
+void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress)                = 0;
+void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock) = 0;
+void (*prefetchAbortHandler)(void)                                                              = 0;
+void (*dataAbortHandler)(void)                                                                  = 0;
+void (*reservedHandler)(void)                                                                   = 0;
+void (*interruptRequestHandler)(void)                                                           = 0;
+void (*fastInterruptRequestHandler)(void)                                                       = 0;
 
 static void signalError(void)
 {

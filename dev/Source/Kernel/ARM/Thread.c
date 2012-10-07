@@ -9,7 +9,7 @@
 #define THREADCONTROLBLOCKS_LENGTH (16)
 
 static int          currentThreadControlBlockIndex;
-ThreadControlBlock *currentThreadControlBlock;
+ThreadControlBlock *currentThreadControlBlock = 0;
 
 static ThreadControlBlock threadControlBlocks[THREADCONTROLBLOCKS_LENGTH];
 

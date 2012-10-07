@@ -6,7 +6,7 @@
 #include <Kernel/VirtualMemory.h>
 #include <Kernel/Symbol.h>
 #include <Kernel/Thread.h>
-#include <Kernel/ARMv6/MemoryManagement.h>
+// include <Kernel/ARMv6/MemoryManagement.h>
 #include <Kernel/Handlers.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
@@ -26,6 +26,11 @@ extern char elfAppl;
 
 static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
 {
+    kDebugCPUState();
+    logMessage("\r\n");
+
+    uartOutput('#');
+
     logMessage("UIHandler: uiAddr:");
     logUnsignedWord32Hex((UnsignedWord32) undefinedInstructionAddress);
     logMessage(" (ui: ");
@@ -36,7 +41,12 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
     logUnsignedWord32Hex(scr);
     logMessage("\r\n");
 
-    kDebugCurrentThread();
+    // kDebugCurrentThread();
+
+    VirtualMemorySegment virtualMemorySegment;
+    virtualMemorySegment.size            = 0x0300;
+    virtualMemorySegment.physicalAddress = 0x0;
+    kDebugVirtualMemorySegment(&virtualMemorySegment);
 
     gpioSetOutput(22);
 
@@ -46,6 +56,8 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
 
 static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
+    uartOutput('@');
+
     if (opcode == 1)
         yieldThread();
     else if (opcode == 2)
@@ -99,8 +111,6 @@ void kernel_init()
     uartInit();
     timerInit(127, 100000, TRUE);
 
-    uartOutput('A');
-
     gpioSetOutput(17);
     gpioSetOutput(18);
     gpioSetOutput(21);
@@ -114,32 +124,28 @@ void kernel_init()
 
     gpioSetOutput(17);
 
-    uartOutput('B');
-
     initThreads();
- 
-    uartOutput('C');
 
-    unsigned int numberOfGlobalSymbols = 5;
+    unsigned int numberOfGlobalSymbols = 0;
+    //    unsigned int numberOfGlobalSymbols = 5;
     Symbol       globalSymbols[numberOfGlobalSymbols];
-    globalSymbols[0].name  = "elfOS_threadYield";
-    globalSymbols[0].value = (UnsignedWord32) elfOS_threadYield;
-    globalSymbols[1].name  = "elfOS_threadStop";
-    globalSymbols[1].value = (UnsignedWord32) elfOS_threadStop;
-    globalSymbols[2].name  = "elfOS_logUnsignedWord32Hex";
-    globalSymbols[2].value = (UnsignedWord32) logUnsignedWord32Hex;
-    globalSymbols[3].name  = "elfOS_logMessage";
-    globalSymbols[3].value = (UnsignedWord32) logMessage;
-    globalSymbols[4].name  = "elfOS_logNewLine";
-    globalSymbols[4].value = (UnsignedWord32) logNewLine;
+    //    globalSymbols[0].name  = "elfOS_threadYield";
+    //    globalSymbols[0].value = (UnsignedWord32) elfOS_threadYield;
+    //    globalSymbols[1].name  = "elfOS_threadStop";
+    //    globalSymbols[1].value = (UnsignedWord32) elfOS_threadStop;
+    //    globalSymbols[2].name  = "elfOS_logUnsignedWord32Hex";
+    //    globalSymbols[2].value = (UnsignedWord32) logUnsignedWord32Hex;
+    //    globalSymbols[3].name  = "elfOS_logMessage";
+    //    globalSymbols[3].value = (UnsignedWord32) logMessage;
+    //    globalSymbols[4].name  = "elfOS_logNewLine";
+    //    globalSymbols[4].value = (UnsignedWord32) logNewLine;
 
     UnsignedByte *nextSegment = (UnsignedByte*) 0x80000;
 
     const char *elf32 = (char*) &elfAppl;
 
-    uartOutput('D');
-
     int valid = elf32_validate(elf32, 1032);
+
     while (valid)
     {
         ELF32Header        *header                           = (ELF32Header*) elf32;
@@ -147,13 +153,9 @@ void kernel_init()
         unsigned int       numberOfSectionHeaders            = header->sectionHeaderEntryNumber;
         unsigned int       numberOfVirtualMemorySegmentInfos = elf32_numberOfVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders);
 
-        uartOutput('E');
-
         VirtualMemorySegmentInfo virtualMemorySegmentInfos[numberOfVirtualMemorySegmentInfos];
 
         elf32_extractVirtualMemorySegmentInfos(sectionHeaders, numberOfSectionHeaders, virtualMemorySegmentInfos, &numberOfVirtualMemorySegmentInfos);
-
-        uartOutput('F');
 
         unsigned int         numberOfSegments = numberOfVirtualMemorySegmentInfos;
         VirtualMemorySegment segments[numberOfSegments];
@@ -167,7 +169,6 @@ void kernel_init()
             nextSegment += 0x10000;
         }
 
-        uartOutput('G');
         gpioSetOutput(18);
 
         if (elf32_segmentsInitialize(elf32, sectionHeaders, numberOfSectionHeaders, globalSymbols, numberOfGlobalSymbols, segments, numberOfSegments))
@@ -194,6 +195,20 @@ void kernel_init()
     }
 
     gpioSetOutput(18);
+
+    kDebugCurrentThread();
+    logMessage("\r\n");
+
+    kDebugHandlers();
+    logMessage("\r\n");
+
+    // Enable interrupts
+    asm("mrs\tr0, cpsr\n\t"
+        "bic\tr0, r0, #0x000000C0\n\t"
+        "msr\tcpsr_csfx, r0": : : "r0");
+
+    kDebugCPUState();
+    logMessage("\r\n");
 
     startThreads();
 

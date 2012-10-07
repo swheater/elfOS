@@ -35,31 +35,39 @@ undefinedInstructionRedirectSkip:
 softwareInterruptRedirector:
 	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
-	STMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
-	NOP
-	STMIA	SP!,{LR}
-	NOP
-	MRS	R2,SPSR
-	STMIA	SP!,{R2}
+	CMP	SP,#0x00000000
+	BEQ	softwareInterruptRedirectorNoCurrentThread
 
 	LDR	SP,=svcStack
 	LDR	R2,=softwareInterruptHandler
 	LDR	R2,[R2]
 	CMP	R2,#0x00000000
-	BEQ	softwareInterruptRedirectSkip
+	BEQ	softwareInterruptRedirectorSkip
 	LDR	R0,[LR,#-0x04]
 	BIC	R0,R0,#0xFF000000
 	LDR	R1,=currentThreadControlBlock
 	LDR	R1,[R1]
 	MOV	LR,PC
 	BX	R2
-
-softwareInterruptRedirectSkip:
-	LDR	SP,=currentThreadControlBlock
-	LDR	SP,[SP]
+softwareInterruptRedirectorSkip:
 	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
 	LDMIA	SP,{PC}^
+
+softwareInterruptRedirectorNoCurrentThread:
+	LDR	SP,=svcStack
+	LDR	R2,=softwareInterruptHandler
+	LDR	R2,[R2]
+	CMP	R2,#0x00000000
+	BEQ	softwareInterruptRedirectorNoCurrentThreadSkip
+	LDR	R0,[LR,#-0x04]
+	BIC	R0,R0,#0xFF000000
+	LDR	R1,=currentThreadControlBlock
+	LDR	R1,[R1]
+	MOV	LR,PC
+	BX	R2
+softwareInterruptRedirectorNoCurrentThreadSkip:
+	MOVS	PC,LR
 
 prefetchAbortRedirector:
 	PUSH	{R0,LR}

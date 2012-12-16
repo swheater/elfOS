@@ -30,16 +30,22 @@ void gpioInit(void)
 {
     unsigned int gpioFuncSelect;
 
+    // Select function output for GPIO04
+    gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET);
+    gpioFuncSelect &= 0xFFFF8FFF;
+    gpioFuncSelect |= 0x00001000;
+    *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET) = gpioFuncSelect;
+
     // Select function output for GPIO17 and GPIO18
     gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_1_OFFSET);
     gpioFuncSelect &= 0xF81FFFFF;
     gpioFuncSelect |= 0x01200000;
     *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_1_OFFSET) = gpioFuncSelect;
 
-    // Select function output for GPIO21 and GPIO22
+    // Select function output for GPIO21, GPIO22, GPIO23, GPIO24 and GPIO25
     gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_2_OFFSET);
-    gpioFuncSelect &= 0xFFFFFE07;
-    gpioFuncSelect |= 0x00000048;
+    gpioFuncSelect &= 0xFFFC0007;
+    gpioFuncSelect |= 0x00009248;
     *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_2_OFFSET) = gpioFuncSelect;
 }
 

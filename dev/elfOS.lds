@@ -19,9 +19,9 @@ SECTIONS
 	}
 	.text kernel : AT (ADDR(.text.boot) + SIZEOF(.text.boot))
 	{
-		kernel_zeroPagePhyStart = (. - ADDR(.text)) + ADDR(.text.boot);
+		kernel_zeroPagePhyStart = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
                 Source/Kernel/ARM/ZeroPage.o (.text);
-		kernel_zeroPagePhyEnd = . + ADDR(.text.boot) - ADDR(.text);
+		kernel_zeroPagePhyEnd = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
                 * (.text);
 	}
 	.rodata :
@@ -33,10 +33,10 @@ SECTIONS
 		* (.data);
 		. = ALIGN(0x2000);
 		kernel_containerTranslationTable    = .;
-		kernel_phyContainerTranslationTable = . + ADDR(.text.boot) - ADDR(.data);
+		kernel_phyContainerTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
 		. = . + 0x2000;
 		kernel_kernelTranslationTable    = .;
-		kernel_phyKernelTranslationTable = . + ADDR(.text.boot) - ADDR(.data);
+		kernel_phyKernelTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
 		. = . + 0x2000;
 	}
 	.bss :

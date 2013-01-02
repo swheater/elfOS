@@ -1,5 +1,5 @@
 @
-@ Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+@ Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 @
 
 	.text
@@ -11,61 +11,60 @@
 	.equ	ABT_MODE,   0x17
 	.equ	UNDEF_MODE, 0x1B
 
-	.global	kernelStart
-	.global	fiqStack
-	.global	irqStack
-	.global	svcStack
-	.global	abtStack
-	.global	undefStack
+	.global	kernel_boot_handlerStacksSetup
+	.global	kernel_fiqStack
+	.global	kernel_irqStack
+	.global	kernel_abtStack
+	.global	kernel_svcStack
+	.global	kernel_undefStack
 
-kernelStart:
+kernel_boot_handlerStacksSetup:
 	MRS	R1,CPSR
 	MRS	R0,CPSR
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#FIQ_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=fiqStack
+	LDR	SP,=kernel_fiqStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#IRQ_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=irqStack
+	LDR	SP,=kernel_irqStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#ABT_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=abtStack
+	LDR	SP,=kernel_abtStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#SVC_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=svcStack
+	LDR	SP,=kernel_svcStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#UNDEF_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=undefStack
+	LDR	SP,=kernel_undefStack
 
 	MSR	CPSR_csfx,R1
 
-	BL	kernel_init
-kernelStop:
-	B	kernelStop
+	BX	LR
 
 	.ltorg
 
 	.bss
 
-	.space	32768
-fiqStack:
-	.space	32768
-irqStack:
-	.space	32768
-svcStack:
-	.space	32768
-abtStack:
-	.space	32768
-undefStack:
+	.align	4
+	.space	4096
+kernel_fiqStack:
+	.space	4096
+kernel_irqStack:
+	.space	4096
+kernel_svcStack:
+	.space	4096
+kernel_abtStack:
+	.space	4096
+kernel_undefStack:
 
 	.end

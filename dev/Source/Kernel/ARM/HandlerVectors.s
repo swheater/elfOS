@@ -1,10 +1,12 @@
 @
-@ Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+@ Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 @
 
 	.text
 
-resetStart:
+	.global	kernel_handlerVectors
+
+kernel_handlerVectors:
 	B	resetHandler
 	B	undefinedInstructionRedirector
 	B	softwareInterruptRedirector
@@ -15,9 +17,7 @@ resetStart:
 	B	fastInterruptRequestRedirector
 
 resetHandler:
-	LDR	SP,=resetStack
-	BL	reset_init
-	B	kernelStart
+	LDR	PC,=kernel_boot
 
 undefinedInstructionRedirector:
 	PUSH	{R0,R1,LR}
@@ -35,10 +35,14 @@ undefinedInstructionRedirectSkip:
 softwareInterruptRedirector:
 	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
-	CMP	SP,#0x00000000
-	BEQ	softwareInterruptRedirectorNoCurrentThread
+	STMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
+	NOP
+	STMIA	SP!,{LR}
+	NOP
+	MRS	R2,SPSR
+	STMIA	SP!,{R2}
 
-	LDR	SP,=svcStack
+	LDR	SP,=kernel_svcStack
 	LDR	R2,=softwareInterruptHandler
 	LDR	R2,[R2]
 	CMP	R2,#0x00000000
@@ -50,24 +54,11 @@ softwareInterruptRedirector:
 	MOV	LR,PC
 	BX	R2
 softwareInterruptRedirectorSkip:
+	LDR	SP,=currentThreadControlBlock
+	LDR	SP,[SP]
 	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
 	LDMIA	SP,{PC}^
-
-softwareInterruptRedirectorNoCurrentThread:
-	LDR	SP,=svcStack
-	LDR	R2,=softwareInterruptHandler
-	LDR	R2,[R2]
-	CMP	R2,#0x00000000
-	BEQ	softwareInterruptRedirectorNoCurrentThreadSkip
-	LDR	R0,[LR,#-0x04]
-	BIC	R0,R0,#0xFF000000
-	LDR	R1,=currentThreadControlBlock
-	LDR	R1,[R1]
-	MOV	LR,PC
-	BX	R2
-softwareInterruptRedirectorNoCurrentThreadSkip:
-	MOVS	PC,LR
 
 prefetchAbortRedirector:
 	PUSH	{R0,LR}
@@ -115,7 +106,7 @@ interruptRequestRedirector:
 	MRS	R2,SPSR
 	STMIA	SP!,{R2}
 
-	LDR	SP,=irqStack
+	LDR	SP,=kernel_irqStack
 	LDR	R0,=interruptRequestHandler
 	LDR	R0,[R0]
 	CMP	R0,#0x00000000
@@ -141,7 +132,5 @@ fastInterruptRequestRedirector:
 fastInterruptRequestRedirectSkip:
 	POP	{R0,LR}
 	SUBS	PC,LR,#0x04
-
-	.ltorg
 
 	.end

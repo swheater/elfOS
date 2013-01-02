@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+ * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
 #include <Kernel/Symbol.h>
 #include <Kernel/Thread.h>
-// include <Kernel/ARMv6/MemoryManagement.h>
 #include <Kernel/Handlers.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
@@ -18,10 +17,8 @@
 #include <elfOS/Thread.h>
 
 extern char start;
-extern char resetSectionStart;
-extern char resetSectionEnd;
-extern char kernelBSSSectionStart;
-extern char kernelBSSSectionEnd;
+extern char kernel_bssSectionStart;
+extern char kernel_bssSectionEnd;
 extern char elfAppl;
 
 static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
@@ -48,7 +45,7 @@ static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
     virtualMemorySegment.physicalAddress = 0x0;
     kDebugVirtualMemorySegment(&virtualMemorySegment);
 
-    gpioSetOutput(22);
+    gpioSetOutput(4);
 
     hereAndNow0:
     goto hereAndNow0;
@@ -58,10 +55,10 @@ static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBl
 {
     uartOutput('@');
 
-    if (opcode == 1)
-        yieldThread();
-    else if (opcode == 2)
-        destroyThread(threadControlBlock);
+    //    if (opcode == 1)
+    //        yieldThread();
+    //    else if (opcode == 2)
+    //        destroyThread(threadControlBlock);
 
     if (currentThreadControlBlock == 0)
     {
@@ -75,25 +72,17 @@ static void irqHandler(void)
 {
     uartOutput('.');
 
-    if (currentThreadControlBlock != 0)
-        yieldThread();
+    //    if (currentThreadControlBlock != 0)
+    //        yieldThread();
 
-    timerClearInterruptRequest();
+    //    timerClearInterruptRequest();
 }
 
-void kernel_init()
+void kernel_start()
 {
-    if (resetSectionStart == 0)
-    {
-        char *resetSectionSource      = &resetSectionStart;
-        char *resetSectionDestination = 0x0;
-        while (resetSectionSource < &resetSectionEnd)
-            *resetSectionDestination++ = *resetSectionSource++;
-    }
-
-    char *bssSectionAddress = &kernelBSSSectionStart;
-    while (bssSectionAddress < &kernelBSSSectionEnd)
-        *bssSectionAddress++ = 0;
+    char *kernel_bssSectionAddress = &kernel_bssSectionStart;
+    while (kernel_bssSectionAddress < &kernel_bssSectionEnd)
+        *kernel_bssSectionAddress++ = 0;
 
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
@@ -108,19 +97,43 @@ void kernel_init()
     interruptRequestHandler     = &irqHandler;
 
     gpioInit();
-    uartInit();
-    timerInit(127, 100000, TRUE);
+    gpioSetOutput(4);
+    //    uartInit();
+    //    timerInit(127, 100000, TRUE);
 
-    gpioSetOutput(17);
-    gpioSetOutput(18);
-    gpioSetOutput(21);
-    gpioSetOutput(22);
     volatile int v;
+    gpioSetOutput(17);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(18);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(21);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(22);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(23);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(24);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(25);
+    for (v = 0; v < 5000000; v++);
+    gpioSetOutput(4);
     for (v = 0; v < 5000000; v++);
     gpioClearOutput(17);
+    for (v = 0; v < 5000000; v++);
     gpioClearOutput(18);
+    for (v = 0; v < 5000000; v++);
     gpioClearOutput(21);
+    for (v = 0; v < 5000000; v++);
     gpioClearOutput(22);
+    for (v = 0; v < 5000000; v++);
+    gpioClearOutput(23);
+    for (v = 0; v < 5000000; v++);
+    gpioClearOutput(24);
+    for (v = 0; v < 5000000; v++);
+    gpioClearOutput(25);
+    for (v = 0; v < 5000000; v++);
+    gpioClearOutput(4);
+    for (v = 0; v < 5000000; v++);
 
     gpioSetOutput(17);
 
@@ -142,6 +155,7 @@ void kernel_init()
 
     UnsignedByte *nextSegment = (UnsignedByte*) 0x80000;
 
+    /*
     const char *elf32 = (char*) &elfAppl;
 
     int valid = elf32_validate(elf32, 1032);
@@ -193,8 +207,8 @@ void kernel_init()
         elf32 += 1032;
         valid = elf32_validate(elf32, 1032);
     }
-
-    gpioSetOutput(18);
+    */
+    gpioSetOutput(22);
 
     kDebugCurrentThread();
     logMessage("\r\n");
@@ -202,17 +216,12 @@ void kernel_init()
     kDebugHandlers();
     logMessage("\r\n");
 
-    // Enable interrupts
-    asm("mrs\tr0, cpsr\n\t"
-        "bic\tr0, r0, #0x000000C0\n\t"
-        "msr\tcpsr_csfx, r0": : : "r0");
-
     kDebugCPUState();
     logMessage("\r\n");
 
-    startThreads();
+    //    startThreads();
 
-    gpioSetOutput(22);
+    gpioSetOutput(25);
 
     logMessage("**** stopped ****\r\n");
     hereAndNow2:

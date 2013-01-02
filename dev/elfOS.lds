@@ -1,57 +1,48 @@
 /*
- * Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+ * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-EXTERN(resetStack kernelTranslationTable containerTranslationTable)
-EXTERN(kernelBSSSectionStart kernelSectionStart kernelBSSSectionEnd kernelSectionEnd)
-EXTERN(elfAppl)
-
-MEMORY
-{
-	reset :		org = 0x00000000, len = 2048M
-	kernel :	org = 0x80006000, len = 2048M
-}
+EXTERN(kernel_boot kernel)
+EXTERN(kernel_zeroPagePhyStart kernel_zeroPagePhyEnd);
+EXTERN(kernel_bssSectionStart kernel_bssSectionEnd)
+EXTERN(kernel_containerTranslationTable kernel_phyContainerTranslationTable kernel_kernelTranslationTable kernel_phyKernelTranslationTable);
 
 SECTIONS
 {
-	. = 0x00000000;
+	kernel_boot = 0x00008000;
+	kernel      = 0x80000000;
 
-	.text.reset :
+	.text.boot kernel_boot :
 	{
-		resetSectionStart = .;
-                Source/Reset/ARM/ZeroPage.o (.text);
-		Source/Reset/ARMv6/Init.o (.text);
-	} > reset
-	.bss.reset :
+                Source/Kernel/ARM/Boot.o (.text);
+		Source/Kernel/ARMv6/BootVirtualMemory.o (.text);
+	}
+	.text kernel : AT (ADDR(.text.boot) + SIZEOF(.text.boot))
 	{
-		. = ALIGN(0x2000);
-		PROVIDE(resetStack = .);
-		PROVIDE(kernelTranslationTable = .);
-		. = . + 0x2000;
-		PROVIDE(containerTranslationTable = .);
-		. = . + 0x2000;
-		resetSectionEnd = .;
-	} > reset
-	.text : AT (resetSectionEnd - resetSectionStart)
-	{
-		kernelSectionStart = .;
+		kernel_zeroPagePhyStart = (. - ADDR(.text)) + ADDR(.text.boot);
+                Source/Kernel/ARM/ZeroPage.o (.text);
+		kernel_zeroPagePhyEnd = . + ADDR(.text.boot) - ADDR(.text);
                 * (.text);
-	} > kernel
+	}
 	.rodata :
 	{
 		* (.rodata);
-	} > kernel
+	}
 	.data :
 	{
 		* (.data);
-	} > kernel
+		. = ALIGN(0x2000);
+		kernel_containerTranslationTable    = .;
+		kernel_phyContainerTranslationTable = . + ADDR(.text.boot) - ADDR(.data);
+		. = . + 0x2000;
+		kernel_kernelTranslationTable    = .;
+		kernel_phyKernelTranslationTable = . + ADDR(.text.boot) - ADDR(.data);
+		. = . + 0x2000;
+	}
 	.bss :
 	{
-		elfAppl = .;
-		. = . + 0x8000;
-		kernelBSSSectionStart = .;
+		kernel_bssSectionStart = .;
 		* (.bss);
-		kernelBSSSectionEnd = .;
-		kernelSectionEnd = .;
-	} > kernel
+		kernel_bssSectionEnd = .;
+	}
 }

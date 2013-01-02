@@ -1,5 +1,5 @@
-#ifndef _DEVICE_RASPPI_UART_H
-#define _DEVICE_RASPPI_UART_H 1
+#ifndef _KERNEL_HANDLERVECTORS
+#define _KERNEL_HANDLERVECTORS 1
 
 /*
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
@@ -7,7 +7,6 @@
 
 #include <Kernel/StdTypes.h>
 
-extern void uartInit(void);
-extern void uartOutput(UnsignedByte ch);
+extern UnsignedWord32 kernel_handlerVectors;
 
 #endif

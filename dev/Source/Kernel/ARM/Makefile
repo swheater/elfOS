@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+# Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
 AS      = arm-none-eabi-as
@@ -8,7 +8,7 @@ CC      = arm-none-eabi-gcc
 CCFLAGS = -Wall -O -I../../../Headers
 RM      = rm
 
-OBJS = Start.o Thread.o StartThreads.o
+OBJS = Boot.o Start.o ZeroPage.o HandlerVectors.o Thread.o StartThreads.o
 
 all: $(OBJS)
 

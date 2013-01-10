@@ -16,6 +16,7 @@ SECTIONS
 	{
                 Source/Kernel/ARM/Boot.o (.text);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.text);
+		. = ALIGN(0x1000);
 	}
 	.text kernel : AT (ADDR(.text.boot) + SIZEOF(.text.boot))
 	{

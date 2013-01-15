@@ -8,12 +8,12 @@
 #include <Kernel/Logging.h>
 #include <Device/RaspPi_Timer.h>
 
-#define IRQCTRL_BASE                    ((volatile UnsignedWord32*) 0x2000B000)
+#define IRQCTRL_BASE                    ((volatile UnsignedWord32*) 0xF000B000)
 #define IRQCTRL_BASICENABLE_OFFSET      (0x86)
 
 #define IRQCTRL_TIMERIRQ_BIT            (0x00000001)
 
-#define TIMER_BASE                      ((volatile UnsignedWord32*) 0x2000B000)
+#define TIMER_BASE                      ((volatile UnsignedWord32*) 0xF000B000)
 #define TIMER_LOAD_OFFSET               (0x100)
 #define TIMER_VALUE_OFFSET              (0x101)
 #define TIMER_CONTROL_OFFSET            (0x102)

@@ -6,8 +6,18 @@
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
 
+extern char kernel_zeroPagePhyStart;
+extern char kernel_zeroPagePhyEnd;
+extern char kernel_bssSectionStart;
+extern char kernel_bssSectionEnd;
+
 void kernel_boot_virtualMemorySetup(void)
 {
+    char *zeroPageDestinationAddress = 0;
+    char *zeroPageSourceAddress      = &kernel_zeroPagePhyStart;
+    while (zeroPageSourceAddress < &kernel_zeroPagePhyEnd)
+        *zeroPageDestinationAddress++ = *zeroPageSourceAddress++;
+
     // Set-up Domain Access Control Register
     UnsignedWord32 domainAccessControl = 0xFFFFFFFF;
     asm("mcr\tp15, 0, %0, c3, c0, 0": : "r" (domainAccessControl));
@@ -52,4 +62,8 @@ void kernel_boot_virtualMemorySetup(void)
         "orr\tr0, r0, #0x00000004\n\t"
         "orr\tr0, r0, #0x00001000\n\t"
         "mcr\tp15, 0, r0, c1, c0, 0": : : "r0");
+
+    char *bssSectionAddress = &kernel_bssSectionStart;
+    while (bssSectionAddress < &kernel_bssSectionEnd)
+        *bssSectionAddress++ = 0;
 }

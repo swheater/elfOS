@@ -17,8 +17,6 @@
 #include <elfOS/Thread.h>
 
 extern char start;
-extern char kernel_bssSectionStart;
-extern char kernel_bssSectionEnd;
 extern char elfAppl;
 
 static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
@@ -80,10 +78,6 @@ static void irqHandler(void)
 
 void kernel_start()
 {
-    char *kernel_bssSectionAddress = &kernel_bssSectionStart;
-    while (kernel_bssSectionAddress < &kernel_bssSectionEnd)
-        *kernel_bssSectionAddress++ = 0;
-
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
     prefetchAbortHandler        = &defaultPrefetchAbortHandler;

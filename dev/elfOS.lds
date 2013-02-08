@@ -13,7 +13,7 @@ SECTIONS
 	kernel      = 0x80000000;
 
 	dev_phyStart = 0x20000000;
-	dev_phyEnd   = 0x20FFFFFF
+	dev_phyEnd   = 0x20FFFFFF;
 	dev_virStart = 0xF0000000;
 
 	.text.boot kernel_boot :

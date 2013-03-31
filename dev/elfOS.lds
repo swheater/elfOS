@@ -4,8 +4,9 @@
 
 EXTERN(kernel_boot kernel)
 EXTERN(kernel_zeroPagePhyStart kernel_zeroPagePhyEnd);
-EXTERN(kernel_bssSectionStart kernel_bssSectionEnd)
+EXTERN(kernel_bssSectionStart kernel_bssSectionEnd);
 EXTERN(kernel_containerTranslationTable kernel_phyContainerTranslationTable kernel_kernelTranslationTable kernel_phyKernelTranslationTable);
+EXTERN(kernel_containerPageTable kernel_phyContainerPageTable kernel_kernelPageTable kernel_phyKernelPageTable kernel_devicePageTable kernel_phyDevicePageTable);
 
 SECTIONS
 {
@@ -41,8 +42,16 @@ SECTIONS
 		kernel_phyContainerTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
 		. = . + 0x2000;
 		kernel_kernelTranslationTable    = .;
-		kernel_phyKernelTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
-		. = . + 0x2000;
+		kernel_phyKernelTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));	
+		. = . + 0x0400;
+		kernel_containerPageTable    = .;
+		kernel_phyContainerPageTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
+		. = . + 0x0400;
+		kernel_kernelPageTable    = .;
+		kernel_phyKernelPageTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
+		. = . + 0x0400;
+		kernel_devicePageTable    = .;
+		kernel_phyDevicePageTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
 	}
 	.bss :
 	{

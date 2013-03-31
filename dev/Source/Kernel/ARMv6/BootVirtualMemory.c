@@ -30,13 +30,27 @@ void kernel_boot_virtualMemorySetup(void)
 
     // Set-up container virtual memory
     for (index = 0; index < CONTAINER_TRANSLATIONTABLESIZE; index++)
-        kernel_containerTranslationTable[index] = (index << 20) | READWRITE_ACCESSCONTROL | SECTION_L1DESCTYPE;
+        kernel_containerTranslationTable[index] = INVALID_L1DESCTYPE;
+
+    for (index = 0; index < PAGETABLESIZE; index++)
+        kernel_containerPageTable[index] = (0x0000000 & 0xFFFFF000) | 0x10; // To be checked
+
+    kernel_containerTranslationTable[0x0000] = (((unsigned int) kernel_containerPageTable) & 0xFFFFFFC0) | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (kernel_containerTranslationTable));
 
     // Set-up kernel virtual memory
     for (index = 0; index < KERNEL_TRANSLATIONTABLESIZE; index++)
-        kernel_kernelTranslationTable[index] = (index << 20) | READWRITE_ACCESSCONTROL | SECTION_L1DESCTYPE;
+        kernel_kernelTranslationTable[index] = INVALID_L1DESCTYPE;
+
+    for (index = 0; index < PAGETABLESIZE; index++)
+        kernel_kernelPageTable[index] = (0x8000000 & 0xFFFFF000) | 0x10; // To be checked
+
+    for (index = 0; index < PAGETABLESIZE; index++)
+        kernel_devicePageTable[index] = (0xF000000 & 0xFFFFF000) | 0x10; // To be checked
+
+    kernel_kernelTranslationTable[0x0000] = (((unsigned int) kernel_kernelPageTable) & 0xFFFFFFC0) | PAGE_L1DESCTYPE;
+    kernel_kernelTranslationTable[0x0F02] = (((unsigned int) kernel_devicePageTable) & 0xFFFFFFC0) | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 1": : "r" (kernel_kernelTranslationTable));
 

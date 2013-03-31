@@ -11,13 +11,12 @@
 #define PAGE_L1DESCTYPE    (0x1)
 #define SECTION_L1DESCTYPE (0x2)
 
-#define NOACCESS_ACCESSCONTROL  (0x1 << 10)
-#define READONLY_ACCESSCONTROL  (0x2 << 10)
-#define READWRITE_ACCESSCONTROL (0x3 << 10)
-
 #define TRANSLATIONTABLE_BOUNDARYSIZE  (0x1)
 #define CONTAINER_TRANSLATIONTABLESIZE (2048)
 #define KERNEL_TRANSLATIONTABLESIZE    (2048)
+
+#define PAGETABLESIZE (256)
+#define PAGESIZE      (4096)
 
 typedef struct
 {
@@ -35,6 +34,16 @@ typedef struct
 
 extern UnsignedWord32 kernel_containerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE];
 extern UnsignedWord32 kernel_kernelTranslationTable[KERNEL_TRANSLATIONTABLESIZE];
+extern UnsignedWord32 kernel_containerPageTable[PAGETABLESIZE];
+extern UnsignedWord32 kernel_kernelPageTable[PAGETABLESIZE];
+extern UnsignedWord32 kernel_devicePageTable[PAGETABLESIZE];
+
+extern UnsignedWord32 *kernel_phyContainerTranslationTable;
+extern UnsignedWord32 *kernel_phyKernelTranslationTable;
+
+extern UnsignedWord32 *kernel_phyContainerPageTable;
+extern UnsignedWord32 *kernel_phyKernelPageTable;
+extern UnsignedWord32 *kernel_phyDevicePageTable;
 
 extern void kernel_boot_virtualMemorySetup(void);
 

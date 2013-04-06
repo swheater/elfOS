@@ -6,7 +6,7 @@
 
 #include <Kernel/StdTypes.h>
 
-#define GPIO_BASE                              ((volatile UnsignedWord32*) 0xF0200000)
+#define GPIO_BASE                              ((volatile UnsignedWord32*) 0x20200000)
 #define GPIO_FUNCSELECT_BASE                   (GPIO_BASE + 0x00)
 #define GPIO_FUNCSELECT_1_OFFSET               (0x01)
 #define GPIO_PINPULLUPDOWNENABLE_OFFSET        (0x25)

@@ -7,7 +7,7 @@
 #include <Kernel/StdTypes.h>
 #include <Device/RaspPi_GPIO.h>
 
-#define GPIO_BASE                ((volatile UnsignedWord32*) 0xF0200000)
+#define GPIO_BASE                ((volatile UnsignedWord32*) 0x20200000)
 #define GPIO_FUNCSELECT_BASE     (GPIO_BASE + 0x00)
 #define GPIO_FUNCSELECT_0_OFFSET (0x00)
 #define GPIO_FUNCSELECT_1_OFFSET (0x01)

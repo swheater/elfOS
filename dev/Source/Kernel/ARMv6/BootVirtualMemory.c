@@ -13,13 +13,14 @@ extern char kernel_bssSectionEnd;
 
 void kernel_boot_virtualMemorySetup(void)
 {
+    // Copy Zero Page code to Zero Page
     char *zeroPageDestinationAddress = 0;
     char *zeroPageSourceAddress      = &kernel_zeroPagePhyStart;
     while (zeroPageSourceAddress < &kernel_zeroPagePhyEnd)
         *zeroPageDestinationAddress++ = *zeroPageSourceAddress++;
 
-    // Set-up Domain Access Control Register
-    UnsignedWord32 domainAccessControl = 0xFFFFFFFF;
+    // Set-up Domain Access Control Register, all client (Accesses are checked against access permissions)
+    UnsignedWord32 domainAccessControl = 0x55555555;
     asm("mcr\tp15, 0, %0, c3, c0, 0": : "r" (domainAccessControl));
 
     // Set-up Translation Table Base Control Register
@@ -33,9 +34,13 @@ void kernel_boot_virtualMemorySetup(void)
         kernel_containerTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_containerPageTable[index] = (0x0000000 & 0xFFFFF000) | 0x10; // To be checked
+        kernel_containerPageTable[index] = (0x00000000 & 0xFFFFF000) | (index << 12) | 0x032;
 
-    kernel_containerTranslationTable[0x0000] = (((unsigned int) kernel_containerPageTable) & 0xFFFFFFC0) | PAGE_L1DESCTYPE;
+    for (index = 0; index < PAGETABLESIZE; index++)
+        kernel_devicePageTable[index] = (0x20200000 & 0xFFFFF000) | (index << 12) | 0x032;
+
+    kernel_containerTranslationTable[0x000] = (((unsigned int) kernel_containerPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_containerTranslationTable[0x202] = (((unsigned int) kernel_devicePageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (kernel_containerTranslationTable));
 
@@ -44,13 +49,9 @@ void kernel_boot_virtualMemorySetup(void)
         kernel_kernelTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_kernelPageTable[index] = (0x8000000 & 0xFFFFF000) | 0x10; // To be checked
+        kernel_kernelPageTable[index] = (0x80000000 & 0xFFFFF000) | (index << 12) | 0x032;
 
-    for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_devicePageTable[index] = (0xF000000 & 0xFFFFF000) | 0x10; // To be checked
-
-    kernel_kernelTranslationTable[0x0000] = (((unsigned int) kernel_kernelPageTable) & 0xFFFFFFC0) | PAGE_L1DESCTYPE;
-    kernel_kernelTranslationTable[0x0F02] = (((unsigned int) kernel_devicePageTable) & 0xFFFFFFC0) | PAGE_L1DESCTYPE;
+    kernel_kernelTranslationTable[0x000] = (((unsigned int) kernel_kernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 1": : "r" (kernel_kernelTranslationTable));
 
@@ -69,6 +70,7 @@ void kernel_boot_virtualMemorySetup(void)
     // Enable Memory Management Unit
     asm("mrc\tp15, 0, r0, c1, c0, 0\n\t"
         "orr\tr0, r0, #0x00000001\n\t"
+        "orr\tr0, r0, #0x00800000\n\t"
         "mcr\tp15, 0, r0, c1, c0, 0": : : "r0");
 
     // Enable Instruction and Data Caching

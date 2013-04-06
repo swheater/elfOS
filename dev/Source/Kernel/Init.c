@@ -11,7 +11,7 @@
 #include <Kernel/KDebug.h>
 #include <Device/RaspPi_GPIO.h>
 #include <Device/RaspPi_UART.h>
-#include <Device/RaspPi_Timer.h>
+// include <Device/RaspPi_Timer.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>

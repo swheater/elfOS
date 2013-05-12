@@ -37,19 +37,6 @@ typedef struct
     UnsignedWord32 size;
 } VirtualMemorySegment;
 
-extern UnsignedWord32 kernel_containerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE];
-extern UnsignedWord32 kernel_kernelTranslationTable[KERNEL_TRANSLATIONTABLESIZE];
-extern UnsignedWord32 kernel_containerPageTable[PAGETABLESIZE];
-extern UnsignedWord32 kernel_kernelPageTable[PAGETABLESIZE];
-extern UnsignedWord32 kernel_devicePageTable[PAGETABLESIZE];
-
-extern UnsignedWord32 *kernel_phyContainerTranslationTable;
-extern UnsignedWord32 *kernel_phyKernelTranslationTable;
-
-extern UnsignedWord32 *kernel_phyContainerPageTable;
-extern UnsignedWord32 *kernel_phyKernelPageTable;
-extern UnsignedWord32 *kernel_phyDevicePageTable;
-
 extern void kernel_boot_virtualMemorySetup(void);
 
 #endif

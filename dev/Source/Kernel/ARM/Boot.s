@@ -13,7 +13,7 @@ kernel_boot:
 	.ltorg
 
 	.align	4
-	.space	1024
+	.space	2048
 kernel_boot_stack:
 
 	.end

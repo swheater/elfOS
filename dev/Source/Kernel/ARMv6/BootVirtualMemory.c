@@ -5,14 +5,26 @@
 #include <Kernel/StdTypes.h>
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
+#include <Device/RaspPi_UART.h>
+#include <Kernel/KDebug.h>
+#include <Kernel/Logging.h>
 
 extern char kernel_zeroPagePhyStart;
 extern char kernel_zeroPagePhyEnd;
 extern char kernel_bssSectionStart;
 extern char kernel_bssSectionEnd;
 
+static UnsignedWord32 kernel_phyContainerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x1000)));
+static UnsignedWord32 kernel_phyKernelTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x1000)));
+
+static UnsignedWord32 kernel_phyContainerPageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
+static UnsignedWord32 kernel_phyDevicePageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
+static UnsignedWord32 kernel_phyKernelPageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
+
 void kernel_boot_virtualMemorySetup(void)
 {
+    uartInit();
+
     // Copy Zero Page code to Zero Page
     char *zeroPageDestinationAddress = 0;
     char *zeroPageSourceAddress      = &kernel_zeroPagePhyStart;
@@ -27,33 +39,32 @@ void kernel_boot_virtualMemorySetup(void)
     UnsignedWord32 translationTableBaseControl = TRANSLATIONTABLE_BOUNDARYSIZE;
     asm("mcr\tp15, 0, %0, c2, c0, 2": : "r" (translationTableBaseControl));
 
-    int index;
-
     // Set-up container virtual memory
+    int index;
     for (index = 0; index < CONTAINER_TRANSLATIONTABLESIZE; index++)
-        kernel_containerTranslationTable[index] = INVALID_L1DESCTYPE;
+        kernel_phyContainerTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_containerPageTable[index] = (0x00000000 & 0xFFFFF000) | (index << 12) | 0x032;
+        kernel_phyContainerPageTable[index] = (0x00000000 & 0xFFFFF000) | (index << 12) | 0x032;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_devicePageTable[index] = (0x20200000 & 0xFFFFF000) | (index << 12) | 0x032;
+        kernel_phyDevicePageTable[index] = (0x20200000 & 0xFFFFF000) | (index << 12) | 0x032;
 
-    kernel_containerTranslationTable[0x000] = (((unsigned int) kernel_containerPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
-    kernel_containerTranslationTable[0x202] = (((unsigned int) kernel_devicePageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyContainerTranslationTable[0x000] = (((unsigned int) kernel_phyContainerPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyContainerTranslationTable[0x202] = (((unsigned int) kernel_phyDevicePageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
-    asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (kernel_containerTranslationTable));
+    asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (kernel_phyContainerTranslationTable));
 
     // Set-up kernel virtual memory
     for (index = 0; index < KERNEL_TRANSLATIONTABLESIZE; index++)
-        kernel_kernelTranslationTable[index] = INVALID_L1DESCTYPE;
+        kernel_phyKernelTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_kernelPageTable[index] = (0x80000000 & 0xFFFFF000) | (index << 12) | 0x032;
+        kernel_phyKernelPageTable[index] = (0x80000000 & 0xFFFFF000) | (index << 12) | 0x032;
 
-    kernel_kernelTranslationTable[0x000] = (((unsigned int) kernel_kernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyKernelTranslationTable[0x000] = (((unsigned int) kernel_phyKernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
-    asm("mcr\tp15, 0, %0, c2, c0, 1": : "r" (kernel_kernelTranslationTable));
+    asm("mcr\tp15, 0, %0, c2, c0, 1": : "r" (kernel_phyKernelTranslationTable));
 
     // Disable Instruction and Data Caching
     asm("mrc\tp15, 0, r0, c1, c0, 0\n\t"
@@ -65,7 +76,7 @@ void kernel_boot_virtualMemorySetup(void)
     asm("mcr\tp15, 0, %0, c7, c7, 0": : "r" (0));
 
     // Invalidate Translation Look-aside Buffer
-    asm("mcr\tp15, 0, %0, c5, c0, 0": : "r" (0));
+    asm("mcr\tp15, 0, %0, c8, c7, 0": : "r" (0));
 
     // Enable Memory Management Unit
     asm("mrc\tp15, 0, r0, c1, c0, 0\n\t"
@@ -82,4 +93,12 @@ void kernel_boot_virtualMemorySetup(void)
     char *bssSectionAddress = &kernel_bssSectionStart;
     while (bssSectionAddress < &kernel_bssSectionEnd)
         *bssSectionAddress++ = 0;
+
+    kDebugCPUState();
+    logMessage("\r\n");
+
+    kDebugMemoryManagement();
+    logMessage("\r\n");
+
+    while (1);
 }

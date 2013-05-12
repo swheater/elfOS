@@ -30,18 +30,45 @@ void kDebugCPUState(void)
     logMessage("CPU Status:\r\n");
     logMessage("    CPU Info: ");
     logUnsignedWord32Hex(cpuInfo);
-    logMessage(", SCR: ");
+    logMessage(", SCR:  ");
     logUnsignedWord32Hex(scr);
-    logMessage("\r\n    SP:   ");
+    logMessage("\r\n    SP:       ");
     logUnsignedWord32Hex(sp);
-    logMessage(",   LR: ");
+    logMessage(", LR:   ");
     logUnsignedWord32Hex(lr);
-    logMessage(",   PC: ");
+    logMessage(", PC: ");
     logUnsignedWord32Hex(pc);
-    logMessage("\r\n    CPSR: ");
+    logMessage("\r\n    CPSR:     ");
     logUnsignedWord32Hex(cpsr);
     logMessage(", SPSR: ");
     logUnsignedWord32Hex(spsr);
+    logMessage("\r\n");
+}
+
+void kDebugMemoryManagement(void)
+{
+    UnsignedWord32 dacr;
+    UnsignedWord32 ttbcr;
+    UnsignedWord32 tt0r;
+    UnsignedWord32 tt1r;
+    UnsignedWord32 mmur;
+    asm("mrc\tp15, 0, %0, c3, c0, 0": "=r" (dacr));
+    asm("mrc\tp15, 0, %0, c2, c0, 2": "=r" (ttbcr));
+    asm("mrc\tp15, 0, %0, c2, c0, 0": "=r" (tt0r));
+    asm("mrc\tp15, 0, %0, c2, c0, 1": "=r" (tt1r));
+    asm("mrc\tp15, 0, %0, c1, c0, 0": "=r" (mmur));
+
+    logMessage("MMU Status:\r\n");
+    logMessage("    DACR: ");
+    logUnsignedWord32Hex(dacr);
+    logMessage(", TTBCR: ");
+    logUnsignedWord32Hex(ttbcr);
+    logMessage("\r\n    TT0R: ");
+    logUnsignedWord32Hex(tt0r);
+    logMessage(", TT1R:  ");
+    logUnsignedWord32Hex(tt1r);
+    logMessage("\r\n    MMUR: ");
+    logUnsignedWord32Hex(mmur);
     logMessage("\r\n");
 }
 
@@ -111,7 +138,7 @@ void kDebugVirtualMemorySegment(VirtualMemorySegment* virtualMemorySegment)
     {
         if ((index & 0x7) == 0)
         {
-	    if (index != 0)
+            if (index != 0)
                 logMessage("\r\n");
             logUnsignedWord32Hex((UnsignedWord32) (virtualMemorySegment->physicalAddress) + index);
             logMessage(":");

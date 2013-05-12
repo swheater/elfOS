@@ -2,33 +2,76 @@
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-EXTERN(kernel_boot kernel)
+EXTERN(phy_boot vir_boot)
+EXTERN(phy_kernel vir_kernel)
+EXTERN(dev_phyStart dev_phyEnd dev_virStart dev_virStart)
 EXTERN(kernel_zeroPagePhyStart kernel_zeroPagePhyEnd);
+EXTERN(boot_bssSectionStart boot_bssSectionEnd);
 EXTERN(kernel_bssSectionStart kernel_bssSectionEnd);
-EXTERN(kernel_containerTranslationTable kernel_phyContainerTranslationTable kernel_kernelTranslationTable kernel_phyKernelTranslationTable);
-EXTERN(kernel_containerPageTable kernel_phyContainerPageTable kernel_kernelPageTable kernel_phyKernelPageTable kernel_devicePageTable kernel_phyDevicePageTable);
 
 SECTIONS
 {
-	kernel_boot = 0x00008000;
-	kernel      = 0x80000000;
+	phy_boot     = 0x00008000;
+	vir_boot     = 0x00008000;
+	phy_kernel   = 0x00018000;
+	vir_kernel   = 0x80000000;
 
 	dev_phyStart = 0x20000000;
 	dev_phyEnd   = 0x20FFFFFF;
 	dev_virStart = 0xF0000000;
+	dev_virEnd   = 0xF0FFFFFF;
 
-	.text.boot kernel_boot :
+	.text.boot phy_boot :
 	{
-                Source/Kernel/ARM/Boot.o (.text);
+		Source/Kernel/ARM/Boot.o (.text);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.text);
+		Source/Device/RaspPi_GPIO.o (.text);
+		Source/Device/RaspPi_UART.o (.text);
+		Source/Kernel/KDebug.o (.text);
+		Source/Kernel/Logging.o (.text);
+	}
+	.data.boot :
+	{
+		Source/Kernel/ARM/Boot.o (.data);
+		Source/Kernel/ARMv6/BootVirtualMemory.o (.data);
+		Source/Device/RaspPi_GPIO.o (.data);
+		Source/Device/RaspPi_UART.o (.data);
+		Source/Kernel/KDebug.o (.data);
+		Source/Kernel/Logging.o (.data);
+	}
+	.bss.boot :
+	{
+                boot_bssSectionStart = .;
+		Source/Kernel/ARM/Boot.o (.bss);
+		Source/Kernel/ARMv6/BootVirtualMemory.o (.bss);
+		Source/Device/RaspPi_GPIO.o (.bss);
+		Source/Device/RaspPi_UART.o (.bss);
+		Source/Kernel/KDebug.o (.bss);
+		Source/Kernel/Logging.o (.bss);
+		boot_bssSectionEnd = .;
+	}
+	.rodata.boot :
+	{
+		Source/Kernel/ARM/Boot.o (.rodata);
+		Source/Kernel/ARMv6/BootVirtualMemory.o (.rodata);
+		Source/Device/RaspPi_GPIO.o (.rodata);
+		Source/Device/RaspPi_UART.o (.rodata);
+		Source/Kernel/KDebug.o (.rodata);
+		Source/Kernel/Logging.o (.rodata);
+		Source/Kernel/ARM/Boot.o (.rodata.str1.4);
+		Source/Kernel/ARMv6/BootVirtualMemory.o (.rodata.str1.4);
+		Source/Device/RaspPi_GPIO.o (.rodata.str1.4);
+		Source/Device/RaspPi_UART.o (.rodata.str1.4);
+		Source/Kernel/KDebug.o (.rodata.str1.4);
+		Source/Kernel/Logging.o (.rodata.str1.4);
 		. = ALIGN(0x1000);
 	}
-	.text kernel : AT (ADDR(.text.boot) + SIZEOF(.text.boot))
+	.text vir_kernel : AT (phy_kernel)
 	{
-		kernel_zeroPagePhyStart = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
-                Source/Kernel/ARM/ZeroPage.o (.text);
-		kernel_zeroPagePhyEnd = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
-                * (.text);
+		kernel_zeroPagePhyStart = .;
+		Source/Kernel/ARM/ZeroPage.o (.text);
+		kernel_zeroPagePhyEnd = .;
+		* (.text);
 	}
 	.rodata :
 	{
@@ -37,21 +80,6 @@ SECTIONS
 	.data :
 	{
 		* (.data);
-		. = ALIGN(0x2000);
-		kernel_containerTranslationTable    = .;
-		kernel_phyContainerTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
-		. = . + 0x2000;
-		kernel_kernelTranslationTable    = .;
-		kernel_phyKernelTranslationTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));	
-		. = . + 0x0400;
-		kernel_containerPageTable    = .;
-		kernel_phyContainerPageTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
-		. = . + 0x0400;
-		kernel_kernelPageTable    = .;
-		kernel_phyKernelPageTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
-		. = . + 0x0400;
-		kernel_devicePageTable    = .;
-		kernel_phyDevicePageTable = (. - ADDR(.text)) + (ADDR(.text.boot) + SIZEOF(.text.boot));
 	}
 	.bss :
 	{

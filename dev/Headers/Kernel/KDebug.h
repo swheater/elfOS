@@ -9,6 +9,7 @@
 #include <Kernel/VirtualMemory.h>
 
 extern void kDebugCPUState(void);
+extern void kDebugMemoryManagement(void);
 extern void kDebugCurrentThread(void);
 extern void kDebugVirtualMemorySegments(VirtualMemorySegment virtualMemorySegments[], unsigned int numberOfVirtualMemorySegments);
 extern void kDebugVirtualMemorySegment(VirtualMemorySegment* virtualMemorySegment);

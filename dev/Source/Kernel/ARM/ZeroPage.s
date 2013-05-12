@@ -3,9 +3,9 @@
 @
 
 	.text
-	
+
 zeroPageVectors:
-	LDR	PC,=kernel_boot
+	LDR	PC,=phy_boot
 	B	resetError
 	B	resetError
 	B	resetError

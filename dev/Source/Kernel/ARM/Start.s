@@ -5,18 +5,21 @@
 	.text
 
 	.equ	MODE_MASK,  0x1F
+	.equ	USR_MODE,   0x10
 	.equ	FIQ_MODE,   0x11
 	.equ	IRQ_MODE,   0x12
 	.equ	SVC_MODE,   0x13
 	.equ	ABT_MODE,   0x17
 	.equ	UNDEF_MODE, 0x1B
+	.equ	SYS_MODE,   0x1F
+	.equ	MON_MODE,   0x16
 
 	.global	kernel_boot_handlerStacksSetup
 	.global	kernel_fiqStack
 	.global	kernel_irqStack
 	.global	kernel_abtStack
-	.global	kernel_svcStack
 	.global	kernel_undefStack
+	.global	kernel_svcStack
 
 kernel_boot_handlerStacksSetup:
 	MRS	R1,CPSR
@@ -38,11 +41,6 @@ kernel_boot_handlerStacksSetup:
 	LDR	SP,=kernel_abtStack
 
 	BIC	R0,R0,#MODE_MASK
-	ORR	R0,R0,#SVC_MODE
-	MSR	CPSR_csfx,R0
-	LDR	SP,=kernel_svcStack
-
-	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#UNDEF_MODE
 	MSR	CPSR_csfx,R0
 	LDR	SP,=kernel_undefStack
@@ -61,10 +59,10 @@ kernel_fiqStack:
 	.space	4096
 kernel_irqStack:
 	.space	4096
-kernel_svcStack:
-	.space	4096
 kernel_abtStack:
 	.space	4096
 kernel_undefStack:
+	.space	16384
+kernel_svcStack:
 
 	.end

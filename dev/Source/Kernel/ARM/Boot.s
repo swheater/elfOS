@@ -5,15 +5,16 @@
 	.text
 
 kernel_boot:
-	LDR	SP,=kernel_boot_stack
+	LDR	SP,=boot_stack
 	BL	kernel_boot_virtualMemorySetup
 	BL	kernel_boot_handlersSetup
+	LDR	SP,=kernel_svcStack
 	LDR	PC,=kernel_start
 
 	.ltorg
 
 	.align	4
 	.space	2048
-kernel_boot_stack:
+boot_stack:
 
 	.end

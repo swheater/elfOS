@@ -76,8 +76,16 @@ static void irqHandler(void)
     //    timerClearInterruptRequest();
 }
 
-void kernel_start()
+void kernel_start(void)
 {
+    kDebugCPUState();
+    logMessage("\r\n");
+
+    volatile int c = 0;
+    for (c = 0; c < 1000000; c++) ;
+
+    gpioSetOutput(4);
+
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
     prefetchAbortHandler        = &defaultPrefetchAbortHandler;
@@ -90,44 +98,46 @@ void kernel_start()
     softwareInterruptHandler    = &swHandler;
     interruptRequestHandler     = &irqHandler;
 
-    gpioInit();
-    gpioSetOutput(4);
+    // gpioInit();
     //    uartInit();
     //    timerInit(127, 100000, TRUE);
 
-    volatile int v;
-    gpioSetOutput(17);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(18);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(21);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(22);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(23);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(24);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(25);
-    for (v = 0; v < 5000000; v++);
-    gpioSetOutput(4);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(17);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(18);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(21);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(22);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(23);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(24);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(25);
-    for (v = 0; v < 5000000; v++);
-    gpioClearOutput(4);
-    for (v = 0; v < 5000000; v++);
+    while (1)
+    {
+        volatile int v;
+        gpioSetOutput(17);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(18);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(21);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(22);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(23);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(24);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(25);
+        for (v = 0; v < 500000; v++);
+        gpioSetOutput(4);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(17);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(18);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(21);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(22);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(23);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(24);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(25);
+        for (v = 0; v < 500000; v++);
+        gpioClearOutput(4);
+        for (v = 0; v < 500000; v++);
+    }
 
     gpioSetOutput(17);
 

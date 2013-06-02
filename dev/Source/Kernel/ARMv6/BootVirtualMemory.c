@@ -6,6 +6,7 @@
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
 #include <Device/RaspPi_UART.h>
+#include <Device/RaspPi_GPIO.h>
 #include <Kernel/KDebug.h>
 #include <Kernel/Logging.h>
 
@@ -21,9 +22,12 @@ static UnsignedWord32 kernel_phyContainerPageTable[PAGETABLESIZE] __attribute__(
 static UnsignedWord32 kernel_phyDevicePageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
 static UnsignedWord32 kernel_phyKernelPageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
 
+extern int phy_kernel;
+
 void kernel_boot_virtualMemorySetup(void)
 {
     uartInit();
+    gpioInit();
 
     // Copy Zero Page code to Zero Page
     char *zeroPageDestinationAddress = 0;
@@ -60,7 +64,7 @@ void kernel_boot_virtualMemorySetup(void)
         kernel_phyKernelTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_phyKernelPageTable[index] = (0x80000000 & 0xFFFFF000) | (index << 12) | 0x032;
+        kernel_phyKernelPageTable[index] = ((((unsigned int) &phy_kernel) & 0xFFFFF000) + (index << 12)) | 0x032;
 
     kernel_phyKernelTranslationTable[0x000] = (((unsigned int) kernel_phyKernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
@@ -93,12 +97,4 @@ void kernel_boot_virtualMemorySetup(void)
     char *bssSectionAddress = &kernel_bssSectionStart;
     while (bssSectionAddress < &kernel_bssSectionEnd)
         *bssSectionAddress++ = 0;
-
-    kDebugCPUState();
-    logMessage("\r\n");
-
-    kDebugMemoryManagement();
-    logMessage("\r\n");
-
-    while (1);
 }

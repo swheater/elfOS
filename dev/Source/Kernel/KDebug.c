@@ -10,6 +10,51 @@
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
 
+void kDebugProgramStatus(UnsignedWord32 psr)
+{
+    logUnsignedWord32Bin(psr);
+    if ((psr & 0x00000200) != 0)
+        logMessage(" E1-");
+    else
+        logMessage(" E0-");
+    if ((psr & 0x00000100) != 0)
+        logMessage("A1-");
+    else
+        logMessage("A0-");
+    if ((psr & 0x00000080) != 0)
+        logMessage("I1-");
+    else
+        logMessage("I0-");
+    if ((psr & 0x00000040) != 0)
+        logMessage("F1-");
+    else
+        logMessage("F0-");
+    if ((psr & 0x00000020) != 0)
+        logMessage("T1-");
+    else
+        logMessage("T0-");
+
+    UnsignedWord32 mode = psr & 0x0000001F;
+    if (mode == 0x10)
+        logMessage("USR");
+    else if (mode == 0x11)
+        logMessage("FIQ");
+    else if (mode == 0x12)
+        logMessage("IRQ");
+    else if (mode == 0x13)
+        logMessage("SVC");
+    else if (mode == 0x17)
+        logMessage("ABT");
+    else if (mode == 0x1B)
+        logMessage("UND");
+    else if (mode == 0x1F)
+        logMessage("SYS");
+    else if (mode == 0x16)
+        logMessage("MON");
+    else
+        logMessage("???");
+}
+
 void kDebugCPUState(void)
 {
     UnsignedWord32 cpuInfo;
@@ -38,10 +83,10 @@ void kDebugCPUState(void)
     logUnsignedWord32Hex(lr);
     logMessage(", PC: ");
     logUnsignedWord32Hex(pc);
-    logMessage("\r\n    CPSR:     ");
-    logUnsignedWord32Hex(cpsr);
-    logMessage(", SPSR: ");
-    logUnsignedWord32Hex(spsr);
+    logMessage("\r\n    CPSR: ");
+    kDebugProgramStatus(cpsr);
+    logMessage("\r\n    SPSR: ");
+    kDebugProgramStatus(spsr);
     logMessage("\r\n");
 }
 

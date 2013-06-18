@@ -10,22 +10,29 @@
 #include <Kernel/KDebug.h>
 #include <Kernel/Logging.h>
 
-extern char kernel_zeroPagePhyStart;
-extern char kernel_zeroPagePhyEnd;
 extern char kernel_bssSectionStart;
 extern char kernel_bssSectionEnd;
+extern char boot_bssSectionStart;
+extern char boot_bssSectionEnd;
+extern char kernel_zeroPagePhyStart;
+extern char kernel_zeroPagePhyEnd;
 
-static UnsignedWord32 kernel_phyContainerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x1000)));
-static UnsignedWord32 kernel_phyKernelTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x1000)));
+static UnsignedWord32 kernel_phyContainerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x2000)));
+static UnsignedWord32 kernel_phyKernelTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x2000)));
 
-static UnsignedWord32 kernel_phyContainerPageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
-static UnsignedWord32 kernel_phyDevicePageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
-static UnsignedWord32 kernel_phyKernelPageTable[PAGETABLESIZE] __attribute__((aligned(0x1000)));
+static UnsignedWord32 kernel_phyContainerPageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
+static UnsignedWord32 kernel_phyDevice200PageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
+static UnsignedWord32 kernel_phyDevice202PageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
+static UnsignedWord32 kernel_phyKernelPageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
 
 extern int phy_kernel;
 
 void kernel_boot_virtualMemorySetup(void)
 {
+    char *boot_bssSectionAddress = &boot_bssSectionStart;
+    while (boot_bssSectionAddress < &boot_bssSectionEnd)
+        *boot_bssSectionAddress++ = 0;
+
     uartInit();
     gpioInit();
 
@@ -49,13 +56,17 @@ void kernel_boot_virtualMemorySetup(void)
         kernel_phyContainerTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_phyContainerPageTable[index] = (0x00000000 & 0xFFFFF000) | (index << 12) | 0x032;
+        kernel_phyContainerPageTable[index] = ((0x00000000 + (index << 12)) & 0xFFFFF000) | 0x032;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_phyDevicePageTable[index] = (0x20200000 & 0xFFFFF000) | (index << 12) | 0x032;
+        kernel_phyDevice200PageTable[index] = ((0x20000000 + (index << 12)) & 0xFFFFF000) | 0x032;
+
+    for (index = 0; index < PAGETABLESIZE; index++)
+        kernel_phyDevice202PageTable[index] = ((0x20200000 + (index << 12)) & 0xFFFFF000) | 0x032;
 
     kernel_phyContainerTranslationTable[0x000] = (((unsigned int) kernel_phyContainerPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
-    kernel_phyContainerTranslationTable[0x202] = (((unsigned int) kernel_phyDevicePageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyContainerTranslationTable[0x200] = (((unsigned int) kernel_phyDevice200PageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyContainerTranslationTable[0x202] = (((unsigned int) kernel_phyDevice202PageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (kernel_phyContainerTranslationTable));
 
@@ -64,7 +75,7 @@ void kernel_boot_virtualMemorySetup(void)
         kernel_phyKernelTranslationTable[index] = INVALID_L1DESCTYPE;
 
     for (index = 0; index < PAGETABLESIZE; index++)
-        kernel_phyKernelPageTable[index] = ((((unsigned int) &phy_kernel) & 0xFFFFF000) + (index << 12)) | 0x032;
+        kernel_phyKernelPageTable[index] = ((((unsigned int) &phy_kernel) + (index << 12)) & 0xFFFFF000) | 0x032;
 
     kernel_phyKernelTranslationTable[0x000] = (((unsigned int) kernel_phyKernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
@@ -94,7 +105,7 @@ void kernel_boot_virtualMemorySetup(void)
         "orr\tr0, r0, #0x00001000\n\t"
         "mcr\tp15, 0, r0, c1, c0, 0": : : "r0");
 
-    char *bssSectionAddress = &kernel_bssSectionStart;
-    while (bssSectionAddress < &kernel_bssSectionEnd)
-        *bssSectionAddress++ = 0;
+    char *kernel_bssSectionAddress = &kernel_bssSectionStart;
+    while (kernel_bssSectionAddress < &kernel_bssSectionEnd)
+        *kernel_bssSectionAddress++ = 0;
 }

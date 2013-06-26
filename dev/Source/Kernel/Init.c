@@ -78,13 +78,9 @@ static void irqHandler(void)
 
 void kernel_start(void)
 {
-    kDebugCPUState();
-    logMessage("\r\n");
-
-    volatile int c = 0;
-    for (c = 0; c < 1000000; c++) ;
-
-    gpioSetOutput(4);
+    uartInit();
+    gpioInit();
+//    timerInit(127, 100000, TRUE);
 
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
@@ -98,9 +94,10 @@ void kernel_start(void)
     softwareInterruptHandler    = &swHandler;
     interruptRequestHandler     = &irqHandler;
 
-    // gpioInit();
-    //    uartInit();
-    //    timerInit(127, 100000, TRUE);
+    kDebugCPUState();
+    logMessage("\r\n");
+
+    gpioSetOutput(4);
 
     while (1)
     {

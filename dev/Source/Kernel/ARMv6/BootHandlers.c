@@ -14,26 +14,6 @@ extern int kernel_undefStack;
 
 void kernel_boot_handlersSetup(void)
 {
-    kDebugCPUState();
-    logMessage("\r\n");
-
-    logMessage("kernel_boot_handlerStacksSetup: ");
-    logUnsignedWord32Hex((UnsignedWord32) &kernel_boot_handlerStacksSetup);
-    logMessage("\r\nkernel_fiqStack:                ");
-    logUnsignedWord32Hex((UnsignedWord32) &kernel_fiqStack);
-    logMessage("\r\nkernel_irqStack:                ");
-    logUnsignedWord32Hex((UnsignedWord32) &kernel_irqStack);
-    logMessage("\r\nkernel_abtStack:                ");
-    logUnsignedWord32Hex((UnsignedWord32) &kernel_abtStack);
-    logMessage("\r\nkernel_svcStack:                ");
-    logUnsignedWord32Hex((UnsignedWord32) &kernel_svcStack);
-    logMessage("\r\nkernel_undefStack:              ");
-    logUnsignedWord32Hex((UnsignedWord32) &kernel_undefStack);
-    logMessage("\r\n");
-
-    volatile int c = 0;
-    for (c = 0; c < 1000000; c++) ;
-
     // Setup Handlers Stacks
     // kernel_boot_handlerStacksSetup();
 

@@ -20,10 +20,10 @@ static void signalError(void)
     volatile int count;
     while (1)
     {
-        gpioSetOutput(22);
-        for (count = 0; count < 2000000; count++);
-        gpioClearOutput(22);
-        for (count = 0; count < 2000000; count++);
+        gpioSetOutput(4);
+        for (count = 0; count < 500000; count++);
+        gpioClearOutput(4);
+        for (count = 0; count < 500000; count++);
     }
 }
 

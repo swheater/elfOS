@@ -5,10 +5,6 @@
 #include <Kernel/StdTypes.h>
 #include <Kernel/Kernel.h>
 #include <Kernel/VirtualMemory.h>
-#include <Device/RaspPi_UART.h>
-#include <Device/RaspPi_GPIO.h>
-#include <Kernel/KDebug.h>
-#include <Kernel/Logging.h>
 
 extern char kernel_bssSectionStart;
 extern char kernel_bssSectionEnd;
@@ -32,9 +28,6 @@ void kernel_boot_virtualMemorySetup(void)
     char *boot_bssSectionAddress = &boot_bssSectionStart;
     while (boot_bssSectionAddress < &boot_bssSectionEnd)
         *boot_bssSectionAddress++ = 0;
-
-    uartInit();
-    gpioInit();
 
     // Copy Zero Page code to Zero Page
     char *zeroPageDestinationAddress = 0;

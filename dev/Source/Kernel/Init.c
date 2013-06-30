@@ -11,7 +11,7 @@
 #include <Kernel/KDebug.h>
 #include <Device/RaspPi_GPIO.h>
 #include <Device/RaspPi_UART.h>
-// include <Device/RaspPi_Timer.h>
+#include <Device/RaspPi_Timer.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>
@@ -73,14 +73,14 @@ static void irqHandler(void)
     //    if (currentThreadControlBlock != 0)
     //        yieldThread();
 
-    //    timerClearInterruptRequest();
+    timerClearInterruptRequest();
 }
 
 void kernel_start(void)
 {
     uartInit();
     gpioInit();
-//    timerInit(127, 100000, TRUE);
+    timerInit(127, 100000, TRUE);
 
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
@@ -97,7 +97,7 @@ void kernel_start(void)
     kDebugCPUState();
     logMessage("\r\n");
 
-    gpioSetOutput(4);
+    gpioSetOutput(25);
 
     while (1)
     {

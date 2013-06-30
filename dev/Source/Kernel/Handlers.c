@@ -47,7 +47,29 @@ void defaultPrefetchAbortHandler(void)
 
 void defaultDataAbortHandler(void)
 {
+    UnsignedWord32 dataFaultStatus;
+    UnsignedWord32 instructionFaultStatus;
+    UnsignedWord32 dataFaultAddress;
+    UnsignedWord32 instructionFaultAddress;
+    UnsignedWord32 watchpointFaultAddress;
+    asm("mrc\tp15, 0, %0, c5, c0, 0": "=r" (dataFaultStatus));
+    asm("mrc\tp15, 0, %0, c5, c0, 1": "=r" (instructionFaultStatus)); 
+    asm("mrc\tp15, 0, %0, c6, c0, 0": "=r" (dataFaultAddress));
+    asm("mrc\tp15, 0, %0, c6, c0, 2": "=r" (instructionFaultAddress));
+    asm("mrc\tp14, 0, %0, c0, c6, 0": "=r" (watchpointFaultAddress));
     logMessage("Problem: Default Data Abort Handler\r\n");
+    logMessage("    Data Fault Status:         ");
+    logUnsignedWord32Bin(dataFaultStatus);
+    logMessage("\r\n    Instruction Fault Status:  ");
+    logUnsignedWord32Bin(instructionFaultStatus);
+    logMessage("\r\n    Data Fault Address:        ");
+    logUnsignedWord32Hex(dataFaultAddress);
+    logMessage("\r\n    Instruction Fault Address: ");
+    logUnsignedWord32Hex(instructionFaultAddress);
+    logMessage("\r\n    Watchpoint Fault Address:  ");
+    logUnsignedWord32Hex(watchpointFaultAddress);
+    logMessage("\r\n");
+
     signalError();
 }
 

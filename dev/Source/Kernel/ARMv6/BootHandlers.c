@@ -4,18 +4,12 @@
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/ARM/HandlerVectors.h>
-
-extern int kernel_boot_handlerStacksSetup;
-extern int kernel_fiqStack;
-extern int kernel_irqStack;
-extern int kernel_abtStack;
-extern int kernel_svcStack;
-extern int kernel_undefStack;
+#include <Kernel/ARM/Start.h>
 
 void kernel_boot_handlersSetup(void)
 {
     // Setup Handlers Stacks
-    // kernel_boot_handlerStacksSetup();
+    kernel_boot_handlerStacksSetup();
 
     // Set Vector Base Address
     asm("mcr\tp15, 0, %0, c12, c0, 0": : "r" (&kernel_handlerVectors));

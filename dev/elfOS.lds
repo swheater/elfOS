@@ -25,45 +25,25 @@ SECTIONS
 	{
 		Source/Kernel/ARM/Boot.o (.text);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.text);
-		Source/Device/RaspPi_GPIO.o (.text);
-		Source/Device/RaspPi_UART.o (.text);
-		Source/Kernel/KDebug.o (.text);
-		Source/Kernel/Logging.o (.text);
 	}
 	.data.boot :
 	{
 		Source/Kernel/ARM/Boot.o (.data);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.data);
-		Source/Device/RaspPi_GPIO.o (.data);
-		Source/Device/RaspPi_UART.o (.data);
-		Source/Kernel/KDebug.o (.data);
-		Source/Kernel/Logging.o (.data);
 	}
 	.bss.boot :
 	{
                 boot_bssSectionStart = .;
 		Source/Kernel/ARM/Boot.o (.bss);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.bss);
-		Source/Device/RaspPi_GPIO.o (.bss);
-		Source/Device/RaspPi_UART.o (.bss);
-		Source/Kernel/KDebug.o (.bss);
-		Source/Kernel/Logging.o (.bss);
 		boot_bssSectionEnd = .;
 	}
 	.rodata.boot :
 	{
 		Source/Kernel/ARM/Boot.o (.rodata);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.rodata);
-		Source/Device/RaspPi_GPIO.o (.rodata);
-		Source/Device/RaspPi_UART.o (.rodata);
-		Source/Kernel/KDebug.o (.rodata);
-		Source/Kernel/Logging.o (.rodata);
 		Source/Kernel/ARM/Boot.o (.rodata.str1.4);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.rodata.str1.4);
-		Source/Device/RaspPi_GPIO.o (.rodata.str1.4);
-		Source/Device/RaspPi_UART.o (.rodata.str1.4);
-		Source/Kernel/KDebug.o (.rodata.str1.4);
-		Source/Kernel/Logging.o (.rodata.str1.4);
 		. = ALIGN(0x1000);
 	}
 	.text vir_kernel : AT (phy_kernel)

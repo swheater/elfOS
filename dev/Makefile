@@ -21,11 +21,10 @@ OBJS = Source/Kernel/ARM/Boot.o \
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
-       Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o
+       Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o Source/Device/RaspPi_Timer.o
 
 #       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o \
 #       Source/Kernel/ARMv6/MemoryManagement.o \
-#       Source/Device/RaspPi_UART.o Source/Device/RaspPi_GPIO.o Source/Device/RaspPi_Timer.o
 
 all: elfOS.img
 

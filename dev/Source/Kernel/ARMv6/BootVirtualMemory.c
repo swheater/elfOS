@@ -19,6 +19,7 @@ static UnsignedWord32 kernel_phyKernelTranslationTable[CONTAINER_TRANSLATIONTABL
 static UnsignedWord32 kernel_phyContainerPageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
 static UnsignedWord32 kernel_phyDevice200PageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
 static UnsignedWord32 kernel_phyDevice202PageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
+static UnsignedWord32 kernel_phyDevice208PageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
 static UnsignedWord32 kernel_phyKernelPageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
 
 extern int phy_kernel;
@@ -57,9 +58,13 @@ void kernel_boot_virtualMemorySetup(void)
     for (index = 0; index < PAGETABLESIZE; index++)
         kernel_phyDevice202PageTable[index] = ((0x20200000 + (index << 12)) & 0xFFFFF000) | 0x032;
 
+    for (index = 0; index < PAGETABLESIZE; index++)
+        kernel_phyDevice208PageTable[index] = ((0x20800000 + (index << 12)) & 0xFFFFF000) | 0x032;
+
     kernel_phyContainerTranslationTable[0x000] = (((unsigned int) kernel_phyContainerPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
     kernel_phyContainerTranslationTable[0x200] = (((unsigned int) kernel_phyDevice200PageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
     kernel_phyContainerTranslationTable[0x202] = (((unsigned int) kernel_phyDevice202PageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyContainerTranslationTable[0x208] = (((unsigned int) kernel_phyDevice208PageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | NONSECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 0": : "r" (kernel_phyContainerTranslationTable));
 

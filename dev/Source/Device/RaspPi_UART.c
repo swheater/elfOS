@@ -5,6 +5,7 @@
 // Device driver for Raspberry Pi, mini UART
 
 #include <Kernel/StdTypes.h>
+#include <Device/RaspPi_UART.h>
 
 #define GPIO_BASE                              ((volatile UnsignedWord32*) 0x20200000)
 #define GPIO_FUNCSELECT_BASE                   (GPIO_BASE + 0x00)
@@ -38,7 +39,7 @@
 #define AUX_ENABLES_UART_BIT           (0x00000001)
 #define UART_LINESTATUS_TXQNOTFULL_BIT (0x00000020)
 
-void uartInit()
+void uartInit(void)
 {
     *(AUX_BASE + AUX_ENABLES_OFFSET) |= AUX_ENABLES_UART_BIT; // Enable UART
 

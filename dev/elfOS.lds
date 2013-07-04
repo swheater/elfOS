@@ -51,6 +51,8 @@ SECTIONS
 		kernel_zeroPagePhyStart = .;
 		Source/Kernel/ARM/ZeroPage.o (.text);
 		kernel_zeroPagePhyEnd = .;
+		. = ALIGN(0x20);
+		Source/Kernel/ARM/HandlerVectors.o (.text);
 		* (.text);
 	}
 	.rodata :

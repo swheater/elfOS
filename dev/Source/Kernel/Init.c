@@ -19,36 +19,6 @@
 extern char start;
 extern char elfAppl;
 
-static void uiHandler(UnsignedWord32* undefinedInstructionAddress)
-{
-    kDebugCPUState();
-    logMessage("\r\n");
-
-    uartOutput('#');
-
-    logMessage("UIHandler: uiAddr:");
-    logUnsignedWord32Hex((UnsignedWord32) undefinedInstructionAddress);
-    logMessage(" (ui: ");
-    logUnsignedWord32Hex(*undefinedInstructionAddress);
-    logMessage("), SCR: ");
-    UnsignedWord32 scr;
-    asm("mrc\tp15, 0, %0, c1, c1, 0": "=r" (scr));
-    logUnsignedWord32Hex(scr);
-    logMessage("\r\n");
-
-    // kDebugCurrentThread();
-
-    VirtualMemorySegment virtualMemorySegment;
-    virtualMemorySegment.size            = 0x0300;
-    virtualMemorySegment.physicalAddress = 0x0;
-    kDebugVirtualMemorySegment(&virtualMemorySegment);
-
-    gpioSetOutput(4);
-
-    hereAndNow0:
-    goto hereAndNow0;
-}
-
 static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
     uartOutput('@');
@@ -58,30 +28,26 @@ static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBl
     //    else if (opcode == 2)
     //        destroyThread(threadControlBlock);
 
-    if (currentThreadControlBlock == 0)
-    {
-        gpioSetOutput(21);
-        hereAndNow1:
-        goto hereAndNow1;
-    }
+    //    if (currentThreadControlBlock == 0)
+    //    {
+    //        gpioSetOutput(21);
+    //        hereAndNow1:
+    //        goto hereAndNow1;
+    //    }
 }
 
 static void irqHandler(void)
 {
     uartOutput('.');
 
-    //    if (currentThreadControlBlock != 0)
-    //        yieldThread();
+    if (currentThreadControlBlock != 0)
+        yieldThread();
 
     timerClearInterruptRequest();
 }
 
 void kernel_start(void)
 {
-    uartInit();
-    gpioInit();
-    timerInit(127, 100000, TRUE);
-
     undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
     softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
     prefetchAbortHandler        = &defaultPrefetchAbortHandler;
@@ -90,56 +56,26 @@ void kernel_start(void)
     interruptRequestHandler     = &defaultInterruptRequestHandler;
     fastInterruptRequestHandler = &defaultFastInterruptRequestHandler;
 
-    undefinedInstructionHandler = &uiHandler;
     softwareInterruptHandler    = &swHandler;
     interruptRequestHandler     = &irqHandler;
 
-    kDebugCPUState();
-    logMessage("\r\n");
-
-    gpioSetOutput(25);
-
-    while (1)
-    {
-        volatile int v;
-        gpioSetOutput(17);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(18);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(21);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(22);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(23);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(24);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(25);
-        for (v = 0; v < 500000; v++);
-        gpioSetOutput(4);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(17);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(18);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(21);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(22);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(23);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(24);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(25);
-        for (v = 0; v < 500000; v++);
-        gpioClearOutput(4);
-        for (v = 0; v < 500000; v++);
-    }
-
-    gpioSetOutput(17);
-
+    uartInit();
+    gpioInit();
     initThreads();
+    timerInit(127, 100000, TRUE);
 
+    UnsignedWord32 reg = 0;
+    while (TRUE)
+    {
+        gpioSetOutput(25);
+	asm("mcr\tp15, 0, %0, c7, c0, 4": : "r" (reg));
+        gpioClearOutput(25);
+	asm("mcr\tp15, 0, %0, c7, c0, 4": : "r" (reg));
+    }
+}
+
+void workInit(void)
+{
     unsigned int numberOfGlobalSymbols = 0;
     //    unsigned int numberOfGlobalSymbols = 5;
     Symbol       globalSymbols[numberOfGlobalSymbols];

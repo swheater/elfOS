@@ -7,8 +7,8 @@
 
 #include <Kernel/StdTypes.h>
 
-extern void i2cInit(void);
-extern void i2c0Output(UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength);
-extern void i2c1Output(UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength);
+extern void i2cInit(UnsignedByte bus);
+extern void i2cRead(UnsignedByte bus, UnsignedByte device, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength);
+extern void i2cWrite(UnsignedByte bus, UnsignedByte device, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength);
 
 #endif

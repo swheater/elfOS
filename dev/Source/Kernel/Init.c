@@ -11,13 +11,11 @@
 #include <Kernel/KDebug.h>
 #include <Device/RaspPi_GPIO.h>
 #include <Device/RaspPi_UART.h>
+#include <Device/RaspPi_I2C.h>
 #include <Device/RaspPi_Timer.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>
-
-extern char start;
-extern char elfAppl;
 
 static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
@@ -61,8 +59,18 @@ void kernel_start(void)
 
     uartInit();
     gpioInit();
+    i2cInit(0);
     initThreads();
     timerInit(127, 100000, TRUE);
+
+    UnsignedByte data[2];
+    data[0] = 0;
+    data[1] = 0;
+    i2cWrite(0, 32, data, 2);
+
+    data[0] = 20;
+    data[1] = 255;
+    i2cWrite(0, 32, data, 2);
 
     UnsignedWord32 reg = 0;
     while (TRUE)

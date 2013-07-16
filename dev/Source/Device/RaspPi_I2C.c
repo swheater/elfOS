@@ -57,64 +57,66 @@ void i2cInit(UnsignedByte bus)
         *(base + BSC_CONTROL_OFFSET) = BSC_CONTROL_ENABLE_BIT | BSC_CONTROL_CLEARFIFO_BITS;
 }
 
-void i2cRead(UnsignedByte bus, UnsignedByte device, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength)
+void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength)
 {
     volatile UnsignedWord32* base = getBusBase(bus);
 
     if (base != 0)
     {
         // Wait for no Active Transfer
-        while ((*(base + BSC_STATUS_OFFSET) & BSC_STATUS_TRANSFERACTIVE_MASK) == BSC_STATUS_TRANSFERACTIVE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) == BSC_STATUS_TRANSFERACTIVE_BIT);
 
         // Clear Clock Stretch Timeout, Ack Error & Done
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
 
-	*(base + BSC_SLAVEADDRESS_OFFSET) = address;
+        if (address != CONTINUE_ADDRESS)
+            *(base + BSC_SLAVEADDRESS_OFFSET) = address;
         *(base + BSC_DATALENGTH_OFFSET)   = dataLength;
 
         // Start transfer
-        *(base + BSC_CONTROL_OFFSET) = *(base + BSC_CONTROL_OFFSET) | BSC_CONTROL_STARTTRANSFER_BIT;
+        *(base + BSC_CONTROL_OFFSET) = (*(base + BSC_CONTROL_OFFSET)) | BSC_CONTROL_STARTTRANSFER_BIT;
 
         int dataIndex;
         for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
-	{
-            while ((*(base + BSC_STATUS_OFFSET) & BSC_STATUS_CONTAINSDATA_MASK) == BSC_STATUS_CONTAINSDATA_BIT);
+        {
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSDATA_MASK) == BSC_STATUS_CONTAINSDATA_BIT);
 
             data[dataIndex] = *(base + BSC_DATAFIFO_OFFSET);
-	}
+        }
 
         // Wait for Done
-        while ((*(base + BSC_STATUS_OFFSET) & BSC_STATUS_DONE_MASK) == BSC_STATUS_DONE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) == BSC_STATUS_DONE_BIT);
     }
 }
 
-void i2cWrite(UnsignedByte bus, UnsignedByte device, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength)
+void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength)
 {
     volatile UnsignedWord32* base = getBusBase(bus);
 
     if (base != 0)
     {
         // Wait for no Active Transfer
-        while ((*(base + BSC_STATUS_OFFSET) & BSC_STATUS_TRANSFERACTIVE_MASK) == BSC_STATUS_TRANSFERACTIVE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) == BSC_STATUS_TRANSFERACTIVE_BIT);
 
         // Clear Clock Stretch Timeout, Ack Error & Done
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
-        
-	*(base + BSC_SLAVEADDRESS_OFFSET) = address;
+
+        if (address != CONTINUE_ADDRESS)
+            *(base + BSC_SLAVEADDRESS_OFFSET) = address;
         *(base + BSC_DATALENGTH_OFFSET)   = dataLength;
 
         // Start transfer
-        *(base + BSC_CONTROL_OFFSET) = *(base + BSC_CONTROL_OFFSET) | BSC_CONTROL_STARTTRANSFER_BIT;
+        *(base + BSC_CONTROL_OFFSET) = (*(base + BSC_CONTROL_OFFSET)) | BSC_CONTROL_STARTTRANSFER_BIT;
 
         int dataIndex;
         for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
-	{
-            while ((*(base + BSC_STATUS_OFFSET) & BSC_STATUS_CONTAINSSPACE_MASK) == BSC_STATUS_CONTAINSSPACE_BIT);
+        {
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) == BSC_STATUS_CONTAINSSPACE_BIT);
 
             *(base + BSC_DATAFIFO_OFFSET) = data[dataIndex];
-	}
+        }
 
         // Wait for Done
-        while ((*(base + BSC_STATUS_OFFSET) & BSC_STATUS_DONE_MASK) == BSC_STATUS_DONE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) == BSC_STATUS_DONE_BIT);
     }
 }

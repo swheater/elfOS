@@ -2,12 +2,18 @@
 # Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-LD      = arm-none-eabi-ld
-LDFLAGS = 
-OBJCOPY = arm-none-eabi-objcopy
-SIZE    = arm-none-eabi-size
-MAKE    = make
-RM      = rm
+export MAKE         = make
+export CC           = arm-none-eabi-gcc
+export CCFLAGS      = -Wall -mcpu=arm1176jzf-s -O -I$(CURDIR)/Headers
+export AS           = arm-none-eabi-as
+export ASFLAGS      = 
+export LD           = arm-none-eabi-ld
+export LDFLAGS      =
+export OBJCOPY      = arm-none-eabi-objcopy
+export OBJCOPYFLAGS =
+export SIZE         = arm-none-eabi-size
+export SIZEFLAGS    = 
+export RM           = rm
 
 OBJS = Source/Kernel/ARM/Boot.o \
        Source/Kernel/ARMv6/BootVirtualMemory.o Source/Kernel/ARMv6/BootHandlers.o \
@@ -34,10 +40,10 @@ $(OBJS):
 
 elfOS.elf elfOS.map: elfOS.lds $(OBJS)
 	$(LD) $(LDFLAGS) -nostdlib -T elfOS.lds -o elfOS.elf -Map elfOS.map $(OBJS)
-	$(SIZE) elfOS.elf
+	$(SIZE) $(SIZEFLAGS) elfOS.elf
 
 elfOS.img: elfOS.elf
-	$(OBJCOPY) -O binary elfOS.elf elfOS.img
+	$(OBJCOPY) $(OBJCOPYFLAGS) -O binary elfOS.elf elfOS.img
 
 clean:
 	$(MAKE) -C Headers clean

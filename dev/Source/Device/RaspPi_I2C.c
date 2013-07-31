@@ -7,6 +7,10 @@
 #include <Kernel/StdTypes.h>
 #include <Device/RaspPi_I2C.h>
 
+#define GPIO_BASE                ((volatile UnsignedWord32*) 0x20200000)
+#define GPIO_FUNCSELECT_BASE     (GPIO_BASE + 0x00)
+#define GPIO_FUNCSELECT_0_OFFSET (0x00)
+
 #define BSC0_BASE                      ((volatile UnsignedWord32*) 0x20205000)
 #define BSC1_BASE                      ((volatile UnsignedWord32*) 0x20804000)
 #define BSC_CONTROL_OFFSET             (0x00)
@@ -54,7 +58,15 @@ void i2cInit(UnsignedByte bus)
 
     // Enable & Clear FIFO
     if (base != 0)
+    {
+        // Select function  for GPIO01 & GPI02
+        unsigned int gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET);
+        gpioFuncSelect &= 0xFFFFFFC0;
+        gpioFuncSelect |= 0x00000024;
+        *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET) = gpioFuncSelect;
+
         *(base + BSC_CONTROL_OFFSET) = BSC_CONTROL_ENABLE_BIT | BSC_CONTROL_CLEARFIFO_BITS;
+    }
 }
 
 void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], UnsignedWord16 dataLength)
@@ -64,7 +76,7 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
     if (base != 0)
     {
         // Wait for no Active Transfer
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) == BSC_STATUS_TRANSFERACTIVE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) != 0);
 
         // Clear Clock Stretch Timeout, Ack Error & Done
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
@@ -79,13 +91,13 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
         int dataIndex;
         for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
         {
-            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSDATA_MASK) == BSC_STATUS_CONTAINSDATA_BIT);
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSDATA_MASK) != 0);
 
             data[dataIndex] = *(base + BSC_DATAFIFO_OFFSET);
         }
 
         // Wait for Done
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) == BSC_STATUS_DONE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);
     }
 }
 
@@ -96,14 +108,14 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
     if (base != 0)
     {
         // Wait for no Active Transfer
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) == BSC_STATUS_TRANSFERACTIVE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) != 0);
 
         // Clear Clock Stretch Timeout, Ack Error & Done
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
 
         if (address != CONTINUE_ADDRESS)
             *(base + BSC_SLAVEADDRESS_OFFSET) = address;
-        *(base + BSC_DATALENGTH_OFFSET)   = dataLength;
+        *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 
         // Start transfer
         *(base + BSC_CONTROL_OFFSET) = (*(base + BSC_CONTROL_OFFSET)) | BSC_CONTROL_STARTTRANSFER_BIT;
@@ -111,12 +123,12 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
         int dataIndex;
         for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
         {
-            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) == BSC_STATUS_CONTAINSSPACE_BIT);
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) != 0);
 
             *(base + BSC_DATAFIFO_OFFSET) = data[dataIndex];
         }
 
         // Wait for Done
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) == BSC_STATUS_DONE_BIT);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);
     }
 }

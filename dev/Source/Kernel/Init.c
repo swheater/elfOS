@@ -36,8 +36,6 @@ static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBl
 
 static void irqHandler(void)
 {
-    uartOutput('.');
-
     if (currentThreadControlBlock != 0)
         yieldThread();
 
@@ -57,27 +55,50 @@ void kernel_start(void)
     softwareInterruptHandler    = &swHandler;
     interruptRequestHandler     = &irqHandler;
 
+    volatile int c;
+    for (c = 0; c < 10000000; c++);
+
     uartInit();
     gpioInit();
     i2cInit(0);
     initThreads();
+
+    uartOutput(0x1B);
+    uartOutput(0x00);
+    uartOutput(0xFF);
+
+    uartOutput(0x1B);
+    uartOutput(0x03);
+    uartOutput(0x02);
+    uartOutput(0xFF);
+
+    uartOutput(0x1B);
+    uartOutput(0x04);
+    uartOutput(0x01);
+    uartOutput(0xFF);
+
+    uartOutput(0x1B);
+    uartOutput(0x04);
+    uartOutput(0x01);
+    uartOutput(0xFF);
+
     timerInit(127, 100000, TRUE);
 
-    UnsignedByte data[2];
-    data[0] = 0;
-    data[1] = 0;
-    i2cWrite(0, 32, data, 2);
+    //    UnsignedByte data[2];
+    //    data[0] = 0;
+    //    data[1] = 0;
+    //    i2cWrite(0, 32, data, 2);
 
-    data[0] = 20;
-    data[1] = 255;
-    i2cWrite(0, 32, data, 2);
+    //    data[0] = 20;
+    //    data[1] = 255;
+    //    i2cWrite(0, 32, data, 2);
 
     UnsignedWord32 reg = 0;
     while (TRUE)
     {
-        gpioSetOutput(25);
+        gpioSetOutput(4);
 	asm("mcr\tp15, 0, %0, c7, c0, 4": : "r" (reg));
-        gpioClearOutput(25);
+        gpioClearOutput(4);
 	asm("mcr\tp15, 0, %0, c7, c0, 4": : "r" (reg));
     }
 }

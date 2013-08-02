@@ -27,8 +27,8 @@
 #define BSC_CONTROL_OPERATION_MASK      (0x00000001)
 #define BSC_CONTROL_READ_OPERATION_BIT  (0x00000001)
 #define BSC_CONTROL_WRITE_OPERATION_BIT (0x00000000)
-#define BSC_CONTROL_STARTTRANSFER_MASK  (0x00000008)
-#define BSC_CONTROL_STARTTRANSFER_BIT   (0x00000008)
+#define BSC_CONTROL_STARTTRANSFER_MASK  (0x00000080)
+#define BSC_CONTROL_STARTTRANSFER_BIT   (0x00000080)
 #define BSC_CONTROL_CLEARFIFO_MASK      (0x00000030)
 #define BSC_CONTROL_CLEARFIFO_BITS      (0x00000010)
 #define BSC_CONTROL_ENABLE_MASK         (0x00008000)
@@ -89,7 +89,7 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
 
         // Start transfer, Read
         UnsignedWord32 bscControl = *(base + BSC_CONTROL_OFFSET);
-        bscControl &= ! (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
+        bscControl &= ~ (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
         bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_READ_OPERATION_BIT;
         *(base + BSC_CONTROL_OFFSET) = bscControl;
 
@@ -112,8 +112,6 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
 
     if (base != 0)
     {
-        i2cDebug(base);
-
         // Wait for no Active Transfer
         while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) != 0);
 
@@ -135,14 +133,12 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
 
         // Start transfer
         UnsignedWord32 bscControl = *(base + BSC_CONTROL_OFFSET);
-        bscControl &= ! (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
+        bscControl &= ~ (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
         bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_WRITE_OPERATION_BIT;
         *(base + BSC_CONTROL_OFFSET) = bscControl;
 
         // Wait for Done
         while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);
-
-        i2cDebug(base);
     }
 }
 

@@ -82,16 +82,20 @@ void kernel_start(void)
     uartOutput(0x01);
     uartOutput(0xFF);
 
-    timerInit(127, 100000, TRUE);
+    timerInit(127, 1000000, TRUE);
 
-    //    UnsignedByte data[2];
-    //    data[0] = 0;
-    //    data[1] = 0;
-    //    i2cWrite(0, 32, data, 2);
+    UnsignedByte data[2];
+    data[0] = 0;
+    data[1] = 0;
+    uartOutput('A');
+    i2cWrite(0, 32, data, 2);
+    uartOutput('B');
 
-    //    data[0] = 20;
-    //    data[1] = 255;
-    //    i2cWrite(0, 32, data, 2);
+    data[0] = 20;
+    data[1] = 255;
+    uartOutput('C');
+    i2cWrite(0, 32, data, 2);
+    uartOutput('D');
 
     UnsignedWord32 reg = 0;
     while (TRUE)
@@ -105,9 +109,9 @@ void kernel_start(void)
 
 void workInit(void)
 {
-    unsigned int numberOfGlobalSymbols = 0;
+    //    unsigned int numberOfGlobalSymbols = 0;
     //    unsigned int numberOfGlobalSymbols = 5;
-    Symbol       globalSymbols[numberOfGlobalSymbols];
+    //    Symbol       globalSymbols[numberOfGlobalSymbols];
     //    globalSymbols[0].name  = "elfOS_threadYield";
     //    globalSymbols[0].value = (UnsignedWord32) elfOS_threadYield;
     //    globalSymbols[1].name  = "elfOS_threadStop";
@@ -119,7 +123,7 @@ void workInit(void)
     //    globalSymbols[4].name  = "elfOS_logNewLine";
     //    globalSymbols[4].value = (UnsignedWord32) logNewLine;
 
-    UnsignedByte *nextSegment = (UnsignedByte*) 0x80000;
+    //    UnsignedByte *nextSegment = (UnsignedByte*) 0x80000;
 
     /*
     const char *elf32 = (char*) &elfAppl;

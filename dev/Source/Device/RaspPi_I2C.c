@@ -5,7 +5,9 @@
 // Device driver for Raspberry Pi, I2C0 & I2C1 (BSC0 & BSC1)
 
 #include <Kernel/StdTypes.h>
+#include <Kernel/Logging.h>
 #include <Device/RaspPi_I2C.h>
+#include <Device/RaspPi_UART.h>
 
 #define GPIO_BASE                ((volatile UnsignedWord32*) 0x20200000)
 #define GPIO_FUNCSELECT_BASE     (GPIO_BASE + 0x00)
@@ -60,7 +62,7 @@ void i2cInit(UnsignedByte bus)
     if (base != 0)
     {
         // Select function  for GPIO01 & GPI02
-        unsigned int gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET);
+        UnsignedWord32 gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET);
         gpioFuncSelect &= 0xFFFFFFC0;
         gpioFuncSelect |= 0x00000024;
         *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET) = gpioFuncSelect;
@@ -83,15 +85,18 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
 
         if (address != CONTINUE_ADDRESS)
             *(base + BSC_SLAVEADDRESS_OFFSET) = address;
-        *(base + BSC_DATALENGTH_OFFSET)   = dataLength;
+        *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 
-        // Start transfer
-        *(base + BSC_CONTROL_OFFSET) = (*(base + BSC_CONTROL_OFFSET)) | BSC_CONTROL_STARTTRANSFER_BIT;
+        // Start transfer, Read
+        UnsignedWord32 bscControl = *(base + BSC_CONTROL_OFFSET);
+        bscControl &= ! (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
+        bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_READ_OPERATION_BIT;
+        *(base + BSC_CONTROL_OFFSET) = bscControl;
 
         int dataIndex;
         for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
         {
-            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSDATA_MASK) != 0);
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSDATA_MASK) == 0);
 
             data[dataIndex] = *(base + BSC_DATAFIFO_OFFSET);
         }
@@ -107,6 +112,8 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
 
     if (base != 0)
     {
+        i2cDebug(base);
+
         // Wait for no Active Transfer
         while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) != 0);
 
@@ -117,18 +124,40 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
             *(base + BSC_SLAVEADDRESS_OFFSET) = address;
         *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 
-        // Start transfer
-        *(base + BSC_CONTROL_OFFSET) = (*(base + BSC_CONTROL_OFFSET)) | BSC_CONTROL_STARTTRANSFER_BIT;
-
+        // Load Data
         int dataIndex;
         for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
         {
-            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) != 0);
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) == 0);
 
             *(base + BSC_DATAFIFO_OFFSET) = data[dataIndex];
         }
 
+        // Start transfer
+        UnsignedWord32 bscControl = *(base + BSC_CONTROL_OFFSET);
+        bscControl &= ! (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
+        bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_WRITE_OPERATION_BIT;
+        *(base + BSC_CONTROL_OFFSET) = bscControl;
+
         // Wait for Done
         while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);
+
+        i2cDebug(base);
     }
+}
+
+void i2cDebug(volatile UnsignedWord32 *base)
+{
+    logMessage("\r\nI2C:");
+    logMessage("\r\nCtrl:   ");
+    logUnsignedWord32Hex(*(base + BSC_CONTROL_OFFSET));
+    logMessage("\r\nStat:   ");
+    logUnsignedWord32Hex(*(base + BSC_STATUS_OFFSET));
+    logMessage("\r\nD Len:  ");
+    logUnsignedWord32Hex(*(base + BSC_DATALENGTH_OFFSET));
+    logMessage("\r\nS Addr: ");
+    logUnsignedWord32Hex(*(base + BSC_SLAVEADDRESS_OFFSET));
+    logMessage("\r\nD FIFO: ");
+    logUnsignedWord32Hex(*(base + BSC_DATAFIFO_OFFSET));
+    logMessage("\r\n");
 }

@@ -2,10 +2,10 @@
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-// Device driver for Raspberry Pi, GPIO output (GPIO17, GPIO18, GPIO21 and GPIO22)
+// Device driver for BCM2835 - GPIO output (GPIO17, GPIO18, GPIO21 and GPIO22)
 
 #include <Kernel/StdTypes.h>
-#include <Device/RaspPi_GPIO.h>
+#include <Device/BCM2835_GPIO.h>
 
 #define GPIO_BASE                ((volatile UnsignedWord32*) 0x20200000)
 #define GPIO_FUNCSELECT_BASE     (GPIO_BASE + 0x00)

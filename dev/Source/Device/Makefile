@@ -2,7 +2,7 @@
 # Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-OBJS = RaspPi_UART.o RaspPi_GPIO.o RaspPi_I2C.o RaspPi_Timer.o 
+OBJS = BCM2835_miniUART.o BCM2835_GPIO.o BCM2835_BSC.o BCM2835_Timer.o 
 
 all: $(OBJS)
 

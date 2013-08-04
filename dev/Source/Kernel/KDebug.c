@@ -6,7 +6,7 @@
 #include <Kernel/ARM/ThreadControlBlock.h>
 #include <Kernel/Thread.h>
 #include <Kernel/Handlers.h>
-#include <Device/RaspPi_UART.h>
+#include <Device/BCM2835_miniUART.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
 

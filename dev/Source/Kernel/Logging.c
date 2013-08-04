@@ -3,7 +3,7 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <Device/RaspPi_UART.h>
+#include <Device/BCM2835_miniUART.h>
 #include <Kernel/Logging.h>
 
 void logUnsignedByteHex(UnsignedByte unsignedByte)

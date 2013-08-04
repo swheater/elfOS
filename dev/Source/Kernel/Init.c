@@ -9,10 +9,10 @@
 #include <Kernel/Handlers.h>
 #include <Kernel/Logging.h>
 #include <Kernel/KDebug.h>
-#include <Device/RaspPi_GPIO.h>
-#include <Device/RaspPi_UART.h>
-#include <Device/RaspPi_I2C.h>
-#include <Device/RaspPi_Timer.h>
+#include <Device/BCM2835_GPIO.h>
+#include <Device/BCM2835_miniUART.h>
+#include <Device/BCM2835_BSC.h>
+#include <Device/BCM2835_Timer.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>

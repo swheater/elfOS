@@ -4,7 +4,7 @@
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/Logging.h>
-#include <Device/RaspPi_GPIO.h>
+#include <Device/BCM2835_GPIO.h>
 #include <Kernel/Handlers.h>
 
 void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress)                = 0;

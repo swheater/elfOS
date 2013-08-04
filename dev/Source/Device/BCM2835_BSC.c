@@ -2,12 +2,12 @@
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-// Device driver for Raspberry Pi, I2C0 & I2C1 (BSC0 & BSC1)
+// Device driver for BCM2835 - BSC0 & BSC1 (I2C0 & I2C1)
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/Logging.h>
-#include <Device/RaspPi_I2C.h>
-#include <Device/RaspPi_UART.h>
+#include <Device/BCM2835_BSC.h>
+#include <Device/BCM2835_miniUART.h>
 
 #define GPIO_BASE                ((volatile UnsignedWord32*) 0x20200000)
 #define GPIO_FUNCSELECT_BASE     (GPIO_BASE + 0x00)
@@ -83,8 +83,7 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
         // Clear Clock Stretch Timeout, Ack Error & Done
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
 
-        if (address != CONTINUE_ADDRESS)
-            *(base + BSC_SLAVEADDRESS_OFFSET) = address;
+        *(base + BSC_SLAVEADDRESS_OFFSET) = address;
         *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 
         // Start transfer, Read
@@ -118,8 +117,7 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
         // Clear Clock Stretch Timeout, Ack Error & Done
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
 
-        if (address != CONTINUE_ADDRESS)
-            *(base + BSC_SLAVEADDRESS_OFFSET) = address;
+        *(base + BSC_SLAVEADDRESS_OFFSET) = address;
         *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 
         // Load Data

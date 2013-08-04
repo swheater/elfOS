@@ -2,11 +2,11 @@
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-// Device driver for Raspberry Pi, Timer
+// Device driver for BCM2835 - Timer
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/Logging.h>
-#include <Device/RaspPi_Timer.h>
+#include <Device/BCM2835_Timer.h>
 
 #define IRQCTRL_BASE                    ((volatile UnsignedWord32*) 0x2000B000)
 #define IRQCTRL_BASICENABLE_OFFSET      (0x86)

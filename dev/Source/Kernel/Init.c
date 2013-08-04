@@ -22,22 +22,15 @@ static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBl
     uartOutput('@');
 
     //    if (opcode == 1)
-    //        yieldThread();
+    //        threadYield();
     //    else if (opcode == 2)
-    //        destroyThread(threadControlBlock);
-
-    //    if (currentThreadControlBlock == 0)
-    //    {
-    //        gpioSetOutput(21);
-    //        hereAndNow1:
-    //        goto hereAndNow1;
-    //    }
+    //        threadDestroy(threadControlBlock);
 }
 
 static void irqHandler(void)
 {
     if (currentThreadControlBlock != 0)
-        yieldThread();
+        threadYield();
 
     timerClearInterruptRequest();
 }
@@ -55,13 +48,13 @@ void kernel_start(void)
     softwareInterruptHandler    = &swHandler;
     interruptRequestHandler     = &irqHandler;
 
-    volatile int c;
-    for (c = 0; c < 10000000; c++);
-
     uartInit();
     gpioInit();
     i2cInit(0);
-    initThreads();
+    threadsInit();
+
+    volatile int c;
+    for (c = 0; c < 10000000; c++);
 
     uartOutput(0x1B);
     uartOutput(0x00);
@@ -87,15 +80,25 @@ void kernel_start(void)
     UnsignedByte data[2];
     data[0] = 0;
     data[1] = 0;
-    uartOutput('A');
     i2cWrite(0, 32, data, 2);
-    uartOutput('B');
+
+    data[0] = 1;
+    data[1] = 255;
+    i2cWrite(0, 32, data, 2);
 
     data[0] = 20;
     data[1] = 255;
-    uartOutput('C');
     i2cWrite(0, 32, data, 2);
-    uartOutput('D');
+
+    data[0] = 21;
+    i2cWrite(0, 32, data, 1);
+
+    data[0] = 0xAA;
+    i2cRead(0, 32, data, 1);
+
+    logMessage("Input: ");
+    logUnsignedWord32Hex((UnsignedWord32) data[0]);
+    logMessage("\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

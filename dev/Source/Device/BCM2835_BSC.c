@@ -101,7 +101,7 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
         }
 
         // Wait for Done
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) == 0);
     }
 }
 
@@ -143,7 +143,7 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
         }
 
         // Wait for Done
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);
+        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) == 0);
     }
 }
 
@@ -158,7 +158,5 @@ void i2cDebug(volatile UnsignedWord32 *base)
     logUnsignedWord32Hex(*(base + BSC_DATALENGTH_OFFSET));
     logMessage("\r\nS Addr: ");
     logUnsignedWord32Hex(*(base + BSC_SLAVEADDRESS_OFFSET));
-    logMessage("\r\nD FIFO: ");
-    logUnsignedWord32Hex(*(base + BSC_DATAFIFO_OFFSET));
     logMessage("\r\n");
 }

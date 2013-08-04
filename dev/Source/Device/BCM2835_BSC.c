@@ -84,7 +84,7 @@ void i2cRead(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsign
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
 
         *(base + BSC_SLAVEADDRESS_OFFSET) = address;
-        *(base + BSC_DATALENGTH_OFFSET) = dataLength;
+        *(base + BSC_DATALENGTH_OFFSET)   = dataLength;
 
         // Start transfer, Read
         UnsignedWord32 bscControl = *(base + BSC_CONTROL_OFFSET);
@@ -118,15 +118,14 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
         *(base + BSC_STATUS_OFFSET) = BSC_CONTROL_CLEARFIFO_BITS | BSC_STATUS_DONE_BIT;
 
         *(base + BSC_SLAVEADDRESS_OFFSET) = address;
-        *(base + BSC_DATALENGTH_OFFSET) = dataLength;
+        *(base + BSC_DATALENGTH_OFFSET)   = dataLength;
 
         // Load Data
-        int dataIndex;
-        for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
+        int dataIndex = 0;
+        while ((dataIndex < dataLength) && (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) != 0))
         {
-            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) == 0);
-
             *(base + BSC_DATAFIFO_OFFSET) = data[dataIndex];
+            dataIndex++;
         }
 
         // Start transfer
@@ -134,6 +133,14 @@ void i2cWrite(UnsignedByte bus, UnsignedByte address, UnsignedByte data[], Unsig
         bscControl &= ~ (BSC_CONTROL_STARTTRANSFER_MASK | BSC_CONTROL_OPERATION_MASK);
         bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_WRITE_OPERATION_BIT;
         *(base + BSC_CONTROL_OFFSET) = bscControl;
+
+        while (dataIndex < dataLength)
+        {
+            while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_CONTAINSSPACE_MASK) == 0);
+
+            *(base + BSC_DATAFIFO_OFFSET) = data[dataIndex];
+            dataIndex++;
+        }
 
         // Wait for Done
         while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_DONE_MASK) != 0);

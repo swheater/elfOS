@@ -10,11 +10,11 @@
 
 extern ThreadControlBlock *currentThreadControlBlock;
 
-extern void               initThreads(void);
-extern void               createThread(void (*runFunction)(void), UnsignedByte *stack);
-extern void               startThreads(void);
+extern void               threadsInit(void);
+extern void               threadcreate(void (*runFunction)(void), UnsignedByte *stack);
+extern void               threadsStart(void);
 extern ThreadControlBlock *getCurrentThreadControlBlock(void);
-extern void               yieldThread(void);
-extern void               destroyThread(ThreadControlBlock *threadControlBlock);
+extern void               threadYield(void);
+extern void               threadDestroy(ThreadControlBlock *threadControlBlock);
 
 #endif

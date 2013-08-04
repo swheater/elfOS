@@ -13,7 +13,7 @@ ThreadControlBlock *currentThreadControlBlock = 0;
 
 static ThreadControlBlock threadControlBlocks[THREADCONTROLBLOCKS_LENGTH];
 
-static void clearThread(ThreadControlBlock *threadControlBlock)
+static void threadClear(ThreadControlBlock *threadControlBlock)
 {
     threadControlBlock->r0          = 0x0;
     threadControlBlock->r1          = 0x0;
@@ -35,14 +35,14 @@ static void clearThread(ThreadControlBlock *threadControlBlock)
     threadControlBlock->blockStatus = FREE;
 }
 
-void initThreads(void)
+void threadsInit(void)
 {
     unsigned int threadControlBlockIndex;
     for (threadControlBlockIndex = 0; threadControlBlockIndex < THREADCONTROLBLOCKS_LENGTH; threadControlBlockIndex++)
-        clearThread(&threadControlBlocks[threadControlBlockIndex]);
+        threadClear(&threadControlBlocks[threadControlBlockIndex]);
 }
 
-void createThread(void (*runFunction)(void), UnsignedByte *stack)
+void threadCreate(void (*runFunction)(void), UnsignedByte *stack)
 {
     ThreadControlBlock *choosenThreadControlBlock = 0;
 
@@ -75,7 +75,7 @@ ThreadControlBlock *getCurrentThreadControlBlock(void)
     return currentThreadControlBlock;
 }
 
-void yieldThread(void)
+void threadYield(void)
 {
     currentThreadControlBlock = 0;
 
@@ -90,13 +90,13 @@ void yieldThread(void)
     }
 }
 
-void destroyThread(ThreadControlBlock *threadControlBlock)
+void threadDestroy(ThreadControlBlock *threadControlBlock)
 {
     if (threadControlBlock != 0)
     {
-        clearThread(threadControlBlock);
+        threadClear(threadControlBlock);
 
         if (threadControlBlock == currentThreadControlBlock)
-            yieldThread();
+            threadYield();
     }
 }

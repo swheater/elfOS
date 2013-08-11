@@ -27,10 +27,10 @@
 #define BSC_CONTROL_OPERATION_MASK      (0x00000001)
 #define BSC_CONTROL_READ_OPERATION_BIT  (0x00000001)
 #define BSC_CONTROL_WRITE_OPERATION_BIT (0x00000000)
-#define BSC_CONTROL_STARTTRANSFER_MASK  (0x00000080)
-#define BSC_CONTROL_STARTTRANSFER_BIT   (0x00000080)
 #define BSC_CONTROL_CLEARFIFO_MASK      (0x00000030)
 #define BSC_CONTROL_CLEARFIFO_BITS      (0x00000010)
+#define BSC_CONTROL_STARTTRANSFER_MASK  (0x00000080)
+#define BSC_CONTROL_STARTTRANSFER_BIT   (0x00000080)
 #define BSC_CONTROL_ENABLE_MASK         (0x00008000)
 #define BSC_CONTROL_ENABLE_BIT          (0x00008000)
 #define BSC_CONTROL_DISABLE_BIT         (0x00000000)
@@ -43,6 +43,8 @@
 #define BSC_STATUS_CONTAINSSPACE_BIT   (0x00000010)
 #define BSC_STATUS_CONTAINSDATA_MASK   (0x00000020)
 #define BSC_STATUS_CONTAINSDATA_BIT    (0x00000020)
+#define BSC_STATUS_ACKERROR_MASK       (0x00000100)
+#define BSC_STATUS_ACKERROR_BIT        (0x00000100)
 
 volatile UnsignedWord32* getBusBase(UnsignedByte bus)
 {
@@ -119,7 +121,7 @@ void i2cRegRead(UnsignedByte bus, UnsignedByte deviceAddress, UnsignedByte regis
 
         *(base + BSC_SLAVEADDRESS_OFFSET) = deviceAddress;
  
-	*(base + BSC_DATALENGTH_OFFSET) = 1;
+        *(base + BSC_DATALENGTH_OFFSET) = 1;
         *(base + BSC_DATAFIFO_OFFSET)   = registerAddress;
 
         // Start transfer, Write
@@ -128,7 +130,7 @@ void i2cRegRead(UnsignedByte bus, UnsignedByte deviceAddress, UnsignedByte regis
         bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_WRITE_OPERATION_BIT;
         *(base + BSC_CONTROL_OFFSET) = bscControl;
 
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) == 0);
+        while (((*(base + BSC_STATUS_OFFSET)) & (BSC_STATUS_TRANSFERACTIVE_MASK | BSC_STATUS_DONE_MASK)) == 0);
 
         *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 
@@ -207,7 +209,7 @@ void i2cRegWrite(UnsignedByte bus, UnsignedByte deviceAddress, UnsignedByte regi
 
         *(base + BSC_SLAVEADDRESS_OFFSET) = deviceAddress;
 
-	*(base + BSC_DATALENGTH_OFFSET) = 1;
+        *(base + BSC_DATALENGTH_OFFSET) = 1;
         *(base + BSC_DATAFIFO_OFFSET)   = registerAddress;
 
         // Start transfer, Write
@@ -216,7 +218,7 @@ void i2cRegWrite(UnsignedByte bus, UnsignedByte deviceAddress, UnsignedByte regi
         bscControl |= BSC_CONTROL_STARTTRANSFER_BIT | BSC_CONTROL_WRITE_OPERATION_BIT;
         *(base + BSC_CONTROL_OFFSET) = bscControl;
 
-        while (((*(base + BSC_STATUS_OFFSET)) & BSC_STATUS_TRANSFERACTIVE_MASK) == 0);
+        while (((*(base + BSC_STATUS_OFFSET)) & (BSC_STATUS_TRANSFERACTIVE_MASK | BSC_STATUS_DONE_MASK)) == 0);
 
         *(base + BSC_DATALENGTH_OFFSET) = dataLength;
 

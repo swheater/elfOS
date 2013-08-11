@@ -77,24 +77,18 @@ void kernel_start(void)
 
     timerInit(127, 1000000, TRUE);
 
-    UnsignedByte data[2];
-    data[0] = 0;
-    data[1] = 0;
-    i2cWrite(0, 32, data, 2);
+    UnsignedByte data[1];
+    data[0] = 0xF0;
+    i2cRegWrite(0, 0x20, 0x00, data, 1);
+    logMessage("Post: i2cRegWrite 0x00\r\n");
 
-    data[0] = 1;
-    data[1] = 255;
-    i2cWrite(0, 32, data, 2);
+    data[0] = 0x0F;
+    i2cRegWrite(0, 0x20, 0x14, data, 1);
+    logMessage("Post: i2cRegWrite 0x14\r\n");
 
-    data[0] = 20;
-    data[1] = 255;
-    i2cWrite(0, 32, data, 2);
-
-    data[0] = 21;
-    i2cWrite(0, 32, data, 1);
-
-    data[0] = 0xAA;
-    i2cRead(0, 32, data, 1);
+    data[0] = 0x00;
+    i2cRegRead(0, 0x20, 0x12, data, 1);
+    logMessage("Post: i2cRegRead 0x12\r\n");
 
     logMessage("Input: ");
     logUnsignedWord32Hex((UnsignedWord32) data[0]);

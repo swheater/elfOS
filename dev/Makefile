@@ -27,7 +27,7 @@ OBJS = Source/Kernel/ARM/Boot.o \
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
-       Source/Device/BCM2835_miniUART.o Source/Device/BCM2835_GPIO.o Source/Device/BCM2835_BSC.o Source/Device/BCM2835_Timer.o
+       Source/Device/BCM2835_miniUART.o Source/Device/BCM2835_GPIO.o Source/Device/BCM2835_BSC.o Source/Device/BCM2835_SPI.o Source/Device/BCM2835_Timer.o
 
 #       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o \
 #       Source/Kernel/ARMv6/MemoryManagement.o \

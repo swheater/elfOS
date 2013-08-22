@@ -13,6 +13,7 @@
 #include <Device/BCM2835_miniUART.h>
 #include <Device/BCM2835_BSC.h>
 #include <Device/BCM2835_Timer.h>
+#include <Device/RaspPi_DisplayTFT18.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>
@@ -50,49 +51,27 @@ void kernel_start(void)
 
     uartInit();
     gpioInit();
+    displayTFT18Init();
     i2cInit(0);
     threadsInit();
-
-    volatile int c;
-    for (c = 0; c < 10000000; c++);
-
-    uartOutput(0x1B);
-    uartOutput(0x00);
-    uartOutput(0xFF);
-
-    uartOutput(0x1B);
-    uartOutput(0x03);
-    uartOutput(0x02);
-    uartOutput(0xFF);
-
-    uartOutput(0x1B);
-    uartOutput(0x04);
-    uartOutput(0x01);
-    uartOutput(0xFF);
-
-    uartOutput(0x1B);
-    uartOutput(0x04);
-    uartOutput(0x01);
-    uartOutput(0xFF);
-
     timerInit(127, 1000000, TRUE);
 
     UnsignedByte data[1];
-    data[0] = 0xF0;
-    i2cRegWrite(0, 0x20, 0x00, data, 1);
-    logMessage("Post: i2cRegWrite 0x00\r\n");
+    data[0] = 0x01;
+    i2cRegWrite(0, 0x54, 0x00, data, 1);
+    logMessage("Post: write 0x54 0x00 0x01\r\n");
 
-    data[0] = 0x0F;
-    i2cRegWrite(0, 0x20, 0x14, data, 1);
-    logMessage("Post: i2cRegWrite 0x14\r\n");
+    data[0] = 0x01;
+    i2cRegWrite(0, 0x54, 0x13, data, 1);
+    logMessage("Post: write 0x54 0x13 0x01\r\n");
 
-    data[0] = 0x00;
-    i2cRegRead(0, 0x20, 0x12, data, 1);
-    logMessage("Post: i2cRegRead 0x12\r\n");
+    data[0] = 0xFF;
+    i2cRegWrite(0, 0x54, 0x01, data, 1);
+    logMessage("Post: write 0x54 0x01 0xFF\r\n");
 
-    logMessage("Input: ");
-    logUnsignedWord32Hex((UnsignedWord32) data[0]);
-    logMessage("\r\n");
+    data[0] = 0xFF;
+    i2cRegWrite(0, 0x54, 0x16, data, 1);
+    logMessage("Post: write 0x54 0x16 0xFF\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

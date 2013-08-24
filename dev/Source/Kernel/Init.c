@@ -56,22 +56,24 @@ void kernel_start(void)
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
+    logMessage("Test PiGlow\r\n");
+
     UnsignedByte data[1];
     data[0] = 0x01;
     i2cRegWrite(0, 0x54, 0x00, data, 1);
-    logMessage("Post: write 0x54 0x00 0x01\r\n");
+    logMessage("P-w: 0x54 0x00 0x01\r\n");
 
     data[0] = 0x01;
     i2cRegWrite(0, 0x54, 0x13, data, 1);
-    logMessage("Post: write 0x54 0x13 0x01\r\n");
+    logMessage("P-w: 0x54 0x13 0x01\r\n");
 
     data[0] = 0xFF;
     i2cRegWrite(0, 0x54, 0x01, data, 1);
-    logMessage("Post: write 0x54 0x01 0xFF\r\n");
+    logMessage("P-w: 0x54 0x01 0xFF\r\n");
 
     data[0] = 0xFF;
     i2cRegWrite(0, 0x54, 0x16, data, 1);
-    logMessage("Post: write 0x54 0x16 0xFF\r\n");
+    logMessage("P-w: 0x54 0x16 0xFF\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

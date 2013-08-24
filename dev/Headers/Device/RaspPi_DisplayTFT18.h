@@ -5,6 +5,8 @@
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
+#include <Kernel/StdTypes.h>
+
 #define DISPLAYTFT18_COLOUR_BLACK   (0x00)
 #define DISPLAYTFT18_COLOUR_BLUE    (0x01)
 #define DISPLAYTFT18_COLOUR_RED     (0x02)

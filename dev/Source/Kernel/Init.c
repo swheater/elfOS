@@ -14,6 +14,7 @@
 #include <Device/BCM2835_BSC.h>
 #include <Device/BCM2835_Timer.h>
 #include <Device/RaspPi_DisplayTFT18.h>
+#include <Device/RaspPi_PiGlow.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>
@@ -58,26 +59,40 @@ void kernel_start(void)
 
     logMessage("Test PiGlow\r\n");
 
-    UnsignedByte data[2];
-    data[0] = 0x00;
-    data[1] = 0x01;
-    i2cWrite(0, 0x54, data, 2);
-    logMessage("W: 0x54, 0x00 0x01\r\n");
+    piglowInit();
 
-    data[0] = 0x13;
-    data[1] = 0x01;
-    i2cWrite(0, 0x54, data, 2);
-    logMessage("W: 0x54, 0x13 0x01\r\n");
+    volatile int count;
+    UnsignedByte arm, ledColour;
+    while (TRUE)
+    {
+        for (arm = PIGLOW_ARM_MIN; arm <= PIGLOW_ARM_MAX; arm++)
+	{
+            for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+	    {
+                piglowSetLEDBrightness(arm, ledColour, PIGLOW_BRIGHTNESS_MAX / 4);
+                for (count = 0; count < 1000000; count++);
+                piglowSetLEDBrightness(arm, ledColour, PIGLOW_BRIGHTNESS_MIN);
+	    }
+	}
 
-    data[0] = 0x01;
-    data[1] = 0xFF;
-    i2cWrite(0, 0x54, data, 2);
-    logMessage("W: 0x54, 0x01 0xFF\r\n");
+        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+            piglowSetLEDBrightness(0, ledColour, PIGLOW_BRIGHTNESS_MAX / 8);
+        for (count = 0; count < 2000000; count++);
+        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+            piglowSetLEDBrightness(0, ledColour, PIGLOW_BRIGHTNESS_MIN);
 
-    data[0] = 0x16;
-    data[1] = 0xFF;
-    i2cWrite(0, 0x54, data, 2);
-    logMessage("W: 0x54, 0x16 0xFF\r\n");
+        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+            piglowSetLEDBrightness(1, ledColour, PIGLOW_BRIGHTNESS_MAX / 8);
+        for (count = 0; count < 2000000; count++);
+        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+            piglowSetLEDBrightness(1, ledColour, PIGLOW_BRIGHTNESS_MIN);
+
+        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+            piglowSetLEDBrightness(2, ledColour, PIGLOW_BRIGHTNESS_MAX / 8);
+        for (count = 0; count < 2000000; count++);
+        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
+            piglowSetLEDBrightness(2, ledColour, PIGLOW_BRIGHTNESS_MIN);
+    }
 
     UnsignedWord32 reg = 0;
     while (TRUE)

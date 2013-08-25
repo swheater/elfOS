@@ -7,12 +7,14 @@
 
 #include <Kernel/StdTypes.h>
 
+#define PIGLOW_ARMS    (6)
 #define PIGLOW_ARM_0   (0x00)
 #define PIGLOW_ARM_1   (0x01)
 #define PIGLOW_ARM_2   (0x02)
 #define PIGLOW_ARM_MIN (PIGLOW_ARM_0)
 #define PIGLOW_ARM_MAX (PIGLOW_ARM_2)
 
+#define PIGLOW_LEDS_PER_ARM     (6)
 #define PIGLOW_LEDCOLOUR_WHITE  (0x00)
 #define PIGLOW_LEDCOLOUR_BLUE   (0x01)
 #define PIGLOW_LEDCOLOUR_GREEN  (0x02)

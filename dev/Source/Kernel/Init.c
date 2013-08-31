@@ -15,6 +15,7 @@
 #include <Device/BCM2835_Timer.h>
 #include <Device/RaspPi_DisplayTFT18.h>
 #include <Device/BCM2835_SPI.h>
+#include <Device/RaspPi_Status.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>
@@ -52,6 +53,7 @@ void kernel_start(void)
 
     uartInit();
     gpioInit();
+    statusInit();
     displayTFT18Init();
     i2cInit(0);
     threadsInit();
@@ -63,7 +65,7 @@ void kernel_start(void)
     UnsignedWord32 inputData[3];
 
     spiInit();
-
+    /*
     outputData[0] = 0x40;
     outputData[0] = 0x00;
     outputData[0] = 0x00;
@@ -83,13 +85,13 @@ void kernel_start(void)
     outputData[0] = 0x15;
     outputData[0] = 0xFF;
     spiTransfer(0, outputData, inputData, 3);
-
+    */
     UnsignedWord32 reg = 0;
     while (TRUE)
     {
-        gpioSetOutput(4);
+        statusSetActiveLED();
 	asm("mcr\tp15, 0, %0, c7, c0, 4": : "r" (reg));
-        gpioClearOutput(4);
+        statusClearActiveLED();
 	asm("mcr\tp15, 0, %0, c7, c0, 4": : "r" (reg));
     }
 }

@@ -35,6 +35,15 @@
 #define SPI_CONTROLSTATUS_CANACCEPTDATA_MASK    (0x00040000)
 #define SPI_CONTROLSTATUS_CANACCEPTDATA_BIT     (0x00040000)
 
+void spiDebug(const char *message)
+{
+    logMessage("SPI: ");
+    logMessage(message);
+    logMessage("\r\nCtrlStat: ");
+    logUnsignedWord32Hex(*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET));
+    logMessage("\r\n");
+}
+
 void spiInit(void)
 {
     // Select function for GPIO7, GPI08 & GPIO9
@@ -56,62 +65,29 @@ void spiInit(void)
 
 void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 dataLength)
 {
-    spiDebug("Entry");
     // Start transfer, Read
     UnsignedWord32 spiStart = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
     spiStart &= ~ (SPI_CONTROLSTATUS_CHIPSELECT_MASK | SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK | SPI_CONTROLSTATUS_CLEARFIFO_MASK);
     spiStart |= (SPI_CONTROLSTATUS_CHIPSELECT_MASK & chip) | SPI_CONTROLSTATUS_TRANSFERACTIVE_BIT | SPI_CONTROLSTATUS_CLEARFIFO_TX_BIT | SPI_CONTROLSTATUS_CLEARFIFO_RX_BIT;
     *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiStart;
 
-    spiDebug("PostStart");
-
-    int count = 0;
-
     UnsignedWord32 outputDataIndex = 0;
     UnsignedWord32 inputDataIndex  = 0;
     while ((outputDataIndex < dataLength) || (inputDataIndex < dataLength))
     {
-        if (count > 10000000)
-	{
-            spiDebug("Loop");
-            count = 0;
-	}
-        else
-  	    count++;
-
         while ((outputDataIndex < dataLength) && (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CANACCEPTDATA_MASK) == SPI_CONTROLSTATUS_CANACCEPTDATA_BIT))
-	{
  	    *(SPI_BASE + SPI_DATAFIFO_OFFSET) = outputData[outputDataIndex++];
-            logMessage("w");
-	}
 
         while ((inputDataIndex < dataLength) && (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CONTAINSDATA_MASK) == SPI_CONTROLSTATUS_CONTAINSDATA_BIT))
-	{
             inputData[inputDataIndex++] = *(SPI_BASE + SPI_DATAFIFO_OFFSET);
-            logMessage("r");
-	}
     }
 
-    spiDebug("PreDone");
-
     // Wait for Done transfer
-    while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_DONETRANSFER_MASK) == 0);
-
-    spiDebug("PostDone");
+    while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_DONETRANSFER_MASK) != SPI_CONTROLSTATUS_DONETRANSFER_BIT);
 
     // Terminate transfer
     UnsignedWord32 spiTerminate = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
     spiTerminate &= ~ SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK;
     spiTerminate |= SPI_CONTROLSTATUS_NOTRANSFERACTIVE_BIT;
     *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiTerminate;
-    spiDebug("Exit");
-}
-
-void spiDebug(const char *message)
-{
-    logMessage("\r\nSPI: ");
-    logMessage(message);
-    logMessage("\r\nCtrlStat: ");
-    logUnsignedWord32Hex(*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET));
-    logMessage("\r\n");
 }

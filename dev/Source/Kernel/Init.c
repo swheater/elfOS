@@ -14,7 +14,7 @@
 #include <Device/BCM2835_BSC.h>
 #include <Device/BCM2835_Timer.h>
 #include <Device/RaspPi_DisplayTFT18.h>
-#include <Device/RaspPi_PiGlow.h>
+#include <Device/BCM2835_SPI.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
 #include <elfOS/Thread.h>
@@ -57,42 +57,32 @@ void kernel_start(void)
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    logMessage("Test PiGlow\r\n");
+    logMessage("Test PiFace Digital\r\n");
 
-    piglowInit();
+    UnsignedWord32 outputData[3];
+    UnsignedWord32 inputData[3];
 
-    volatile int count;
-    UnsignedByte arm, ledColour;
-    while (TRUE)
-    {
-        for (arm = PIGLOW_ARM_MIN; arm <= PIGLOW_ARM_MAX; arm++)
-	{
-            for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-	    {
-                piglowSetLEDBrightness(arm, ledColour, PIGLOW_BRIGHTNESS_MAX / 4);
-                for (count = 0; count < 1000000; count++);
-                piglowSetLEDBrightness(arm, ledColour, PIGLOW_BRIGHTNESS_MIN);
-	    }
-	}
+    spiInit();
 
-        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-            piglowSetLEDBrightness(0, ledColour, PIGLOW_BRIGHTNESS_MAX / 8);
-        for (count = 0; count < 2000000; count++);
-        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-            piglowSetLEDBrightness(0, ledColour, PIGLOW_BRIGHTNESS_MIN);
+    outputData[0] = 0x40;
+    outputData[0] = 0x00;
+    outputData[0] = 0x00;
+    spiTransfer(0, outputData, inputData, 3);
 
-        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-            piglowSetLEDBrightness(1, ledColour, PIGLOW_BRIGHTNESS_MAX / 8);
-        for (count = 0; count < 2000000; count++);
-        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-            piglowSetLEDBrightness(1, ledColour, PIGLOW_BRIGHTNESS_MIN);
+    outputData[0] = 0x40;
+    outputData[0] = 0x01;
+    outputData[0] = 0x00;
+    spiTransfer(0, outputData, inputData, 3);
 
-        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-            piglowSetLEDBrightness(2, ledColour, PIGLOW_BRIGHTNESS_MAX / 8);
-        for (count = 0; count < 2000000; count++);
-        for (ledColour = PIGLOW_LEDCOLOUR_MIN; ledColour <= PIGLOW_LEDCOLOUR_MAX; ledColour++)
-            piglowSetLEDBrightness(2, ledColour, PIGLOW_BRIGHTNESS_MIN);
-    }
+    outputData[0] = 0x40;
+    outputData[0] = 0x14;
+    outputData[0] = 0xFF;
+    spiTransfer(0, outputData, inputData, 3);
+
+    outputData[0] = 0x40;
+    outputData[0] = 0x15;
+    outputData[0] = 0xFF;
+    spiTransfer(0, outputData, inputData, 3);
 
     UnsignedWord32 reg = 0;
     while (TRUE)

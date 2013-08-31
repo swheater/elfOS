@@ -8,9 +8,6 @@
 #include <Kernel/StdTypes.h>
 
 extern void spiInit(void);
-extern void spiRead(UnsignedByte chip, UnsignedWord32 data[], UnsignedWord16 dataLength);
-extern void spiWrite(UnsignedByte chip, UnsignedWord32 data[], UnsignedWord16 dataLength);
-
-extern void spiDebug(void);
+extern void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 dataLength);
 
 #endif

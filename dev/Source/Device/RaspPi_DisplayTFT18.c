@@ -31,7 +31,7 @@ void displayTFT18Init(void)
 {
     // Delay to wait for ATmega328 chip startup
     volatile int c;
-    for (c = 0; c < 10000000; c++);
+    for (c = 0; c < 20000000; c++);
 
     displayTFT18ClearScreen();
     displayTFT18SetForegroundColour(DISPLAYTFT18_COLOUR_WHITE);

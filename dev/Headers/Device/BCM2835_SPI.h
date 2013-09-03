@@ -8,6 +8,8 @@
 #include <Kernel/StdTypes.h>
 
 extern void spiInit(void);
+extern UnsignedWord32 spiSetClockRate(UnsignedWord32 clockRate);
 extern void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 dataLength);
+extern void spiAsyncTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 outputDataLength, UnsignedWord32 inputDataLength);
 
 #endif

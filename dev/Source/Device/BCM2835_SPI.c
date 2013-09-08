@@ -114,23 +114,39 @@ void spiAsyncTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWo
     spiStart |= (SPI_CONTROLSTATUS_CHIPSELECT_MASK & chip) | SPI_CONTROLSTATUS_TRANSFERACTIVE_BIT | SPI_CONTROLSTATUS_CLEARFIFO_TX_BIT | SPI_CONTROLSTATUS_CLEARFIFO_RX_BIT;
     *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiStart;
 
+    UnsignedWord32 dummy;
     UnsignedWord32 outputDataIndex = 0;
     UnsignedWord32 inputDataIndex  = 0;
-    while ((outputDataIndex < outputDataLength) || (inputDataIndex < inputDataLength))
+    while ((outputDataIndex < outputDataLength) || (inputDataIndex < outputDataLength))
     {
-        while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CANACCEPTDATA_MASK) == SPI_CONTROLSTATUS_CANACCEPTDATA_BIT)
-            if (outputDataIndex < outputDataLength)
-                *(SPI_BASE + SPI_DATAFIFO_OFFSET) = outputData[outputDataIndex++];
-            else
-                *(SPI_BASE + SPI_DATAFIFO_OFFSET) = 0xFF;
+        while ((outputDataIndex < outputDataLength) && (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CANACCEPTDATA_MASK) == SPI_CONTROLSTATUS_CANACCEPTDATA_BIT))
+            *(SPI_BASE + SPI_DATAFIFO_OFFSET) = outputData[outputDataIndex++];
 
-        while ((inputDataIndex < inputDataLength) && (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CONTAINSDATA_MASK) == SPI_CONTROLSTATUS_CONTAINSDATA_BIT))
-	{
-            inputData[inputDataIndex] = *(SPI_BASE + SPI_DATAFIFO_OFFSET);
-            if ((inputDataIndex > 0) || (inputData[inputDataIndex] != 0x00))
-	        inputDataIndex++;
-	}
+        while ((inputDataIndex < outputDataLength) && (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CONTAINSDATA_MASK) == SPI_CONTROLSTATUS_CONTAINSDATA_BIT))
+        {
+            dummy = *(SPI_BASE + SPI_DATAFIFO_OFFSET);
+            inputDataIndex++;
+            logMessage(" ");
+            logUnsignedByteHex(dummy);
+        }
     }
+
+    inputDataIndex = 0;
+    while (inputDataIndex < inputDataLength)
+    {
+        while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CANACCEPTDATA_MASK) != SPI_CONTROLSTATUS_CANACCEPTDATA_BIT);
+  
+        *(SPI_BASE + SPI_DATAFIFO_OFFSET) = 0xFF;
+
+        while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CONTAINSDATA_MASK) != SPI_CONTROLSTATUS_CONTAINSDATA_BIT);
+
+        inputData[inputDataIndex] = *(SPI_BASE + SPI_DATAFIFO_OFFSET);
+        logMessage(" ");
+        logUnsignedByteHex(inputData[inputDataIndex]);
+        if ((inputDataIndex > 0) || ((inputData[inputDataIndex] != 0x3F) && ((inputData[inputDataIndex] & 0x80) == 0x00)))
+            inputDataIndex++;
+    }
+    logMessage("\r\n");
 
     // Wait for Done transfer
     while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_DONETRANSFER_MASK) != SPI_CONTROLSTATUS_DONETRANSFER_BIT);

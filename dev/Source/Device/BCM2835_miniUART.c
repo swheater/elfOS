@@ -48,8 +48,8 @@ void uartInit(void)
     *(UART_BASE + UART_LINECONTROL_OFFSET)       = 0x03;      // Select 8 bit 
     *(UART_BASE + UART_INTERRUPTIDENTIFY_OFFSET) = 0xC6;      // Clear receive and transmit FIFO queue
     *(UART_BASE + UART_MODEMCONTROL_OFFSET)      = 0x00;      // RTS to high
-//  *(UART_BASE + UART_BAUDRATE_OFFSET)          = 0x010E;    // Set baud rate of 115200 pulses per second
-    *(UART_BASE + UART_BAUDRATE_OFFSET)          = 0x0CB6;    // Set baud rate of 9600 pulses per second
+    *(UART_BASE + UART_BAUDRATE_OFFSET)          = 0x010E;    // Set baud rate of 115200 pulses per second
+//    *(UART_BASE + UART_BAUDRATE_OFFSET)          = 0x0CB6;    // Set baud rate of 9600 pulses per second
 
     UnsignedWord32 funcSelect1 = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_1_OFFSET);
     funcSelect1 &= GPIO_FUNCSELECT_1_GPIO14_MASK;

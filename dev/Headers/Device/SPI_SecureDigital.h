@@ -5,8 +5,8 @@
  * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-extern void securedigitalInit(void);
+extern UnsignedByte securedigitalInit(void);
 
-extern void securedigitalTest(void);
+extern UnsignedByte securedigitalReadBlock(UnsignedWord32 blockNumber, UnsignedByte block[512]);
 
 #endif

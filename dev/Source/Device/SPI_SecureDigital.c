@@ -16,7 +16,7 @@ static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 d
     UnsignedWord32 dataIndex;
     for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
     {
-        if ((dataIndex % 16) == 0)
+        if ((dataIndex % 48) == 0)
             logMessage("\r\n");
 
         logMessage(" ");
@@ -25,7 +25,130 @@ static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 d
     logMessage("\r\n");
 }
 
-void securedigitalInit(void)
+static Boolean startFirstResponseInput(UnsignedWord32 inputData, void *context)
+{
+    return (inputData != 0x3F) && ((inputData & 0x80) == 0x00);
+}
+
+static Boolean startResponseInput(UnsignedWord32 inputData, void *context)
+{
+    return (inputData & 0x80) == 0x00;
+}
+
+static Boolean stopResponseInput(UnsignedWord32 inputData, void *context)
+{
+    return FALSE;
+}
+
+static Boolean startDataInput(UnsignedWord32 inputData, void *context)
+{
+    if (inputData == 0xFE)
+    {
+        *((Boolean*) context) = FALSE;
+        return TRUE;
+    }
+    else if ((inputData & 0xE0) == 0x00)
+    {
+        *((Boolean*) context) = TRUE;
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
+static Boolean stopDataInput(UnsignedWord32 inputData, void *context)
+{
+    if (*((Boolean*) context))
+        return TRUE;
+    else
+        return FALSE;
+}
+
+static UnsignedByte securedigitalSendFirstCommandR1(UnsignedByte command, UnsignedByte args[4], UnsignedByte crc)
+{
+    UnsignedWord32 outputData[6];
+    UnsignedWord32 inputData[1];
+
+    outputData[0] = (0x0000003F & command) | 0x00000040;
+    UnsignedWord32 argsIndex;
+    for (argsIndex = 0; argsIndex < 4; argsIndex++)
+        outputData[argsIndex + 1] = args[argsIndex];
+    outputData[5] = (crc << 1) | 0x00000001;
+ 
+    Boolean context = FALSE;
+    spiAsyncTransfer(1, outputData, inputData, 6, 1, startFirstResponseInput, stopResponseInput, &context);
+
+    return inputData[0];
+}
+
+static UnsignedByte securedigitalSendCommandR1(UnsignedByte command, UnsignedByte args[4], UnsignedByte crc)
+{
+    UnsignedWord32 outputData[6];
+    UnsignedWord32 inputData[1];
+
+    outputData[0] = (0x0000003F & command) | 0x00000040;
+    UnsignedWord32 argsIndex;
+    for (argsIndex = 0; argsIndex < 4; argsIndex++)
+        outputData[argsIndex + 1] = args[argsIndex];
+    outputData[5] = (crc << 1) | 0x00000001;
+ 
+    Boolean context = FALSE;
+    //    logData("OutputData R1", outputData, 6);
+    spiAsyncTransfer(1, outputData, inputData, 6, 1, startResponseInput, stopResponseInput, &context);
+    //    logData("InputData  R1", inputData, 1);
+
+    return inputData[0];
+}
+
+static UnsignedByte securedigitalSendCommandR3(UnsignedByte command, UnsignedByte args[4], UnsignedByte crc)
+{
+    UnsignedWord32 outputData[6];
+    UnsignedWord32 inputData[5];
+
+    outputData[0] = (0x0000003F & command) | 0x00000040;
+    UnsignedWord32 argsIndex;
+    for (argsIndex = 0; argsIndex < 4; argsIndex++)
+        outputData[argsIndex + 1] = args[argsIndex];
+    outputData[5] = (crc << 1) | 0x00000001;
+ 
+    Boolean context = FALSE;
+    //    logData("OutputData R3", outputData, 6);
+    spiAsyncTransfer(1, outputData, inputData, 6, 5, startResponseInput, stopResponseInput, &context);
+    //    logData("InputData  R3", inputData, 5);
+
+    return inputData[0];
+}
+
+static UnsignedByte securedigitalSendCommandR7(UnsignedByte command, UnsignedByte args[4], UnsignedByte crc)
+{
+    UnsignedWord32 outputData[6];
+    UnsignedWord32 inputData[5];
+
+    outputData[0] = (0x0000003F & command) | 0x00000040;
+    UnsignedWord32 argsIndex;
+    for (argsIndex = 0; argsIndex < 4; argsIndex++)
+        outputData[argsIndex + 1] = args[argsIndex];
+    outputData[5] = (crc << 1) | 0x00000001;
+
+    Boolean context = FALSE;
+    //    logData("OutputData R7", outputData, 6);
+    spiAsyncTransfer(1, outputData, inputData, 6, 5, startResponseInput, stopResponseInput, &context);
+    //    logData("InputData  R7", inputData, 5);
+
+    return inputData[0];
+}
+
+static UnsignedByte securedigitalReceiveData(UnsignedWord32 *inputData)
+{
+    UnsignedWord32 outputData[0];
+
+    Boolean context = FALSE;
+    spiAsyncTransfer(1, outputData, inputData, 0, 515, startDataInput, stopDataInput, &context);
+
+    return inputData[0];
+}
+
+UnsignedByte securedigitalInit(void)
 {
     spiSetClockRate(400000);
 
@@ -37,53 +160,14 @@ void securedigitalInit(void)
         outputData[dataIndex] = 0xFF;
 
     spiTransfer(2, outputData, inputData, 10);
-}
 
-UnsignedByte securedigitalSendCommandR1(UnsignedByte command, UnsignedByte args[4], UnsignedByte crc)
-{
-    UnsignedWord32 outputData[6];
-    UnsignedWord32 inputData[1];
-
-    outputData[0] = (0x0000003F & command) | 0x00000040;
-    UnsignedWord32 argsIndex;
-    for (argsIndex = 0; argsIndex < 4; argsIndex++)
-        outputData[argsIndex + 1] = args[argsIndex];
-    outputData[5] = (crc << 1) | 0x00000001;
-
-    //    logData("Request", outputData, 6);
-    spiAsyncTransfer(1, outputData, inputData, 6, 1);
-    //    logData("Response", inputData, 1);
-
-    return inputData[0];
-}
-
-UnsignedByte securedigitalSendCommandR7(UnsignedByte command, UnsignedByte args[4], UnsignedByte crc)
-{
-    UnsignedWord32 outputData[6];
-    UnsignedWord32 inputData[5];
-
-    outputData[0] = (0x0000003F & command) | 0x00000040;
-    UnsignedWord32 argsIndex;
-    for (argsIndex = 0; argsIndex < 4; argsIndex++)
-        outputData[argsIndex + 1] = args[argsIndex];
-    outputData[5] = (crc << 1) | 0x00000001;
-
-    //    logData("Request", outputData, 6);
-    spiAsyncTransfer(1, outputData, inputData, 6, 5);
-    //    logData("Response", inputData, 5);
-
-    return inputData[0];
-}
-
-void securedigitalTest(void)
-{
     UnsignedByte args[4];
 
     UnsignedWord32 argsIndex;
     for (argsIndex = 0; argsIndex < 4; argsIndex++)
         args[argsIndex] = 0x00;
 
-    securedigitalSendCommandR1(0, args, 0x4A);
+    securedigitalSendFirstCommandR1(0, args, 0x4A);
 
     securedigitalSendCommandR1(0, args, 0x4A);
 
@@ -91,11 +175,11 @@ void securedigitalTest(void)
     args[2] = 0x01;
     args[3] = 0xAA;
     res = securedigitalSendCommandR7(8, args, 0x43);
+
     args[2] = 0x00;
     args[3] = 0x00;
-
     UnsignedWord32 count = 0;
-    while ((res == 0x01) && (count < 16))
+    while ((res == 0x01) && (count < 1024))
     {
         securedigitalSendCommandR1(55, args, 0x00);
 
@@ -105,8 +189,35 @@ void securedigitalTest(void)
         count++;
     }
 
-    logUnsignedByteHex(res);
-    logMessage("\r\n");
-    logUnsignedWord32Hex(count++);
-    logMessage("\r\n");
+    if (res == 0x00)
+        res = securedigitalSendCommandR3(58, args, 0x00);
+ 
+    return res;
+}
+
+UnsignedByte securedigitalReadBlock(UnsignedWord32 blockNumber, UnsignedByte block[512])
+{
+    UnsignedByte res;
+    UnsignedByte args[4];
+    args[0] = (blockNumber >> 24) & 0xFF;
+    args[1] = (blockNumber >> 16) & 0xFF;
+    args[2] = (blockNumber >> 8) & 0xFF;
+    args[3] = blockNumber & 0xFF;
+
+    res = securedigitalSendCommandR1(17, args, 0x00);
+    if (res == 0x00)
+    {
+        UnsignedWord32 index;
+        UnsignedWord32 inputData[515];
+
+        res = securedigitalReceiveData(inputData);
+
+        if (res == 0xFE)
+            for (index = 0; index < 512; index++)
+                block[index] = inputData[index + 1];
+
+        return res;
+    }
+    else
+        return res;
 }

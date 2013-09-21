@@ -61,9 +61,48 @@ void kernel_start(void)
     spiInit();
     timerInit(127, 1000000, TRUE);
 
-    securedigitalInit();
+    UnsignedByte res;
 
-    securedigitalTest();
+    res = securedigitalInit();
+
+    logMessage("SD Init Res    = ");
+    logUnsignedByteHex(res);
+    logMessage("\r\n");
+
+    UnsignedWord32 index;
+    UnsignedByte   block[512];
+  
+    for (index = 0; index < 512; index++)
+        block[index] = 0x00;
+
+    res = securedigitalReadBlock(0, block);
+
+    logMessage("SD Read(0) Res = ");
+    logUnsignedByteHex(res);
+    logMessage("\r\n");
+
+    for (index = 0; index < 512; index++)
+    {
+        logUnsignedByteHex(block[index]);
+        logMessage(" ");
+    }
+    logMessage("\r\n");
+
+    for (index = 0; index < 512; index++)
+        block[index] = 0x00;
+
+    res = securedigitalReadBlock(1, block);
+
+    logMessage("SD Read(1) Res = ");
+    logUnsignedByteHex(res);
+    logMessage("\r\n");
+
+    for (index = 0; index < 512; index++)
+    {
+        logUnsignedByteHex(block[index]);
+        logMessage(" ");
+    }
+    logMessage("\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

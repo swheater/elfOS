@@ -34,7 +34,7 @@ void systemtimerWait(UnsignedWord64 microSecondDelay)
 {
     UnsignedWord64 counterValue = *((volatile UnsignedWord64*) (SYSTEMTIMER_BASE + SYSTEMTIMER_COUNTER_OFFSET));
     
-    UnsignedWord64 counterTargetValue = counter + microSecondDelay;
+    UnsignedWord64 counterTargetValue = counterValue + microSecondDelay;
     while (counterValue < counterTargetValue)
         counterValue = *((volatile UnsignedWord64*) (SYSTEMTIMER_BASE + SYSTEMTIMER_COUNTER_OFFSET));
 }

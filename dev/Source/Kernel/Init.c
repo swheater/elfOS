@@ -13,8 +13,10 @@
 #include <Device/BCM2835_miniUART.h>
 #include <Device/BCM2835_BSC.h>
 #include <Device/BCM2835_Timer.h>
+#include <Device/BCM2835_SystemTimer.h>
 #include <Device/RaspPi_DisplayTFT18.h>
 #include <Device/BCM2835_SPI.h>
+#include <Device/RaspPi_ILI9320.h>
 #include <Device/RaspPi_Status.h>
 #include <Device/SPI_SecureDigital.h>
 #include <ELF/ELF32.h>
@@ -53,56 +55,18 @@ void kernel_start(void)
     interruptRequestHandler     = &irqHandler;
 
     statusInit();
+    systemtimerInit();
     gpioInit();
+    spiInit();
     uartInit();
     //    displayTFT18Init();
-    i2cInit(0);
+    //    i2cInit(0);
     threadsInit();
-    spiInit();
     timerInit(127, 1000000, TRUE);
 
-    UnsignedByte res;
-
-    res = securedigitalInit();
-
-    logMessage("SD Init Res    = ");
-    logUnsignedByteHex(res);
-    logMessage("\r\n");
-
-    UnsignedWord32 index;
-    UnsignedByte   block[512];
-  
-    for (index = 0; index < 512; index++)
-        block[index] = 0x00;
-
-    res = securedigitalReadBlock(0, block);
-
-    logMessage("SD Read(0) Res = ");
-    logUnsignedByteHex(res);
-    logMessage("\r\n");
-
-    for (index = 0; index < 512; index++)
-    {
-        logUnsignedByteHex(block[index]);
-        logMessage(" ");
-    }
-    logMessage("\r\n");
-
-    for (index = 0; index < 512; index++)
-        block[index] = 0x00;
-
-    res = securedigitalReadBlock(1, block);
-
-    logMessage("SD Read(1) Res = ");
-    logUnsignedByteHex(res);
-    logMessage("\r\n");
-
-    for (index = 0; index < 512; index++)
-    {
-        logUnsignedByteHex(block[index]);
-        logMessage(" ");
-    }
-    logMessage("\r\n");
+    logMessage("Before: ili9320Init\r\n");
+    ili9320Init();
+    logMessage("After: ili9320Init\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

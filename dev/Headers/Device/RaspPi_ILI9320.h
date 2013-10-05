@@ -6,5 +6,8 @@
  */
 
 extern void ili9320Init(void);
+extern void ili9320Sleep(void);
+extern void ili9320Wake(void);
+extern void ili9320Shutdown(void);
 
 #endif

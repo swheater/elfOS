@@ -68,6 +68,10 @@ void kernel_start(void)
     ili9320Init();
     logMessage("After: ili9320Init\r\n");
 
+    logMessage("Before: ili9320Test\r\n");
+    ili9320Test();
+    logMessage("After: ili9320Test\r\n");
+
     UnsignedWord32 reg = 0;
     while (TRUE)
     {

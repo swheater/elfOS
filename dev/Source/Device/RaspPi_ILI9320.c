@@ -82,21 +82,21 @@ static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 d
     logMessage("\r\n");
 }
 
-static void ili9320SetIndexRegistar(UnsignedWord16 registar)
+static void ili9320SetIndexRegister(UnsignedWord16 reg)
 {
     UnsignedWord32 outputData[3];
     UnsignedWord32 inputData[3];
 
     outputData[0] =  0x70;
-    outputData[1] = (registar >> 8) & 0xFF;
-    outputData[2] = registar & 0xFF;
+    outputData[1] = (reg >> 8) & 0xFF;
+    outputData[2] = reg & 0xFF;
  
     logData("sir output", outputData, 3);
     spiTransfer(0, outputData, inputData, 3);
     logData("sir input", inputData, 3);
 }
 
-static UnsignedWord16 ili9320GetStatusRegistar(void)
+static UnsignedWord16 ili9320GetStatusRegister(void)
 {
     UnsignedWord32 outputData[4];
     UnsignedWord32 inputData[4];
@@ -113,7 +113,7 @@ static UnsignedWord16 ili9320GetStatusRegistar(void)
     return (inputData[3] << 8) | inputData[2];
 }
 
-static UnsignedWord16 ili9320GetRegistar(void)
+static UnsignedWord16 ili9320GetCurrentRegister(void)
 {
     UnsignedWord32 outputData[4];
     UnsignedWord32 inputData[4];
@@ -123,22 +123,42 @@ static UnsignedWord16 ili9320GetRegistar(void)
     outputData[2] = 0xFF;
     outputData[3] = 0xFF;
  
-    logData("gr output", outputData, 4);
+    logData("gcr output", outputData, 4);
     spiTransfer(0, outputData, inputData, 4);
-    logData("gr input", inputData, 4);
+    logData("gcr input", inputData, 4);
 
     return (inputData[3] << 8) | inputData[2];
 }
 
+static void ili9320SetCurrentRegister(UnsignedWord16 value)
+{
+    UnsignedWord32 outputData[3];
+    UnsignedWord32 inputData[3];
+
+    outputData[0] =  0x72;
+    outputData[1] = (value >> 8) & 0xFF;
+    outputData[2] = value & 0xFF;
+ 
+    logData("scr output", outputData, 3);
+    spiTransfer(0, outputData, inputData, 3);
+    logData("scr input", inputData, 3);
+}
+
+static void ili9320SetRegister(UnsignedWord16 reg, UnsignedWord16 value)
+{
+    ili9320SetIndexRegister(reg);
+
+    ili9320SetCurrentRegister(value);
+}
+
 static void ili9320Reset(void)
 {
-    // Reset
     gpioSetOutput(ILI9320_GPIO_RESET);
-    systemtimerWait(20000);
+    systemtimerWait(1000);
     gpioClearOutput(ILI9320_GPIO_RESET);
-    systemtimerWait(20000);
+    systemtimerWait(10000);
     gpioSetOutput(ILI9320_GPIO_RESET);
-    systemtimerWait(200000);
+    systemtimerWait(50000);
 }
 
 static void ili9320EnableBacklight(Boolean enabled)
@@ -149,26 +169,132 @@ static void ili9320EnableBacklight(Boolean enabled)
         gpioClearOutput(ILI9320_GPIO_BACKLIGHT);
 }
 
+static void ili9320StartInitialSequence(void)
+{
+    ili9320SetRegister(0x00E5, 0x8000); // What is this?
+    ili9320SetRegister(ILI9320_GPIO_STARTOSCILLATION_INST,     0x0001);
+    ili9320SetRegister(ILI9320_GPIO_DRIVEROUTPUTCONTROL1_INST, 0x0100);
+    ili9320SetRegister(ILI9320_GPIO_ENTRYMODE_INST,            0x0700);
+    ili9320SetRegister(ILI9320_GPIO_LCDDRIVINGCONTROL_INST,    0x1030);
+    ili9320SetRegister(ILI9320_GPIO_RESIZECONTROL_INST,        0x0000);
+
+    ili9320SetRegister(ILI9320_GPIO_DISPLAYCONTROL1_INST,             0x0202);
+    ili9320SetRegister(ILI9320_GPIO_DISPLAYCONTROL2_INST,             0x0000);
+    ili9320SetRegister(ILI9320_GPIO_DISPLAYCONTROL3_INST,             0x0000);
+    ili9320SetRegister(ILI9320_GPIO_DISPLAYCONTROL4_INST,             0x0000);
+    ili9320SetRegister(ILI9320_GPIO_RGBDISPLAYINTERFACECONTROL1_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_FRAMEMAKERPOSITION_INST,          0x0000);
+    ili9320SetRegister(ILI9320_GPIO_RGBDISPLAYINTERFACECONTROL2_INST, 0x0000);
+}
+
+static void ili9320PowerOnSequence(void)
+{
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL1_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL2_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL3_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL4_INST, 0x0000);
+    systemtimerWait(200000);
+
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL1_INST, 0x17B0);
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL2_INST, 0x0031);
+    systemtimerWait(50000);
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL3_INST, 0x0138);
+    systemtimerWait(50000);
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL4_INST, 0x1800);
+
+    ili9320SetRegister(ILI9320_GPIO_POWERCONTROL7_INST, 0x0008);
+    systemtimerWait(50000);
+
+    ili9320SetRegister(ILI9320_GPIO_HORIZONTALGRAMADDRESSSET_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_VERTICALGRAMADDRESSSET_INST, 0x0000);
+}
+
+static void ili9320DefaultGammaCurve(void)
+{
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL01_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL02_INST, 0x0505);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL03_INST, 0x0004);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL04_INST, 0x0006);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL05_INST, 0x0707);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL06_INST, 0x0105);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL07_INST, 0x0002);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL08_INST, 0x0707);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL09_INST, 0x0704);
+    ili9320SetRegister(ILI9320_GPIO_GAMMACONTROL10_INST, 0x0807);
+}
+
+static void ili9320SetGRAMArea(void)
+{
+    ili9320SetRegister(ILI9320_GPIO_HORIZONTALADDRESSSTARTPOSITION_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_HORIZONTALADDRESSENDPOSITION_INST, 0x00EF);
+    ili9320SetRegister(ILI9320_GPIO_VERTICALADDRESSSTARTPOSITION_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_VERTICALADDRESSENDPOSITION_INST, 0x013F);
+
+    ili9320SetRegister(ILI9320_GPIO_DRIVEROUTPUTCONTROL2_INST, 0x2700);
+    ili9320SetRegister(ILI9320_GPIO_BASEIMAGEDISPLAYCONTROL_INST, 0x0010);
+    ili9320SetRegister(ILI9320_GPIO_VERTICALSCROLLCONTROL_INST, 0x0000);
+}
+
+static void ili9320PartialDisplayControl(void)
+{
+    ili9320SetRegister(ILI9320_GPIO_PARTIALIMAGE1DISPLAYPOSITION_INST , 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PARTIALIMAGE1AREASTARTLINE_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PARTIALIMAGE1AREAENDLINE_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PARTIALIMAGE2DISPLAYPOSITION_INST , 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PARTIALIMAGE2AREASTARTLINE_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PARTIALIMAGE2AREAENDLINE_INST, 0x0000);
+}
+
+static void ili9320PanelControl(void)
+{
+    ili9320SetRegister(ILI9320_GPIO_PANELINTERFACECONTROL1_INST, 0x0010);
+    ili9320SetRegister(ILI9320_GPIO_PANELINTERFACECONTROL2_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PANELINTERFACECONTROL3_INST, 0x0003);
+    ili9320SetRegister(ILI9320_GPIO_PANELINTERFACECONTROL4_INST, 0x0110);
+    ili9320SetRegister(ILI9320_GPIO_PANELINTERFACECONTROL5_INST, 0x0000);
+    ili9320SetRegister(ILI9320_GPIO_PANELINTERFACECONTROL6_INST, 0x0000);
+
+    ili9320SetRegister(ILI9320_GPIO_DISPLAYCONTROL1_INST, 0x0173);
+}
+
 void ili9320Init(void)
 {
     ili9320Reset();
     ili9320EnableBacklight(TRUE);
 
-    UnsignedWord16 status = ili9320GetStatusRegistar();
-    logMessage("Status: ");
-    logUnsignedWord16Hex(status);
-    logMessage("\r\n");
-
-    ili9320SetIndexRegistar(ILI9320_GPIO_DRIVERCODEREAD_INST);
-
-    UnsignedWord16 reg = ili9320GetRegistar();
-    logMessage("Reg: ");
-    logUnsignedWord16Hex(reg);
-    logMessage("\r\n");
+    ili9320StartInitialSequence();
+    ili9320PowerOnSequence();
+    ili9320DefaultGammaCurve();
+    ili9320SetGRAMArea();
+    ili9320PartialDisplayControl();
+    ili9320PanelControl();
 }
 
 void ili9320Sleep(void)
 {
+}
+
+void ili9320Test(void)
+{
+    UnsignedWord16 status = ili9320GetStatusRegister();
+    logMessage("Status: ");
+    logUnsignedWord16Hex(status);
+    logMessage("\r\n");
+
+    int            count = 0;
+    UnsignedWord16 reg   = 0;
+    while ((reg == 0x0000) && (count < 8))
+    {
+        ili9320SetIndexRegister(ILI9320_GPIO_DRIVERCODEREAD_INST);
+
+        reg = ili9320GetCurrentRegister();
+        logMessage("Reg: ");
+        logUnsignedWord16Hex(reg);
+        logMessage("\r\n");
+
+        systemtimerWait(6000000);
+        count++;
+    }
 }
 
 void ili9320Wake(void)

@@ -11,8 +11,8 @@
 #include <Device/BCM2835_SystemTimer.h>
 #include <Device/RaspPi_ILI9320.h>
 
-#define ILI9320_GPIO_RESET     (18)
-#define ILI9320_GPIO_BACKLIGHT (25)
+#define ILI9320_GPIO_RESET     (25)
+#define ILI9320_GPIO_BACKLIGHT (18)
 
 #define ILI9320_GPIO_DRIVERCODEREAD_INST                 (0x0000)
 #define ILI9320_GPIO_STARTOSCILLATION_INST               (0x0000)

@@ -73,9 +73,6 @@ static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 d
     UnsignedWord32 dataIndex;
     for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
     {
-        if ((dataIndex % 48) == 0)
-            logMessage("\r\n");
-
         logMessage(" ");
         logUnsignedByteHex(data[dataIndex]);
     }
@@ -259,6 +256,8 @@ static void ili9320PanelControl(void)
 
 void ili9320Init(void)
 {
+    spiSetClockRate(500000);
+
     ili9320Reset();
     ili9320EnableBacklight(TRUE);
 

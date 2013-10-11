@@ -46,6 +46,8 @@ void spiDebug(const char *message)
     logMessage("\r\n");
 }
 
+static Boolean inCompoundTransfer;
+
 void spiInit(void)
 {
     // Select function for GPIO7, GPI08 & GPIO9
@@ -66,6 +68,9 @@ void spiInit(void)
 
     // Set Clock Divider to 250 for 1MHz clock
     *(SPI_BASE + SPI_CLOCKDIVIDER_OFFSET) = 250;
+
+    // Set not in compound transfer
+    inCompoundTransfer = FALSE;
 }
 
 UnsignedWord32 spiSetClockRate(UnsignedWord32 clockRate)
@@ -75,6 +80,22 @@ UnsignedWord32 spiSetClockRate(UnsignedWord32 clockRate)
     *(SPI_BASE + SPI_CLOCKDIVIDER_OFFSET) = clockDivider;
 
     return CORECLOCK_RATE / clockDivider;
+}
+
+void spiStartCompoundTransfer(void)
+{
+    inCompoundTransfer = TRUE;
+}
+
+void spiEndCompoundTransfer(void)
+{
+    // Terminate transfer
+    UnsignedWord32 spiTerminate = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
+    spiTerminate &= ~ SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK;
+    spiTerminate |= SPI_CONTROLSTATUS_NOTRANSFERACTIVE_BIT;
+    *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiTerminate;
+
+    inCompoundTransfer = FALSE;
 }
 
 void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 dataLength)
@@ -99,11 +120,14 @@ void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 
     // Wait for Done transfer
     while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_DONETRANSFER_MASK) != SPI_CONTROLSTATUS_DONETRANSFER_BIT);
 
-    // Terminate transfer
-    UnsignedWord32 spiTerminate = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
-    spiTerminate &= ~ SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK;
-    spiTerminate |= SPI_CONTROLSTATUS_NOTRANSFERACTIVE_BIT;
-    *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiTerminate;
+    if (! inCompoundTransfer)
+    {
+        // Terminate transfer
+        UnsignedWord32 spiTerminate = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
+        spiTerminate &= ~ SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK;
+        spiTerminate |= SPI_CONTROLSTATUS_NOTRANSFERACTIVE_BIT;
+        *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiTerminate;
+    }
 }
 
 void spiAsyncTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 outputDataLength, UnsignedWord32 inputDataLength, Boolean (*startInput)(UnsignedWord32, void*), Boolean (*stopInput)(UnsignedWord32, void*), void *context)
@@ -145,9 +169,12 @@ void spiAsyncTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWo
     // Wait for Done transfer
     while (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_DONETRANSFER_MASK) != SPI_CONTROLSTATUS_DONETRANSFER_BIT);
 
-    // Terminate transfer
-    UnsignedWord32 spiTerminate = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
-    spiTerminate &= ~ SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK;
-    spiTerminate |= SPI_CONTROLSTATUS_NOTRANSFERACTIVE_BIT;
-    *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiTerminate;
+    if (! inCompoundTransfer)
+    {
+        // Terminate transfer
+        UnsignedWord32 spiTerminate = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
+        spiTerminate &= ~ SPI_CONTROLSTATUS_TRANSFERACTIVITY_MASK;
+        spiTerminate |= SPI_CONTROLSTATUS_NOTRANSFERACTIVE_BIT;
+        *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET) = spiTerminate;
+    }
 }

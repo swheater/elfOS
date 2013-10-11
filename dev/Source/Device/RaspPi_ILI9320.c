@@ -143,9 +143,13 @@ static void ili9320SetCurrentRegister(UnsignedWord16 value)
 
 static void ili9320SetRegister(UnsignedWord16 reg, UnsignedWord16 value)
 {
+    spiStartCompoundTransfer();
+
     ili9320SetIndexRegister(reg);
 
     ili9320SetCurrentRegister(value);
+
+    spiEndCompoundTransfer();
 }
 
 static void ili9320Reset(void)

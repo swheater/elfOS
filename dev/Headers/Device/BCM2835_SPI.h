@@ -9,6 +9,8 @@
 
 extern void spiInit(void);
 extern UnsignedWord32 spiSetClockRate(UnsignedWord32 clockRate);
+extern void spiStartCompoundTransfer(void);
+extern void spiEndCompoundTransfer(void);
 extern void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 dataLength);
 extern void spiAsyncTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 outputDataLength, UnsignedWord32 inputDataLength, Boolean (*startInput)(UnsignedWord32, void*), Boolean (*stopInput)(UnsignedWord32, void*), void *context);
 

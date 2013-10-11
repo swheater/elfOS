@@ -17,6 +17,7 @@
 #include <Device/RaspPi_DisplayTFT18.h>
 #include <Device/BCM2835_SPI.h>
 #include <Device/RaspPi_ILI9320.h>
+#include <Device/RaspPi_XPT2046.h>
 #include <Device/RaspPi_Status.h>
 #include <Device/SPI_SecureDigital.h>
 #include <ELF/ELF32.h>
@@ -64,13 +65,13 @@ void kernel_start(void)
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    logMessage("Before: ili9320Init\r\n");
-    ili9320Init();
-    logMessage("After: ili9320Init\r\n");
+    logMessage("Before: xpt2046Init\r\n");
+    xpt2046Init();
+    logMessage("After: xpt2046Init\r\n");
 
-    logMessage("Before: ili9320Test\r\n");
-    ili9320Test();
-    logMessage("After: ili9320Test\r\n");
+    logMessage("Before: xpt2046Test\r\n");
+    xpt2046Test();
+    logMessage("After: xpt2046Test\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

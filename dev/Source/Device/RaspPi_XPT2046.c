@@ -20,8 +20,41 @@
 
 #define XPT2046_GPIO_PENIRQN (17)
 
+#define XPI2046_POWERDOWNMODE0_BIT        (0x00)
+#define XPI2046_POWERDOWNMODE1_BIT        (0x01)
+#define XPI2046_POWERDOWNMODE2_BIT        (0x02)
+#define XPI2046_POWERDOWNMODE3_BIT        (0x03)
+#define XPI2046_DIFFERENTIALREFERENCE_BIT (0x00)
+#define XPI2046_SINGLEENDEDREFERENCE_BIT  (0x04)
+#define XPI2046_MODE_8BIT_BIT             (0x08)
+#define XPI2046_MODE_12BIT_BIT            (0x00)
+#define XPI2046_CHANNELSELECT0_BITS       (0x00)
+#define XPI2046_CHANNELSELECT1_BITS       (0x10)
+#define XPI2046_CHANNELSELECT2_BITS       (0x20)
+#define XPI2046_CHANNELSELECT3_BITS       (0x30)
+#define XPI2046_CHANNELSELECT4_BITS       (0x40)
+#define XPI2046_CHANNELSELECT5_BITS       (0x50)
+#define XPI2046_CHANNELSELECT6_BITS       (0x60)
+#define XPI2046_CHANNELSELECT7_BITS       (0x70)
+#define XPI2046_START_BIT                 (0x80)
+
+static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength)
+{
+    logMessage(message);
+    logMessage(":");
+    UnsignedWord32 dataIndex;
+    for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
+    {
+        logMessage(" ");
+        logUnsignedByteHex(data[dataIndex]);
+    }
+    logMessage("\r\n");
+}
+
 void xpt2046Init(void)
 {
+    spiSetClockRate(500000);
+
     UnsignedWord32 gpioFuncSelect;
 
     // Select function input for GPIO17
@@ -36,11 +69,21 @@ void xpt2046Test(void)
     UnsignedWord16 count;
     for (count = 0; count < 255; count++)
     {
-        UnsignedWord32 value = (*(GPIO_LEVEL_BASE + GPIO_LEVEL_0_OFFSET)) & 0x00020000;
-        logUnsignedWord16Hex(count);
-        logMessage(" ");
-        logUnsignedWord32Hex(value);
-        logMessage("\r\n");
+        UnsignedWord32 outputData[8];
+        UnsignedWord32 inputData[8];
+
+        outputData[0] = XPI2046_START_BIT | XPI2046_CHANNELSELECT5_BITS | XPI2046_MODE_12BIT_BIT | XPI2046_DIFFERENTIALREFERENCE_BIT | XPI2046_POWERDOWNMODE0_BIT;
+        outputData[1] = 0xFF;
+        outputData[2] = 0xFF;
+        outputData[3] = 0xFF;
+        outputData[4] = 0xFF;
+        outputData[5] = 0xFF;
+        outputData[6] = 0xFF;
+        outputData[7] = 0xFF;
+
+        logData("Output", outputData, 3);
+        spiTransfer(1, outputData, inputData, 3);
+        logData("Input", inputData, 3);
 
 	systemtimerWait(1000000);
     }

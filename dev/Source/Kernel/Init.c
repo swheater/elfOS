@@ -65,13 +65,13 @@ void kernel_start(void)
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    logMessage("Before: xpt2046Init\r\n");
-    xpt2046Init();
-    logMessage("After: xpt2046Init\r\n");
+    logMessage("Before: ili9320Init\r\n");
+    ili9320Init();
+    logMessage("After: ili9320Init\r\n");
 
-    logMessage("Before: xpt2046Test\r\n");
-    xpt2046Test();
-    logMessage("After: xpt2046Test\r\n");
+    logMessage("Before: ili9320Test\r\n");
+    ili9320Test();
+    logMessage("After: ili9320Test\r\n");
 
     UnsignedWord32 reg = 0;
     while (TRUE)

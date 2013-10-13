@@ -84,6 +84,17 @@ void logUnsignedWord64Hex(UnsignedWord64 unsignedWord64)
     }
 }
 
+void logDataHex(UnsignedByte data[], UnsignedWord32 dataLength)
+{
+    UnsignedWord32 dataIndex;
+    for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
+    {
+        if (dataIndex != 0)
+            logMessage(" ");
+        logUnsignedByteHex(data[dataIndex]);
+    }
+}
+
 void logMessage(const char *message)
 {
     while (*message != 0) 

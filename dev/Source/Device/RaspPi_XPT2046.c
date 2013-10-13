@@ -40,8 +40,8 @@
 
 static UnsignedWord16 xpt2046Get12Bit(UnsignedByte channelSelect)
 {
-        UnsignedWord32 outputData[3];
-        UnsignedWord32 inputData[3];
+        UnsignedByte outputData[3];
+        UnsignedByte inputData[3];
 
         outputData[0] = XPI2046_START_BIT | channelSelect | XPI2046_MODE_12BIT_BIT | XPI2046_DIFFERENTIALREFERENCE_BIT | XPI2046_POWERDOWNMODE0_BIT;
         outputData[1] = 0x00;

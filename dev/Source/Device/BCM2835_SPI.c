@@ -98,7 +98,7 @@ void spiEndCompoundTransfer(void)
     inCompoundTransfer = FALSE;
 }
 
-void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 dataLength)
+void spiTransfer(UnsignedByte chip, UnsignedByte outputData[], UnsignedByte inputData[], UnsignedWord32 dataLength)
 {
     // Start transfer, Read
     UnsignedWord32 spiStart = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);
@@ -130,7 +130,7 @@ void spiTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 
     }
 }
 
-void spiAsyncTransfer(UnsignedByte chip, UnsignedWord32 outputData[], UnsignedWord32 inputData[], UnsignedWord32 outputDataLength, UnsignedWord32 inputDataLength, Boolean (*startInput)(UnsignedWord32, void*), Boolean (*stopInput)(UnsignedWord32, void*), void *context)
+void spiAsyncTransfer(UnsignedByte chip, UnsignedByte outputData[], UnsignedByte inputData[], UnsignedWord32 outputDataLength, UnsignedWord32 inputDataLength, Boolean (*startInput)(UnsignedByte, void*), Boolean (*stopInput)(UnsignedByte, void*), void *context)
 {
     // Start transfer, Read
     UnsignedWord32 spiStart = *(SPI_BASE + SPI_CONTROLSTATUS_OFFSET);

@@ -66,79 +66,74 @@
 #define ILI9320_GPIO_PANELINTERFACECONTROL5_INST         (0x0097)
 #define ILI9320_GPIO_PANELINTERFACECONTROL6_INST         (0x0098)
 
-static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength)
+static void logOutputInputData(const char *message, UnsignedByte outputData[], UnsignedWord32 outputDataLength, UnsignedByte inputData[], UnsignedWord32 inputDataLength)
 {
     logMessage(message);
-    logMessage(":");
-    UnsignedWord32 dataIndex;
-    for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
-    {
-        logMessage(" ");
-        logUnsignedByteHex(data[dataIndex]);
-    }
+    logMessage(": output = ");
+    logDataHex(outputData, outputDataLength);
+    logMessage(", input = ");
+    logDataHex(inputData, inputDataLength);
     logMessage("\r\n");
 }
 
 static void ili9320SetIndexRegister(UnsignedWord16 reg)
 {
-    UnsignedWord32 outputData[3];
-    UnsignedWord32 inputData[3];
+    UnsignedByte outputData[3];
+    UnsignedByte inputData[3];
+
+    logUnsignedWord16Hex(reg);
 
     outputData[0] =  0x70;
     outputData[1] = (reg >> 8) & 0xFF;
     outputData[2] = reg & 0xFF;
  
-    logData("sir output", outputData, 3);
     spiTransfer(0, outputData, inputData, 3);
-    logData("sir input", inputData, 3);
+    logOutputInputData("sir", outputData, 3, inputData, 3);
 }
 
 static UnsignedWord16 ili9320GetStatusRegister(void)
 {
-    UnsignedWord32 outputData[4];
-    UnsignedWord32 inputData[4];
+    UnsignedByte outputData[4];
+    UnsignedByte inputData[4];
 
     outputData[0] = 0x71;
     outputData[1] = 0xFF;
     outputData[2] = 0xFF;
     outputData[3] = 0xFF;
  
-    logData("gsr output", outputData, 4);
     spiTransfer(0, outputData, inputData, 4);
-    logData("gsr input", inputData, 4);
+    logOutputInputData("gsr", outputData, 4, inputData, 4);
 
-    return (inputData[3] << 8) | inputData[2];
+    return (inputData[2] << 8) | inputData[3];
 }
 
 static UnsignedWord16 ili9320GetCurrentRegister(void)
 {
-    UnsignedWord32 outputData[4];
-    UnsignedWord32 inputData[4];
+    UnsignedByte outputData[4];
+    UnsignedByte inputData[4];
 
     outputData[0] = 0x73;
     outputData[1] = 0xFF;
     outputData[2] = 0xFF;
     outputData[3] = 0xFF;
  
-    logData("gcr output", outputData, 4);
     spiTransfer(0, outputData, inputData, 4);
-    logData("gcr input", inputData, 4);
+    logOutputInputData("gcr", outputData, 4, inputData, 4);
 
     return (inputData[3] << 8) | inputData[2];
 }
 
 static void ili9320SetCurrentRegister(UnsignedWord16 value)
 {
-    UnsignedWord32 outputData[3];
-    UnsignedWord32 inputData[3];
+    UnsignedByte outputData[3];
+    UnsignedByte inputData[3];
 
     outputData[0] =  0x72;
     outputData[1] = (value >> 8) & 0xFF;
     outputData[2] = value & 0xFF;
  
-    logData("scr output", outputData, 3);
     spiTransfer(0, outputData, inputData, 3);
-    logData("scr input", inputData, 3);
+    logOutputInputData("scr", outputData, 3, inputData, 3);
 }
 
 static void ili9320SetRegister(UnsignedWord16 reg, UnsignedWord16 value)
@@ -263,7 +258,6 @@ void ili9320Init(void)
     spiSetClockRate(500000);
 
     ili9320Reset();
-    ili9320EnableBacklight(TRUE);
 
     ili9320StartInitialSequence();
     ili9320PowerOnSequence();
@@ -271,6 +265,8 @@ void ili9320Init(void)
     ili9320SetGRAMArea();
     ili9320PartialDisplayControl();
     ili9320PanelControl();
+
+    ili9320EnableBacklight(TRUE);
 }
 
 void ili9320Sleep(void)
@@ -286,7 +282,7 @@ void ili9320Test(void)
 
     int            count = 0;
     UnsignedWord16 reg   = 0;
-    while ((reg == 0x0000) && (count < 8))
+    while ((reg == 0x0000) && (count < 4))
     {
         ili9320SetIndexRegister(ILI9320_GPIO_DRIVERCODEREAD_INST);
 
@@ -297,6 +293,12 @@ void ili9320Test(void)
 
         systemtimerWait(6000000);
         count++;
+    }
+
+    ili9320SetIndexRegister(ILI9320_GPIO_WRITEDATATOGRAM_INST);
+    for (count = 0; count < 4096; count++)
+    {
+        ili9320SetCurrentRegister(0xFF0FF0);
     }
 }
 

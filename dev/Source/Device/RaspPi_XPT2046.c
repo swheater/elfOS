@@ -38,17 +38,17 @@
 #define XPI2046_CHANNELSELECT7_BITS       (0x70)
 #define XPI2046_START_BIT                 (0x80)
 
-static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength)
+static UnsignedWord16 xpt2046Get12Bit(UnsignedByte channelSelect)
 {
-    logMessage(message);
-    logMessage(":");
-    UnsignedWord32 dataIndex;
-    for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
-    {
-        logMessage(" ");
-        logUnsignedByteHex(data[dataIndex]);
-    }
-    logMessage("\r\n");
+        UnsignedWord32 outputData[3];
+        UnsignedWord32 inputData[3];
+
+        outputData[0] = XPI2046_START_BIT | channelSelect | XPI2046_MODE_12BIT_BIT | XPI2046_DIFFERENTIALREFERENCE_BIT | XPI2046_POWERDOWNMODE0_BIT;
+        outputData[1] = 0x00;
+        outputData[2] = 0x00;
+        spiTransfer(1, outputData, inputData, 3);
+
+        return (inputData[1] << 5) | (inputData[2] >> 3);
 }
 
 void xpt2046Init(void)
@@ -64,29 +64,31 @@ void xpt2046Init(void)
     *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_1_OFFSET) = gpioFuncSelect;
 }
 
-void xpt2046Test(void)
+Boolean xpt2046GetTouch(void)
 {
-    UnsignedWord16 count;
-    for (count = 0; count < 255; count++)
-    {
-        UnsignedWord32 outputData[8];
-        UnsignedWord32 inputData[8];
+    return ((*(GPIO_LEVEL_BASE + GPIO_LEVEL_0_OFFSET)) & 0x00020000) == 0;
+}
 
-        outputData[0] = XPI2046_START_BIT | XPI2046_CHANNELSELECT5_BITS | XPI2046_MODE_12BIT_BIT | XPI2046_DIFFERENTIALREFERENCE_BIT | XPI2046_POWERDOWNMODE0_BIT;
-        outputData[1] = 0xFF;
-        outputData[2] = 0xFF;
-        outputData[3] = 0xFF;
-        outputData[4] = 0xFF;
-        outputData[5] = 0xFF;
-        outputData[6] = 0xFF;
-        outputData[7] = 0xFF;
+UnsignedWord16 xpt2046GetXPosition(void)
+{
+    return xpt2046Get12Bit(XPI2046_CHANNELSELECT5_BITS);
+}
 
-        logData("Output", outputData, 3);
-        spiTransfer(1, outputData, inputData, 3);
-        logData("Input", inputData, 3);
+UnsignedWord16 xpt2046GetYPosition(void)
+{
+    return xpt2046Get12Bit(XPI2046_CHANNELSELECT1_BITS);
+}
 
-	systemtimerWait(1000000);
-    }
+UnsignedWord16 xpt2046GetTouchPressure(void)
+{
+    UnsignedWord16 xPosition = xpt2046Get12Bit(XPI2046_CHANNELSELECT5_BITS);
+    UnsignedWord16 z1        = xpt2046Get12Bit(XPI2046_CHANNELSELECT3_BITS);
+    UnsignedWord16 z2        = xpt2046Get12Bit(XPI2046_CHANNELSELECT4_BITS);
+
+    if (z1 != 0)
+       return ((unsigned int) (xPosition * z2) / (unsigned int) z1) - xPosition;
+    else
+       return 0x0FFF;
 }
 
 void xpt2046Shutdown(void)

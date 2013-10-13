@@ -6,6 +6,10 @@
  */
 
 extern void xpt2046Init(void);
+extern Boolean xpt2046GetTouch(void);
+extern UnsignedWord16 xpt2046GetXPosition(void);
+extern UnsignedWord16 xpt2046GetYPosition(void);
+extern UnsignedWord16 xpt2046GetTouchPressure(void);
 extern void xpt2046Shutdown(void);
 
 #endif

@@ -3,6 +3,7 @@
 #
 
 OBJS = BCM2835_miniUART.o BCM2835_GPIO.o BCM2835_BSC.o BCM2835_SPI.o BCM2835_SystemTimer.o BCM2835_Timer.o \
+       BCM2835_EMMC.o \
        RaspPi_Status.o RaspPi_PiGlow.o RaspPi_DisplayTFT18.o \
        RaspPi_ILI9320.o RaspPi_XPT2046.o \
        SPI_SecureDigital.o

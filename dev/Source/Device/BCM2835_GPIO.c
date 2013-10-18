@@ -16,11 +16,14 @@
 #define GPIO_FUNCSELECT_4_OFFSET (0x04)
 #define GPIO_FUNCSELECT_5_OFFSET (0x05)
 #define GPIO_SET_BASE            (GPIO_BASE + 0x07)
-#define GPIO_SET_0_OFFSET        (0x07)
-#define GPIO_SET_1_OFFSET        (0x08)
+#define GPIO_SET_0_OFFSET        (0x00)
+#define GPIO_SET_1_OFFSET        (0x01)
 #define GPIO_CLEAR_BASE          (GPIO_BASE + 0x0A)
-#define GPIO_CLEAR_0_OFFSET      (0x0A)
-#define GPIO_CLEAR_1_OFFSET      (0x0B)
+#define GPIO_CLEAR_0_OFFSET      (0x00)
+#define GPIO_CLEAR_1_OFFSET      (0x01)
+#define GPIO_LEVEL_BASE          (GPIO_BASE + 0x0D)
+#define GPIO_LEVEL_0_OFFSET      (0x00)
+#define GPIO_LEVEL_1_OFFSET      (0x01)
 
 #define GPIO_FUNC_MASK   (0x7)
 #define GPIO_INPUT_FUNC  (0x0)
@@ -47,6 +50,11 @@ void gpioInit(void)
     gpioFuncSelect &= 0xFFFC0007;
     gpioFuncSelect |= 0x00009248;
     *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_2_OFFSET) = gpioFuncSelect;
+}
+
+Boolean gpioGetInput(int gpioIndex)
+{
+    return ((*(GPIO_LEVEL_BASE + (gpioIndex >> 5))) & (1 << (gpioIndex & 0x1F))) != 0;
 }
 
 void gpioSetOutput(int gpioIndex)

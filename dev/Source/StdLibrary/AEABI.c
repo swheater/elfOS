@@ -40,7 +40,7 @@ unsigned int __aeabi_uidiv(unsigned int numerator, unsigned int denominator)
         {
             result    |= bit;
             numerator -= shifted;
-	}
+        }
 
         shifted >>= 1;
         bit     >>= 1;

@@ -140,10 +140,10 @@ void workInit(void)
             logMessage("\r\n");
 
             if (runFunction != 0)
-	    {
+            {
                 createThread(runFunction, nextSegment);
                 nextSegment += 0x10000;
-	    }
+            }
             else
                 logMessage("**** no runFunction ****\r\n");
         }

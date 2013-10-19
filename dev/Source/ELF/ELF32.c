@@ -43,10 +43,10 @@ Boolean findGlobalSymbolValue(const char *symbolName, UnsignedWord32 *symbolValu
     unsigned int globalSymbolIndex;
     for (globalSymbolIndex = 0; globalSymbolIndex < numberOfGlobalSymbols; globalSymbolIndex++)
         if (string_equal(symbolName, (char*) globalSymbols[globalSymbolIndex].name))
-	{
+        {
             *symbolValue = globalSymbols[globalSymbolIndex].value;
             valid = TRUE;
-	}
+        }
 
     return valid;
 }
@@ -60,7 +60,7 @@ Boolean populateSymbolValues(UnsignedWord32 symbolValues[], unsigned int numberO
         if ((ELF32_SYMBOL_BINDING(symbols[symbolIndex].info) == ELF32_SYMBOLBINDING_GLOBAL) && (symbols[symbolIndex].sectionHeaderTableIndex == ELF32_SECTIONHEADERINDEX_UNDEFINED))
         {
             const char *name = &stringTable[symbols[symbolIndex].name];
-	    valid &= findGlobalSymbolValue(name, &symbolValues[symbolIndex], globalSymbols, numberOfGlobalSymbols);
+            valid &= findGlobalSymbolValue(name, &symbolValues[symbolIndex], globalSymbols, numberOfGlobalSymbols);
         }
         else if ((symbols[symbolIndex].sectionHeaderTableIndex != ELF32_SECTIONHEADERINDEX_UNDEFINED) && (symbols[symbolIndex].sectionHeaderTableIndex < ELF32_SECTIONHEADERINDEX_LOWRESERVE))
             symbolValues[symbolIndex] = (UnsignedWord32) &(virtualMemorySegments[sectionMapping[symbols[symbolIndex].sectionHeaderTableIndex]].virtualAddress[symbols[symbolIndex].value]);
@@ -81,7 +81,7 @@ Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader sec
         {
             if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_PROGBITS)
             {
-  	        virtualMemorySegments[sectionIndex].size = sectionHeaders[sectionHeaderIndex].size;
+                virtualMemorySegments[sectionIndex].size = sectionHeaders[sectionHeaderIndex].size;
 
                 unsigned int index;
                 for (index = 0; index < virtualMemorySegments[sectionIndex].size; index++)
@@ -89,7 +89,7 @@ Boolean elf32_segmentsInitialize(const char *elf32, const ELF32SectionHeader sec
             }
             else if (sectionHeaders[sectionHeaderIndex].type == ELF32_SECTIONHEADERTYPE_NOBITS)
             {
-  	        virtualMemorySegments[sectionIndex].size = sectionHeaders[sectionHeaderIndex].size;
+                virtualMemorySegments[sectionIndex].size = sectionHeaders[sectionHeaderIndex].size;
 
                 unsigned int index;
                 for (index = 0; index < virtualMemorySegments[sectionIndex].size; index++)

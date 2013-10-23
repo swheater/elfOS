@@ -31,38 +31,27 @@
 
 void gpioInit(void)
 {
-    unsigned int gpioFuncSelect;
-
-    // Select function output for GPIO04
-    gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET);
-    gpioFuncSelect &= 0xFFFF8FFF;
-    gpioFuncSelect |= 0x00001000;
-    *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_0_OFFSET) = gpioFuncSelect;
-
-    // Select function output for GPIO17 and GPIO18
-    gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_1_OFFSET);
-    gpioFuncSelect &= 0xF81FFFFF;
-    gpioFuncSelect |= 0x01200000;
-    *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_1_OFFSET) = gpioFuncSelect;
-
-    // Select function output for GPIO21, GPIO22, GPIO23, GPIO24 and GPIO25
-    gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_2_OFFSET);
-    gpioFuncSelect &= 0xFFFC0007;
-    gpioFuncSelect |= 0x00009248;
-    *(GPIO_FUNCSELECT_BASE + GPIO_FUNCSELECT_2_OFFSET) = gpioFuncSelect;
 }
 
-Boolean gpioGetInput(int gpioIndex)
+void gpioFuncSelect(UnsignedByte gpioIndex, UnsignedByte funcSelect)
+{
+    UnsignedWord32 gpioFuncSelect = *(GPIO_FUNCSELECT_BASE + (gpioIndex / 10));
+    gpioFuncSelect &= ~ (0x07 << (3 * (gpioIndex % 10)));
+    gpioFuncSelect |= funcSelect << (3 * (gpioIndex % 10));
+    *(GPIO_FUNCSELECT_BASE + (gpioIndex / 10)) = gpioFuncSelect;
+}
+
+Boolean gpioGetInput(UnsignedByte gpioIndex)
 {
     return ((*(GPIO_LEVEL_BASE + (gpioIndex >> 5))) & (1 << (gpioIndex & 0x1F))) != 0;
 }
 
-void gpioSetOutput(int gpioIndex)
+void gpioSetOutput(UnsignedByte gpioIndex)
 {
     *(GPIO_SET_BASE + (gpioIndex >> 5)) = 1 << (gpioIndex & 0x1F);
 }
 
-void gpioClearOutput(int gpioIndex)
+void gpioClearOutput(UnsignedByte gpioIndex)
 {
     *(GPIO_CLEAR_BASE + (gpioIndex >> 5)) = 1 << (gpioIndex & 0x1F);
 }

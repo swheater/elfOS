@@ -20,6 +20,7 @@
 #include <Device/RaspPi_XPT2046.h>
 #include <Device/RaspPi_Status.h>
 #include <Device/RaspPi_PiLITEr.h>
+#include <Device/RaspPi_BerryClip.h>
 #include <Device/SPI_SecureDigital.h>
 #include <ELF/ELF32.h>
 #include <ELF/ELF32_ARM_EABI.h>
@@ -61,20 +62,29 @@ void kernel_start(void)
     gpioInit();
     spiInit();
     uartInit();
-    piliterInit();
     //    displayTFT18Init();
     //    i2cInit(0);
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    piliterSetLED(PILITER_LED_0, TRUE);
-    piliterSetLED(PILITER_LED_1, TRUE);
-    piliterSetLED(PILITER_LED_2, TRUE);
-    piliterSetLED(PILITER_LED_3, TRUE);
-    piliterSetLED(PILITER_LED_4, TRUE);
-    piliterSetLED(PILITER_LED_5, TRUE);
-    piliterSetLED(PILITER_LED_6, TRUE);
-    piliterSetLED(PILITER_LED_7, TRUE);
+    berryclipInit();
+    berryclipSetLED(BERRYCLIP_LED_1, TRUE);
+    systemtimerWait(1000000);
+    berryclipSetLED(BERRYCLIP_LED_2, TRUE);
+    systemtimerWait(1000000);
+    berryclipSetLED(BERRYCLIP_LED_3, TRUE);
+    systemtimerWait(1000000);
+    berryclipSetLED(BERRYCLIP_LED_4, TRUE);
+    systemtimerWait(1000000);
+    berryclipSetLED(BERRYCLIP_LED_5, TRUE);
+    systemtimerWait(1000000);
+    berryclipSetLED(BERRYCLIP_LED_6, TRUE);
+    systemtimerWait(1000000);
+    berryclipSetBuzzer(TRUE);
+    systemtimerWait(1000000);
+    berryclipSetBuzzer(FALSE);
+
+    while (berryclipGetSwitch());
 
     UnsignedWord32 reg = 0;
     while (TRUE)

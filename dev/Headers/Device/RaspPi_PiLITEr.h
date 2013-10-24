@@ -18,6 +18,6 @@
 
 extern void piglowInit(void);
 extern void piglowSetLED(UnsignedByte ledNumber, Boolean on);
-extern void piglowInit(void);
+extern void piglowShutdown(void);
 
 #endif

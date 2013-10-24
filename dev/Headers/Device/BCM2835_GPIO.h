@@ -21,5 +21,6 @@ extern void    gpioFuncSelect(UnsignedByte gpioIndex, UnsignedByte funcSelect);
 extern Boolean gpioGetInput(UnsignedByte gpioIndex);
 extern void    gpioSetOutput(UnsignedByte gpioIndex);
 extern void    gpioClearOutput(UnsignedByte gpioIndex);
+extern void    gpioShutdown(void);
 
 #endif

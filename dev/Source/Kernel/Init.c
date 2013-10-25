@@ -20,6 +20,7 @@
 #include <Device/RaspPi_XPT2046.h>
 #include <Device/RaspPi_Status.h>
 #include <Device/RaspPi_PiLITEr.h>
+#include <Device/RaspPi_Ladder.h>
 #include <Device/RaspPi_BerryClip.h>
 #include <Device/SPI_SecureDigital.h>
 #include <ELF/ELF32.h>
@@ -60,31 +61,61 @@ void kernel_start(void)
     statusInit();
     systemtimerInit();
     gpioInit();
-    spiInit();
-    uartInit();
+    //    spiInit();
+    //    uartInit();
     //    displayTFT18Init();
     //    i2cInit(0);
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    berryclipInit();
-    berryclipSetLED(BERRYCLIP_LED_1, TRUE);
-    systemtimerWait(1000000);
-    berryclipSetLED(BERRYCLIP_LED_2, TRUE);
-    systemtimerWait(1000000);
-    berryclipSetLED(BERRYCLIP_LED_3, TRUE);
-    systemtimerWait(1000000);
-    berryclipSetLED(BERRYCLIP_LED_4, TRUE);
-    systemtimerWait(1000000);
-    berryclipSetLED(BERRYCLIP_LED_5, TRUE);
-    systemtimerWait(1000000);
-    berryclipSetLED(BERRYCLIP_LED_6, TRUE);
-    systemtimerWait(1000000);
-    berryclipSetBuzzer(TRUE);
-    systemtimerWait(1000000);
-    berryclipSetBuzzer(FALSE);
+    ladderInit();
 
-    while (berryclipGetSwitch());
+    while (TRUE)
+    {
+        if (ladderGetSwitch(LADDER_SWITCH_1))
+	{
+            ladderSetLED(LADDER_RED_LED_1, TRUE);
+            ladderSetLED(LADDER_RED_LED_2, FALSE);
+	}
+        else
+	{
+            ladderSetLED(LADDER_RED_LED_1, FALSE);
+            ladderSetLED(LADDER_RED_LED_2, TRUE);
+	}
+
+        if (ladderGetSwitch(LADDER_SWITCH_2))
+	{
+            ladderSetLED(LADDER_YELLOW_LED_1, TRUE);
+            ladderSetLED(LADDER_YELLOW_LED_2, FALSE);
+	}
+        else
+	{
+            ladderSetLED(LADDER_YELLOW_LED_1, FALSE);
+            ladderSetLED(LADDER_YELLOW_LED_2, TRUE);
+	}
+
+        if (ladderGetSwitch(LADDER_SWITCH_3))
+	{
+            ladderSetLED(LADDER_GREEN_LED_1, TRUE);
+            ladderSetLED(LADDER_GREEN_LED_2, FALSE);
+	}
+        else
+	{
+            ladderSetLED(LADDER_GREEN_LED_1, FALSE);
+            ladderSetLED(LADDER_GREEN_LED_2, TRUE);
+	}
+
+        if (ladderGetSwitch(LADDER_SWITCH_4))
+	{
+            ladderSetLED(LADDER_BLUE_LED_1, TRUE);
+            ladderSetLED(LADDER_BLUE_LED_2, FALSE);
+	}
+        else
+	{
+            ladderSetLED(LADDER_BLUE_LED_1, FALSE);
+            ladderSetLED(LADDER_BLUE_LED_2, TRUE);
+	}
+    }
 
     UnsignedWord32 reg = 0;
     while (TRUE)

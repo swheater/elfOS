@@ -16,8 +16,8 @@
 #define PILITER_LED_6 (24)
 #define PILITER_LED_7 (25)
 
-extern void piglowInit(void);
-extern void piglowSetLED(UnsignedByte ledNumber, Boolean on);
-extern void piglowShutdown(void);
+extern void piliterInit(void);
+extern void piliterSetLED(UnsignedByte ledNumber, Boolean on);
+extern void piliterShutdown(void);
 
 #endif

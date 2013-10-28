@@ -13,7 +13,14 @@
 #define GPIO_CLEAR_BASE      (GPIO_BASE + 0x0A)
 #define GPIO_LEVEL_BASE      (GPIO_BASE + 0x0D)
 
-#define GPIO_FUNCSELECT_MASK (0x7)
+#define GPIO_PINPULLUPDOWNENABLE_OFFSET    (0x25)
+#define GPIO_PINPULLUPDOWNENABLECLOCK_BASE (GPIO_BASE + 0x26)
+
+#define GPIO_PINPULLUPDOWN_SETUPDELAY           (150)
+#define GPIO_FUNCSELECT_MASK                    (0x7)
+#define GPIO_PULLCONTROL_MASK                   (0x3)
+#define GPIO_PINPULLUPDOWNENABLE_OFF_BITS       (0x00000000)
+#define GPIO_PINPULLUPDOWNENABLECLOCK_NONE_BITS (0x00000000)
 
 void gpioInit(void)
 {
@@ -25,6 +32,17 @@ void gpioFuncSelect(UnsignedByte gpioIndex, UnsignedByte funcSelect)
     gpioFuncSelect &= ~ (GPIO_FUNCSELECT_MASK << (3 * (gpioIndex % 10)));
     gpioFuncSelect |= funcSelect << (3 * (gpioIndex % 10));
     *(GPIO_FUNCSELECT_BASE + (gpioIndex / 10)) = gpioFuncSelect;
+}
+
+void gpioSetPullControl(UnsignedByte gpioIndex, UnsignedByte pullControl)
+{
+    volatile unsigned int delayCount;
+    *(GPIO_BASE + GPIO_PINPULLUPDOWNENABLE_OFFSET)           = (pullControl & GPIO_PULLCONTROL_MASK);
+    for (delayCount = 0; delayCount < GPIO_PINPULLUPDOWN_SETUPDELAY; delayCount++);
+    *(GPIO_PINPULLUPDOWNENABLECLOCK_BASE + (gpioIndex >> 5)) = (1 << (gpioIndex & 0x1F));
+    for (delayCount = 0; delayCount < GPIO_PINPULLUPDOWN_SETUPDELAY; delayCount++);
+    *(GPIO_BASE + GPIO_PINPULLUPDOWNENABLE_OFFSET)           = GPIO_PINPULLUPDOWNENABLE_OFF_BITS;
+    *(GPIO_PINPULLUPDOWNENABLECLOCK_BASE + (gpioIndex >> 5)) = GPIO_PINPULLUPDOWNENABLECLOCK_NONE_BITS;
 }
 
 Boolean gpioGetInput(UnsignedByte gpioIndex)

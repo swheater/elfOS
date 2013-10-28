@@ -16,8 +16,13 @@
 #define GPIO_FUNCSELECT_ALTFUNC4 (0x03)
 #define GPIO_FUNCSELECT_ALTFUNC5 (0x02)
 
+#define GPIO_PULL_OFF  (0x00)
+#define GPIO_PULL_DOWN (0x01)
+#define GPIO_PULL_UP   (0x02)
+
 extern void    gpioInit(void);
 extern void    gpioFuncSelect(UnsignedByte gpioIndex, UnsignedByte funcSelect);
+extern void    gpioSetPullControl(UnsignedByte gpioIndex, UnsignedByte pullControl);
 extern Boolean gpioGetInput(UnsignedByte gpioIndex);
 extern void    gpioSetOutput(UnsignedByte gpioIndex);
 extern void    gpioClearOutput(UnsignedByte gpioIndex);

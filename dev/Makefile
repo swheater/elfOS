@@ -34,6 +34,7 @@ OBJS = Source/Kernel/ARM/Boot.o \
        Source/Device/RaspPi_Ladder.o Source/Device/RaspPi_DisplayTFT18.o \
        Source/Device/RaspPi_ILI9320.o Source/Device/RaspPi_XPT2046.o Source/Device/RaspPi_MotorPiTX.o \
        Source/Device/SPI_SecureDigital.o
+#       Source/Kernel/Kernel/Process.o
 #       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o \
 #       Source/Kernel/ARMv6/MemoryManagement.o \
 

@@ -7,7 +7,15 @@
 
 #include <Kernel/StdTypes.h>
 
-extern void motorpitxInit(void);
-extern void motorpitxShutdown(void);
+#define MOTORPITX_OUTPUT1 (1)
+#define MOTORPITX_OUTPUT2 (2)
+#define MOTORPITX_INPUT1  (1)
+#define MOTORPITX_INPUT2  (2)
+
+extern void    motorpitxInit(void);
+extern void    motorpitxSetReadyLED(Boolean on);
+extern void    motorpitxSetOutput(UnsignedByte outputNumber, Boolean on);
+extern Boolean motorpitxGetInput(UnsignedByte inputNumber);
+extern void    motorpitxShutdown(void);
 
 #endif

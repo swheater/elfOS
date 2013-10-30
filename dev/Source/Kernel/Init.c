@@ -21,6 +21,7 @@
 #include <Device/RaspPi_Status.h>
 #include <Device/RaspPi_PiLITEr.h>
 #include <Device/RaspPi_Ladder.h>
+#include <Device/RaspPi_elfOSDebug.h>
 #include <Device/RaspPi_BerryClip.h>
 #include <Device/RaspPi_MotorPiTX.h>
 #include <Device/SPI_SecureDigital.h>
@@ -68,14 +69,23 @@ void kernel_start(void)
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    motorpitxInit();
+    elfosdebugInit();
+    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_1, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_2, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_3, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_4, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_5, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_6, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_GREEN_LED, TRUE);
+    systemtimerWait(1000000);
+    elfosdebugSetLED(ELFOSDEBUG_RED_LED, TRUE);
 
-    int count;
-    for (count = 0; count < 30; count++)
-    {
-        motorpitxSetReadyLED(motorpitxGetInput(MOTORPITX_INPUT2));
-        systemtimerWait(1000000);
-    }
 
     UnsignedWord32 reg = 0;
     while (TRUE)

@@ -298,7 +298,7 @@ void ili9320Test(void)
     ili9320SetIndexRegister(ILI9320_GPIO_WRITEDATATOGRAM_INST);
     for (count = 0; count < 4096; count++)
     {
-        ili9320SetCurrentRegister(0xFF0FF0);
+        ili9320SetCurrentRegister(0x0FF0);
     }
 }
 

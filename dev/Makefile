@@ -32,7 +32,8 @@ OBJS = Source/Kernel/ARM/Boot.o \
        Source/Device/BCM2835_EMMC.o \
        Source/Device/RaspPi_Status.o Source/Device/RaspPi_PiGlow.o Source/Device/RaspPi_PiLITEr.o Source/Device/RaspPi_BerryClip.o \
        Source/Device/RaspPi_Ladder.o Source/Device/RaspPi_DisplayTFT18.o \
-       Source/Device/RaspPi_ILI9320.o Source/Device/RaspPi_XPT2046.o Source/Device/RaspPi_MotorPiTX.o Source/Device/RaspPi_elfOSDebug.o \
+       Source/Device/RaspPi_ILI9320.o Source/Device/RaspPi_SSD1351.o Source/Device/RaspPi_XPT2046.o \
+       Source/Device/RaspPi_MotorPiTX.o Source/Device/RaspPi_elfOSDebug.o \
        Source/Device/SPI_SecureDigital.o
 #       Source/Kernel/Kernel/Process.o
 #       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o \

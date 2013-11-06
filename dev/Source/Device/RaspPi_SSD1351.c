@@ -68,15 +68,18 @@ void ssd1351Shutdown(void)
 
 void ssd1351Test(void)
 {
-  /*
     UnsignedByte params[30];
 
-    params[0] = 0x1F;
-    params[1] = 0x1F;
-    params[2] = 0x1F;
+    int index;
+    for (index = 0; index < 30; index++)
+        params[index] = 0x00;
 
     ssd1351SendOperation(0x5C, params, 30);
-  */
 
-    ssd1351SendOperation(0xA5, 0, 0);
+    for (index = 0; index < 127; index++)
+    {
+        params[0] = index;
+        ssd1351SendOperation(0xA1, params, 1);
+	systemtimerWait(100000);
+    }
 }

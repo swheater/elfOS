@@ -17,6 +17,7 @@
 #include <Device/RaspPi_DisplayTFT18.h>
 #include <Device/BCM2835_SPI.h>
 #include <Device/RaspPi_ILI9320.h>
+#include <Device/RaspPi_SSD1351.h>
 #include <Device/RaspPi_XPT2046.h>
 #include <Device/RaspPi_Status.h>
 #include <Device/RaspPi_PiLITEr.h>
@@ -61,31 +62,17 @@ void kernel_start(void)
     statusInit();
     systemtimerInit();
     gpioInit();
-    //    spiInit();
-    //    uartInit();
+    //    ladderInit();
+    spiInit();
+    uartInit();
     //    displayTFT18Init();
     //    i2cInit(0);
     //    ladderInit();
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    elfosdebugInit();
-    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_1, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_2, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_3, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_4, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_5, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_YELLOW_LED_6, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_GREEN_LED, TRUE);
-    systemtimerWait(1000000);
-    elfosdebugSetLED(ELFOSDEBUG_RED_LED, TRUE);
-
+    ssd1351Init();
+    ssd1351Test();
 
     UnsignedWord32 reg = 0;
     while (TRUE)

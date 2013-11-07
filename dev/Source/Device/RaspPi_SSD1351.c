@@ -17,17 +17,16 @@
 static void ssd1351SendOperation(UnsignedByte command, UnsignedByte params[], UnsignedWord32 paramsLength)
 {
     UnsignedByte outputData[1];
-    UnsignedByte inputData[32];
 
     spiStartCompoundTransfer();
 
     outputData[0] = command;
     gpioClearOutput(SSD1351_GPIO_IOCONTROL);
-    spiTransfer(0, outputData, inputData, 1);
+    spiOutputTransfer(0, outputData, 1);
     if (paramsLength > 0)
     {
         gpioSetOutput(SSD1351_GPIO_IOCONTROL);
-        spiTransfer(0, params, inputData, paramsLength);
+        spiOutputTransfer(0, params, paramsLength);
     }
 
     spiEndCompoundTransfer();
@@ -68,15 +67,24 @@ void ssd1351Shutdown(void)
 
 void ssd1351Test(void)
 {
-    UnsignedByte params[30];
+    UnsignedByte params[384];
+
+    params[0] = 0xA0;
+    ssd1351SendOperation(0xA0, params, 1);
 
     int index;
-    for (index = 0; index < 30; index++)
-        params[index] = 0x00;
+    for (index = 0; index < 384; index++)
+    {
+        params[index] = (index & 0x3F);
+    }
 
-    ssd1351SendOperation(0x5C, params, 30);
-
-    for (index = 0; index < 127; index++)
+    for (index = 0; index < 64; index++)
+    {
+        ssd1351SendOperation(0x5C, params, 384);
+	systemtimerWait(100000);
+    }
+    
+    for (index = 0; index < 128; index++)
     {
         params[0] = index;
         ssd1351SendOperation(0xA1, params, 1);

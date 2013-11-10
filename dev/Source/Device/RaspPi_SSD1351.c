@@ -14,7 +14,24 @@
 #define SSD1351_GPIO_RESET     (24)
 #define SSD1351_GPIO_IOCONTROL (25)
 
-static void ssd1351SendOperation(UnsignedByte command, UnsignedByte params[], UnsignedWord32 paramsLength)
+void ssd1351Init(Boolean andWake)
+{
+    spiSetClockRate(20000000);
+
+    gpioFuncSelect(SSD1351_GPIO_RESET,     GPIO_FUNCSELECT_OUTPUT);
+    gpioFuncSelect(SSD1351_GPIO_IOCONTROL, GPIO_FUNCSELECT_OUTPUT);
+
+    systemtimerWaitUntil(1000);
+    gpioClearOutput(SSD1351_GPIO_RESET);
+    systemtimerWait(10);
+    gpioSetOutput(SSD1351_GPIO_RESET);
+    systemtimerWait(10);
+
+    if (andWake)
+        ssd1351Wake();
+}
+
+void ssd1351SendOperation(UnsignedByte command, UnsignedByte params[], UnsignedWord32 paramsLength)
 {
     UnsignedByte outputData[1];
 
@@ -32,62 +49,18 @@ static void ssd1351SendOperation(UnsignedByte command, UnsignedByte params[], Un
     spiEndCompoundTransfer();
 }
 
-static void ssd1351Reset(void)
-{
-    gpioFuncSelect(SSD1351_GPIO_RESET,     GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(SSD1351_GPIO_IOCONTROL, GPIO_FUNCSELECT_OUTPUT);
-
-    systemtimerWaitUntil(1000);
-    gpioClearOutput(SSD1351_GPIO_RESET);
-    systemtimerWait(10);
-    gpioSetOutput(SSD1351_GPIO_RESET);
-    systemtimerWait(10);
-    ssd1351SendOperation(0xAF, 0, 0);
-    systemtimerWait(200000);
-}
-
-void ssd1351Init(void)
-{
-    spiSetClockRate(500000);
-
-    ssd1351Reset();
-}
-
 void ssd1351Sleep(void)
 {
+    ssd1351SendOperation(0xAE, 0, 0);
 }
 
 void ssd1351Wake(void)
 {
+    ssd1351SendOperation(0xAF, 0, 0);
+    systemtimerWait(200000);
 }
 
 void ssd1351Shutdown(void)
 {
-}
-
-void ssd1351Test(void)
-{
-    UnsignedByte params[384];
-
-    params[0] = 0xA0;
-    ssd1351SendOperation(0xA0, params, 1);
-
-    int index;
-    for (index = 0; index < 384; index++)
-    {
-        params[index] = (index & 0x3F);
-    }
-
-    for (index = 0; index < 64; index++)
-    {
-        ssd1351SendOperation(0x5C, params, 384);
-	systemtimerWait(100000);
-    }
-    
-    for (index = 0; index < 128; index++)
-    {
-        params[0] = index;
-        ssd1351SendOperation(0xA1, params, 1);
-	systemtimerWait(100000);
-    }
+    ssd1351SendOperation(0xAE, 0, 0);
 }

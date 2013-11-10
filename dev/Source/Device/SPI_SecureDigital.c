@@ -9,22 +9,6 @@
 #include <Device/BCM2835_SPI.h>
 #include <Device/SPI_SecureDigital.h>
 
-static void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength)
-{
-    logMessage(message);
-    logMessage(":");
-    UnsignedWord32 dataIndex;
-    for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
-    {
-        if ((dataIndex % 48) == 0)
-            logMessage("\r\n");
-
-        logMessage(" ");
-        logUnsignedByteHex(data[dataIndex]);
-    }
-    logMessage("\r\n");
-}
-
 static Boolean startFirstResponseInput(UnsignedByte inputData, void *context)
 {
     return (inputData != 0x3F) && ((inputData & 0x80) == 0x00);

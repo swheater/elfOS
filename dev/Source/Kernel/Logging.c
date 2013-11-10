@@ -104,6 +104,22 @@ void logMessage(const char *message)
     }
 }
 
+void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength)
+{
+    logMessage(message);
+    logMessage(":");
+    UnsignedWord32 dataIndex;
+    for (dataIndex = 0; dataIndex < dataLength; dataIndex++)
+    {
+        if ((dataIndex % 40) == 0)
+            logMessage("\r\n");
+
+        logMessage(" ");
+        logUnsignedByteHex(data[dataIndex]);
+    }
+    logMessage("\r\n");
+}
+
 void logNewLine(void)
 {
     uartOutput('\r');

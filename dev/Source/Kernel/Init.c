@@ -25,6 +25,7 @@
 #include <Device/RaspPi_elfOSDebug.h>
 #include <Device/RaspPi_BerryClip.h>
 #include <Device/RaspPi_MotorPiTX.h>
+#include <Device/RaspPi_ILSoftOLED.h>
 #include <Device/SPI_SecureDigital.h>
 #include <elfOS/Thread.h>
 
@@ -62,17 +63,15 @@ void kernel_start(void)
     statusInit();
     systemtimerInit();
     gpioInit();
-    //    ladderInit();
     spiInit();
     uartInit();
-    //    displayTFT18Init();
-    //    i2cInit(0);
-    //    ladderInit();
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    ssd1351Init();
-    ssd1351Test();
+    ssd1351Init(FALSE);
+    ilsoftoledInit();
+
+    ilsoftoledTest();
 
     UnsignedWord32 reg = 0;
     while (TRUE)

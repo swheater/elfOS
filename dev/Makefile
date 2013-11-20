@@ -29,7 +29,7 @@ OBJS = Source/Kernel/ARM/Boot.o \
        Source/String/String.o \
        Source/Device/BCM2835_miniUART.o Source/Device/BCM2835_GPIO.o \
        Source/Device/BCM2835_BSC.o Source/Device/BCM2835_SPI.o Source/Device/BCM2835_SystemTimer.o Source/Device/BCM2835_Timer.o \
-       Source/Device/BCM2835_EMMC.o \
+       Source/Device/BCM2835_PWM.o Source/Device/BCM2835_EMMC.o \
        Source/Device/RaspPi_Status.o Source/Device/RaspPi_PiGlow.o Source/Device/RaspPi_PiLITEr.o Source/Device/RaspPi_BerryClip.o \
        Source/Device/RaspPi_Ladder.o Source/Device/RaspPi_DisplayTFT18.o \
        Source/Device/RaspPi_ILI9320.o Source/Device/RaspPi_SSD1351.o Source/Device/RaspPi_XPT2046.o \

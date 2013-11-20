@@ -9,8 +9,12 @@
 
 extern void           systemtimerInit();
 extern UnsignedWord64 systemtimerGetCounterValue(void);
+extern void           systemtimerSetCompareValue(UnsignedByte comparitor, UnsignedWord32 compareValue);
+extern Boolean        systemtimerTestComparitorMatch(UnsignedByte comparitor);
+extern void           systemtimerClearComparitorMatch(UnsignedByte comparitor);
 extern void           systemtimerWait(UnsignedWord64 microSecondDelay);
 extern void           systemtimerWaitUntil(UnsignedWord64 microSecondCounterValue);
+extern void           systemtimerShutdown(void);
 
 extern void systemtimerDebug(void);
 

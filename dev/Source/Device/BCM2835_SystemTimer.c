@@ -11,6 +11,7 @@
 #define SYSTEMTIMER_BASE                 ((volatile UnsignedWord32*) 0x20003000)
 #define SYSTEMTIMER_CONTROLSTATUS_OFFSET (0x00)
 #define SYSTEMTIMER_COUNTER_OFFSET       (0x01)
+#define SYSTEMTIMER_COMPARE_BASE         (SYSTEMTIMER_BASE + 0x03)
 #define SYSTEMTIMER_COMPARE0_OFFSET      (0x03)
 #define SYSTEMTIMER_COMPARE1_OFFSET      (0x04)
 #define SYSTEMTIMER_COMPARE2_OFFSET      (0x05)
@@ -19,11 +20,26 @@
 void systemtimerInit()
 {
     *(SYSTEMTIMER_BASE + SYSTEMTIMER_CONTROLSTATUS_OFFSET) = 0x00000000;
-    *(SYSTEMTIMER_BASE + SYSTEMTIMER_COMPARE0_OFFSET)      = 0x00000000;
+    // Used by GPU:   *(SYSTEMTIMER_BASE + SYSTEMTIMER_COMPARE0_OFFSET)      = 0x00000000;
     *(SYSTEMTIMER_BASE + SYSTEMTIMER_COMPARE1_OFFSET)      = 0x00000000;
-    *(SYSTEMTIMER_BASE + SYSTEMTIMER_COMPARE2_OFFSET)      = 0x00000000;
+    // Used by GPU:   *(SYSTEMTIMER_BASE + SYSTEMTIMER_COMPARE2_OFFSET)      = 0x00000000;
     *(SYSTEMTIMER_BASE + SYSTEMTIMER_COMPARE3_OFFSET)      = 0x00000000;
 }
+
+void systemtimerSetCompareValue(UnsignedByte comparitor, UnsignedWord32 compareValue)
+{
+    *(SYSTEMTIMER_COMPARE_BASE + comparitor) = compareValue;
+}
+
+Boolean systemtimerTestComparitorMatch(UnsignedByte comparitor)
+{
+    return ((*(SYSTEMTIMER_BASE + SYSTEMTIMER_CONTROLSTATUS_OFFSET)) & (1 << comparitor)) != 0;
+}
+
+void systemtimerClearComparitorMatch(UnsignedByte comparitor)
+{
+    *(SYSTEMTIMER_BASE + SYSTEMTIMER_CONTROLSTATUS_OFFSET) = (1 << comparitor);
+} 
 
 UnsignedWord64 systemtimerGetCounterValue(void)
 {
@@ -42,6 +58,10 @@ void systemtimerWait(UnsignedWord64 microSecondDelay)
 void systemtimerWaitUntil(UnsignedWord64 microSecondCounterValue)
 {
     while (*((volatile UnsignedWord64*) (SYSTEMTIMER_BASE + SYSTEMTIMER_COUNTER_OFFSET)) < microSecondCounterValue);
+}
+
+void systemtimerShutdown(void)
+{
 }
 
 void systemtimerDebug(void)

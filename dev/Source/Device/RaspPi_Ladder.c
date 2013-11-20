@@ -10,24 +10,34 @@
 
 void ladderInit(void)
 {
-    gpioFuncSelect(LADDER_SMALLRED_LED,   GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_SMALLGREEN_LED, GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_RED_LED_1,      GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_RED_LED_2,      GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_YELLOW_LED_1,   GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_YELLOW_LED_2,   GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_GREEN_LED_1,    GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_GREEN_LED_2,    GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_BLUE_LED_1,     GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_BLUE_LED_2,     GPIO_FUNCSELECT_OUTPUT);
-    gpioFuncSelect(LADDER_SWITCH_1,       GPIO_FUNCSELECT_INPUT);
-    gpioSetPullControl(LADDER_SWITCH_1,   GPIO_PULL_UP);
-    gpioFuncSelect(LADDER_SWITCH_2,       GPIO_FUNCSELECT_INPUT); 
-    gpioSetPullControl(LADDER_SWITCH_2,   GPIO_PULL_UP);
-    gpioFuncSelect(LADDER_SWITCH_3,       GPIO_FUNCSELECT_INPUT);
-    gpioSetPullControl(LADDER_SWITCH_3,   GPIO_PULL_UP);
-    gpioFuncSelect(LADDER_SWITCH_4,       GPIO_FUNCSELECT_INPUT);
-    gpioSetPullControl(LADDER_SWITCH_4,   GPIO_PULL_UP);
+    gpioFuncSelect(LADDER_SMALLRED_LED,       GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_SMALLRED_LED,   GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_SMALLGREEN_LED,     GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_SMALLGREEN_LED, GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_RED_LED_1,          GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_RED_LED_1,      GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_RED_LED_2,          GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_RED_LED_2,      GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_YELLOW_LED_1,       GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_YELLOW_LED_1,   GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_YELLOW_LED_2,       GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_YELLOW_LED_2,   GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_GREEN_LED_1,        GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_GREEN_LED_1,    GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_GREEN_LED_2,        GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_GREEN_LED_2,    GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_BLUE_LED_1,         GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_BLUE_LED_1,     GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_BLUE_LED_2,         GPIO_FUNCSELECT_OUTPUT);
+    gpioSetPullControl(LADDER_BLUE_LED_2,     GPIO_PULL_OFF);
+    gpioFuncSelect(LADDER_SWITCH_1,           GPIO_FUNCSELECT_INPUT);
+    gpioSetPullControl(LADDER_SWITCH_1,       GPIO_PULL_UP);
+    gpioFuncSelect(LADDER_SWITCH_2,           GPIO_FUNCSELECT_INPUT); 
+    gpioSetPullControl(LADDER_SWITCH_2,       GPIO_PULL_UP);
+    gpioFuncSelect(LADDER_SWITCH_3,           GPIO_FUNCSELECT_INPUT);
+    gpioSetPullControl(LADDER_SWITCH_3,       GPIO_PULL_UP);
+    gpioFuncSelect(LADDER_SWITCH_4,           GPIO_FUNCSELECT_INPUT);
+    gpioSetPullControl(LADDER_SWITCH_4,       GPIO_PULL_UP);
 }
 
 void ladderSetLED(UnsignedByte ledNumber, Boolean on)

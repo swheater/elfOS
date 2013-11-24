@@ -185,9 +185,9 @@ void ilsoftoledTest(void)
     for (x = 0; x < 128; x++)
         for (y = 0; y < 128; y++)
         {
-            int red   = max(0, x - y, 255);
-            int green = max(0, y - x, 255);
-            int blue  = max(0, (x + y) / 2, 255);
+            int red   = range(0, x - y, 255);
+            int green = range(0, y - x, 255);
+            int blue  = range(0, (x + y) / 2, 255);
 
             ilsoftoledSetPixel(x, y, red, green, blue);
         }

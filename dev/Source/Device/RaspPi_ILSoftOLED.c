@@ -169,14 +169,6 @@ void ilsoftoledShutdown(void)
 {
 }
 
-static int max(int v1, int v2)
-{
-    if (v1 > v2)
-        return v1;
-    else
-        return v2;
-}
-
 static int range(int bottom, int v, int top)
 {
     if (bottom > v)
@@ -193,9 +185,9 @@ void ilsoftoledTest(void)
     for (x = 0; x < 128; x++)
         for (y = 0; y < 128; y++)
         {
-            int red   = max(x - y, 0);
-            int green = max(y - x, 0);
-            int blue  = (x + y) / 2;
+            int red   = max(0, x - y, 255);
+            int green = max(0, y - x, 255);
+            int blue  = max(0, (x + y) / 2, 255);
 
             ilsoftoledSetPixel(x, y, red, green, blue);
         }

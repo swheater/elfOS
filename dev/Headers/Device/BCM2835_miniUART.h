@@ -8,6 +8,8 @@
 #include <Kernel/StdTypes.h>
 
 extern void uartInit(void);
+extern UnsignedWord32 uartSetBaudRate(UnsignedWord32 baudRate);
 extern void uartOutput(UnsignedByte ch);
+extern void uartShutdown(void);
 
 #endif

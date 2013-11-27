@@ -15,7 +15,7 @@ extern void logUnsignedWord32Bin(UnsignedWord32 unsignedWord32);
 extern void logUnsignedWord64Hex(UnsignedWord64 unsignedWord64);
 extern void logDataHex(UnsignedByte data[], UnsignedWord32 dataLength);
 extern void logMessage(const char *message);
-extern void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength);
+extern void logData(const char *message, UnsignedByte data[], UnsignedWord32 dataLength);
 extern void logNewLine(void);
 
 #endif

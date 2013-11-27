@@ -104,7 +104,7 @@ void logMessage(const char *message)
     }
 }
 
-void logData(const char *message, UnsignedWord32 data[], UnsignedWord32 dataLength)
+void logData(const char *message, UnsignedByte data[], UnsignedWord32 dataLength)
 {
     logMessage(message);
     logMessage(":");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+ * Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
 // Device driver for BCM2835 - GPIO output (GPIO17, GPIO18, GPIO21 and GPIO22)

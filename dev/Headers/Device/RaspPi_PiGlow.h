@@ -2,7 +2,7 @@
 #define _DEVICE_RASPPI_PIGLOW_H 1
 
 /*
- * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+ * Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
 #include <Kernel/StdTypes.h>

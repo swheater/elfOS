@@ -2,7 +2,7 @@
 #define _DEVICE_SPI_MCP23S17_H 1
 
 /*
- * Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+ * Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
 #define MCP23S17_BANK0_IODIRA_REG   (0x00)

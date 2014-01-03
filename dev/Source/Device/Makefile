@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2013, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
+# Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
 OBJS = BCM2835_miniUART.o BCM2835_GPIO.o BCM2835_BSC.o BCM2835_SPI.o BCM2835_SystemTimer.o BCM2835_Timer.o \

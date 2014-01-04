@@ -9,6 +9,7 @@ all:
 	$(MAKE) -e -C StdLibrary all
 	$(MAKE) -e -C elfOS all
 	$(MAKE) -e -C Device all
+	$(MAKE) -e -C OPENflow all
 
 clean:
 	$(MAKE) -e -C Kernel clean
@@ -17,4 +18,5 @@ clean:
 	$(MAKE) -e -C StdLibrary clean
 	$(MAKE) -e -C elfOS clean
 	$(MAKE) -e -C Device clean
+	$(MAKE) -e -C OPENflow clean
 	$(RM) -f *~

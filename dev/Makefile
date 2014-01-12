@@ -20,7 +20,7 @@ OBJS = Source/Kernel/ARM/Boot.o \
        \
        Source/Kernel/ARM/Start.o Source/Kernel/Init.o \
        Source/Kernel/ARM/Thread.o \
-       Source/Kernel/Handlers.o \
+       Source/Kernel/Handlers.o Source/Kernel/PageMemory.o \
        Source/Kernel/ARMv6/CPUInfo.o Source/Kernel/Logging.o Source/Kernel/KDebug.o \
        Source/Kernel/ARM/HandlerVectors.o \
        \

@@ -20,6 +20,8 @@ void kernel_pageMemorySetup(void)
     pageBitmap[3] = 0xFF;
     pageBitmap[4] = 0xFF;
     pageBitmap[5] = 0xFF;
+    pageBitmap[6] = 0xFF;
+    pageBitmap[7] = 0xFF;
 
     for (index = PAGEMAPSIZE - ((16 * 1024 * 1024) / (4 * 1024 * 8)); index < PAGEMAPSIZE; index++)
         pageBitmap[index] = 0xFF;
@@ -40,15 +42,15 @@ UnsignedWord32 kernel_pageMemoryAcquire(void)
  
             int bitIndex;
             for (bitIndex = 0; (bitIndex < 8) && (page == 0); bitIndex++)
-	    {
+            {
                 if ((bitmap & 0x01) == 0x00)
-		{
+                {
                     page = 4096 * ((8 * (pageIndex + pageBitmapIndex)) + bitIndex);
                     pageBitmap[(pageIndex + pageBitmapIndex) % PAGEMAPSIZE] |= (1 << bitIndex);
-		}
+                }
 
                 bitmap = bitmap >> 1;
-	    }
+            }
         }
     }
 

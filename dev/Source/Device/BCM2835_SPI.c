@@ -147,7 +147,7 @@ void spiOutputTransfer(UnsignedByte chip, UnsignedByte outputData[], UnsignedWor
             *(SPI_BASE + SPI_DATAFIFO_OFFSET) = outputData[outputDataIndex++];
 
         while ((inputDataIndex < outputDataLength) && (((*(SPI_BASE + SPI_CONTROLSTATUS_OFFSET)) & SPI_CONTROLSTATUS_CONTAINSDATA_MASK) == SPI_CONTROLSTATUS_CONTAINSDATA_BIT))
-	{
+        {
             dummy = *(SPI_BASE + SPI_DATAFIFO_OFFSET);
             inputDataIndex++;
         }

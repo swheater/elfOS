@@ -36,8 +36,7 @@ OBJS = Source/Kernel/ARM/Boot.o \
        Source/Device/RaspPi_MotorPiTX.o Source/Device/RaspPi_elfOSDebug.o \
        Source/Device/RaspPi_ILSoftOLED.o Source/Device/SPI_SecureDigital.o Source/Device/SPI_MCP23S17.o 
 #       Source/Kernel/Kernel/Process.o
-#       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o \
-#       Source/Kernel/ARMv6/MemoryManagement.o \
+#       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o
 
 all: elfOS.img
 

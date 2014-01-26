@@ -35,14 +35,6 @@ static void irqHandler(void)
 
 void kernel_start(void)
 {
-    undefinedInstructionHandler = &defaultUndefinedInstructionHandler;
-    softwareInterruptHandler    = &defaultSoftwareInterruptHandler;
-    prefetchAbortHandler        = &defaultPrefetchAbortHandler;
-    dataAbortHandler            = &defaultDataAbortHandler;
-    reservedHandler             = &defaultReservedHandler;
-    interruptRequestHandler     = &defaultInterruptRequestHandler;
-    fastInterruptRequestHandler = &defaultFastInterruptRequestHandler;
-
     softwareInterruptHandler    = &swHandler;
     interruptRequestHandler     = &irqHandler;
 
@@ -52,44 +44,13 @@ void kernel_start(void)
 
     uartInit();
 
-    kernel_pageMemoryInit();
-
-    UnsignedWord32 page;
-
-    page = kernel_pageMemoryOctPageAcquire();
-    while (page != 0)
-    {
-        logUnsignedWord32Hex(page);
-        logNewLine();
-
-        page = kernel_pageMemoryOctPageAcquire();
-    }
+    kDebugCPUState();
     logNewLine();
-
-    kernel_pageMemorySinglePageRelease(0x01000000);
-    page = kernel_pageMemorySinglePageAcquire();
-    logUnsignedWord32Hex(page);
+    kDebugMemoryManagement();
     logNewLine();
-
-    kernel_pageMemorySinglePageRelease(0x01001000);
-    page = kernel_pageMemorySinglePageAcquire();
-    logUnsignedWord32Hex(page);
+    kDebugCurrentThread();
     logNewLine();
-
-    kernel_pageMemoryDuelPageRelease(0x01000000);
-    page = kernel_pageMemoryDuelPageAcquire();
-    logUnsignedWord32Hex(page);
-    logNewLine();
-
-    kernel_pageMemoryQuadPageRelease(0x01000000);
-    page = kernel_pageMemoryQuadPageAcquire();
-    logUnsignedWord32Hex(page);
-    logNewLine();
-
-    kernel_pageMemoryOctPageRelease(0x01000000);
-    page = kernel_pageMemoryOctPageAcquire();
-    logUnsignedWord32Hex(page);
-    logNewLine();
+    kDebugHandlers();
 
     UnsignedWord32 reg = 0;
     while (TRUE)

@@ -7,14 +7,6 @@
 #include <Device/BCM2835_GPIO.h>
 #include <Kernel/Handlers.h>
 
-void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress)                = 0;
-void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock) = 0;
-void (*prefetchAbortHandler)(void)                                                              = 0;
-void (*dataAbortHandler)(void)                                                                  = 0;
-void (*reservedHandler)(void)                                                                   = 0;
-void (*interruptRequestHandler)(void)                                                           = 0;
-void (*fastInterruptRequestHandler)(void)                                                       = 0;
-
 static void signalError(void)
 {
     volatile int count;
@@ -90,3 +82,11 @@ void defaultFastInterruptRequestHandler(void)
     logMessage("Problem: Default Fast Interrupt Request Handler\r\n");
     signalError();
 }
+
+void (*undefinedInstructionHandler)(UnsignedWord32* undefinedInstructionAddress)                = &defaultUndefinedInstructionHandler;
+void (*softwareInterruptHandler)(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock) = &defaultSoftwareInterruptHandler;
+void (*prefetchAbortHandler)(void)                                                              = &defaultPrefetchAbortHandler;
+void (*dataAbortHandler)(void)                                                                  = &defaultDataAbortHandler;
+void (*reservedHandler)(void)                                                                   = &defaultReservedHandler;
+void (*interruptRequestHandler)(void)                                                           = &defaultInterruptRequestHandler;
+void (*fastInterruptRequestHandler)(void)                                                       = &defaultFastInterruptRequestHandler;

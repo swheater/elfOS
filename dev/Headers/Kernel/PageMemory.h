@@ -10,8 +10,15 @@
 #define PAGEMAPSIZE (16384)
 #define PAGESIZE    (4096)
 
-extern void           kernel_pageMemorySetup(void);
-extern UnsignedWord32 kernel_pageMemoryAcquire(void);
-extern void           kernel_pageMemoryRelease(UnsignedWord32 pageAddress);
+extern void           kernel_pageMemoryInit(void);
+extern UnsignedWord32 kernel_pageMemorySingleAcquirePage(void);
+extern UnsignedWord32 kernel_pageMemoryAcquireDualPage(void);
+extern UnsignedWord32 kernel_pageMemoryAcquireQuadPage(void);
+extern UnsignedWord32 kernel_pageMemoryAcquireOctPage(void);
+extern void           kernel_pageMemorySinglePageRelease(UnsignedWord32 pageAddress);
+extern void           kernel_pageMemoryDualPageRelease(UnsignedWord32 pageAddress);
+extern void           kernel_pageMemoryQuadPageRelease(UnsignedWord32 pageAddress);
+extern void           kernel_pageMemoryOctPageRelease(UnsignedWord32 pageAddress);
+extern void           kernel_pageMemoryShutdown(void);
 
 #endif

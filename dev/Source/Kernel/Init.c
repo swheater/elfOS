@@ -50,33 +50,46 @@ void kernel_start(void)
     threadsInit();
     timerInit(127, 1000000, TRUE);
 
-    kernel_pageMemorySetup();
-
     uartInit();
+
+    kernel_pageMemoryInit();
 
     UnsignedWord32 page;
 
-    page = kernel_pageMemoryAcquire();
+    page = kernel_pageMemoryOctPageAcquire();
     while (page != 0)
     {
         logUnsignedWord32Hex(page);
         logNewLine();
 
-        page = kernel_pageMemoryAcquire();
+        page = kernel_pageMemoryOctPageAcquire();
     }
-
     logNewLine();
 
-    kernel_pageMemoryRelease(0x01000000);
+    kernel_pageMemorySinglePageRelease(0x01000000);
+    page = kernel_pageMemorySinglePageAcquire();
+    logUnsignedWord32Hex(page);
+    logNewLine();
 
-    page = kernel_pageMemoryAcquire();
-    while (page != 0)
-    {
-        logUnsignedWord32Hex(page);
-        logNewLine();
+    kernel_pageMemorySinglePageRelease(0x01001000);
+    page = kernel_pageMemorySinglePageAcquire();
+    logUnsignedWord32Hex(page);
+    logNewLine();
 
-        page = kernel_pageMemoryAcquire();
-    }
+    kernel_pageMemoryDuelPageRelease(0x01000000);
+    page = kernel_pageMemoryDuelPageAcquire();
+    logUnsignedWord32Hex(page);
+    logNewLine();
+
+    kernel_pageMemoryQuadPageRelease(0x01000000);
+    page = kernel_pageMemoryQuadPageAcquire();
+    logUnsignedWord32Hex(page);
+    logNewLine();
+
+    kernel_pageMemoryOctPageRelease(0x01000000);
+    page = kernel_pageMemoryOctPageAcquire();
+    logUnsignedWord32Hex(page);
+    logNewLine();
 
     UnsignedWord32 reg = 0;
     while (TRUE)

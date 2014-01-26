@@ -8,7 +8,7 @@
 static int          pageBitmapIndex;
 static UnsignedByte pageBitmap[PAGEMAPSIZE];
 
-void kernel_pageMemorySetup(void)
+void kernel_pageMemoryInit(void)
 {
     int index;
     for (index = 0; index < PAGEMAPSIZE; index++)
@@ -29,7 +29,7 @@ void kernel_pageMemorySetup(void)
     pageBitmapIndex = 0;
 }
 
-UnsignedWord32 kernel_pageMemoryAcquire(void)
+static UnsignedWord32 kernel_pageMemoryAcquirePage(UnsignedByte bitmask, UnsignedByte bitsPerGroup)
 {
     UnsignedWord32 page = 0;
 
@@ -41,15 +41,15 @@ UnsignedWord32 kernel_pageMemoryAcquire(void)
             UnsignedByte bitmap = pageBitmap[(pageIndex + pageBitmapIndex) % PAGEMAPSIZE];
  
             int bitIndex;
-            for (bitIndex = 0; (bitIndex < 8) && (page == 0); bitIndex++)
+            for (bitIndex = 0; (bitIndex < 8) && (page == 0); bitIndex += bitsPerGroup)
             {
-                if ((bitmap & 0x01) == 0x00)
+                if ((bitmap & bitmask) == 0x00)
                 {
                     page = 4096 * ((8 * (pageIndex + pageBitmapIndex)) + bitIndex);
-                    pageBitmap[(pageIndex + pageBitmapIndex) % PAGEMAPSIZE] |= (1 << bitIndex);
+                    pageBitmap[(pageIndex + pageBitmapIndex) % PAGEMAPSIZE] |= (bitmask << bitIndex);
                 }
 
-                bitmap = bitmap >> 1;
+                bitmap =  bitmap >> bitsPerGroup;
             }
         }
     }
@@ -57,10 +57,54 @@ UnsignedWord32 kernel_pageMemoryAcquire(void)
     return page;
 }
 
-void kernel_pageMemoryRelease(UnsignedWord32 pageAddress)
+UnsignedWord32 kernel_pageMemorySinglePageAcquire(void)
+{
+    return kernel_pageMemoryAcquirePage(0x01, 1);
+}
+
+UnsignedWord32 kernel_pageMemoryDuelPageAcquire(void)
+{
+    return kernel_pageMemoryAcquirePage(0x03, 2);
+}
+
+UnsignedWord32 kernel_pageMemoryQuadPageAcquire(void)
+{
+    return kernel_pageMemoryAcquirePage(0x0F, 4);
+}
+
+UnsignedWord32 kernel_pageMemoryOctPageAcquire(void)
+{
+    return kernel_pageMemoryAcquirePage(0xFF, 8);
+}
+
+void kernel_pageMemoryPageReleases(UnsignedWord32 pageAddress, UnsignedByte bitmask)
 {
     int pageIndex = pageAddress / (4096 * 8);
     int bitIndex  = (pageAddress / 4096) % 8;
 
-    pageBitmap[pageIndex] &= ~ (1 << bitIndex);
+    pageBitmap[pageIndex] &= ~ (bitmask << bitIndex);
+}
+
+void kernel_pageMemorySinglePageRelease(UnsignedWord32 pageAddress)
+{
+    kernel_pageMemoryPageReleases(pageAddress, 0x01);
+}
+
+void kernel_pageMemoryDuelPageRelease(UnsignedWord32 pageAddress)
+{
+    kernel_pageMemoryPageReleases(pageAddress, 0x03);
+}
+
+void kernel_pageMemoryQuadPageRelease(UnsignedWord32 pageAddress)
+{
+    kernel_pageMemoryPageReleases(pageAddress, 0x0F);
+}
+
+void kernel_pageMemoryOctPageRelease(UnsignedWord32 pageAddress)
+{
+    kernel_pageMemoryPageReleases(pageAddress, 0xFF);
+}
+
+void kernel_pageMemoryShutdown(void)
+{
 }

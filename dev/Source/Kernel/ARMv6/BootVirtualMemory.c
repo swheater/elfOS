@@ -14,7 +14,7 @@ extern char kernel_zeroPagePhyStart;
 extern char kernel_zeroPagePhyEnd;
 
 static UnsignedWord32 kernel_phyContainerTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x2000)));
-static UnsignedWord32 kernel_phyKernelTranslationTable[CONTAINER_TRANSLATIONTABLESIZE] __attribute__((aligned(0x2000)));
+static UnsignedWord32 kernel_phyKernelTranslationTable[KERNEL_TRANSLATIONTABLESIZE] __attribute__((aligned(0x2000)));
 
 static UnsignedWord32 kernel_phyContainerPageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));
 static UnsignedWord32 kernel_phyDevice200PageTable[PAGETABLESIZE] __attribute__((aligned(0x400)));

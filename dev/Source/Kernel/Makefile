@@ -2,7 +2,7 @@
 # Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-OBJS = Init.o Handlers.o Process.o PageMemory.o Logging.o KDebug.o
+OBJS = Init.o Handlers.o Process.o PageMemory.o Logging.o KDebug.o BDebug.o
 
 all: $(OBJS)
 	$(MAKE) -C ARM all

@@ -13,7 +13,7 @@ SECTIONS
 {
 	phy_boot     = 0x00008000;
 	vir_boot     = 0x00008000;
-	phy_kernel   = 0x00018000;
+	phy_kernel   = 0x00020000;
 	vir_kernel   = 0x80000000;
 
 	phy_devStart = 0x20000000;
@@ -22,25 +22,30 @@ SECTIONS
 	.text.boot phy_boot :
 	{
 		Source/Kernel/ARM/Boot.o (.text);
+		Source/Kernel/BDebug.o (.text);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.text);
 	}
 	.data.boot :
 	{
 		Source/Kernel/ARM/Boot.o (.data);
+		Source/Kernel/BDebug.o (.data);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.data);
 	}
 	.bss.boot :
 	{
                 boot_bssSectionStart = .;
 		Source/Kernel/ARM/Boot.o (.bss);
+		Source/Kernel/BDebug.o (.bss);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.bss);
 		boot_bssSectionEnd = .;
 	}
 	.rodata.boot :
 	{
 		Source/Kernel/ARM/Boot.o (.rodata);
+		Source/Kernel/BDebug.o (.rodata);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.rodata);
 		Source/Kernel/ARM/Boot.o (.rodata.str1.4);
+		Source/Kernel/BDebug.o (.rodata.str1.4);
 		Source/Kernel/ARMv6/BootVirtualMemory.o (.rodata.str1.4);
 		. = ALIGN(0x1000);
 	}

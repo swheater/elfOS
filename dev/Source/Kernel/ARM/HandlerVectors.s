@@ -17,7 +17,7 @@ kernel_handlerVectors:
 	B	fastInterruptRequestRedirector
 
 resetHandler:
-	LDR	PC,=phy_kernel
+	LDR	PC,=kernel_phyStart
 
 undefinedInstructionRedirector:
 	PUSH	{R0,R1,LR}

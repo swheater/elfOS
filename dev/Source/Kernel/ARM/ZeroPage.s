@@ -5,7 +5,7 @@
 	.text
 
 zeroPageVectors:
-	LDR	PC,=phy_boot
+	LDR	PC,=boot_phyStart
 	B	resetError
 	B	resetError
 	B	resetError

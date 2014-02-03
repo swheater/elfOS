@@ -1,5 +1,5 @@
-#ifndef _KERNEL_BDEBUG
-#define _KERNEL_BDEBUG 1
+#ifndef _BOOT_BDEBUG
+#define _BOOT_BDEBUG 1
 
 /*
  * Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.

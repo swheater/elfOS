@@ -15,8 +15,9 @@ export SIZE         = arm-none-eabi-size
 export SIZEFLAGS    = 
 export RM           = rm
 
-OBJS = Source/Kernel/ARM/Boot.o Source/Kernel/BDebug.o \
-       Source/Kernel/ARMv6/BootVirtualMemory.o Source/Kernel/ARMv6/BootHandlers.o \
+OBJS = Source/Boot/ARM/Init.o Source/Boot/ARM/StacksSetup.o Source/Boot/ARMv6/InitialHandlersSetup.o \
+       Source/Boot/ARM/Handlers.o Source/Boot/ARMv6/VirtualMemorySetup.o \
+       Source/Boot/BDebug.o \
        \
        Source/Kernel/ARM/Start.o Source/Kernel/Init.o \
        Source/Kernel/ARM/Thread.o \
@@ -27,6 +28,7 @@ OBJS = Source/Kernel/ARM/Boot.o Source/Kernel/BDebug.o \
        Source/StdLibrary/AEABI.o \
        Source/ELF/ELF32.o Source/ELF/ELF32_ARM_EABI.o \
        Source/String/String.o \
+       \
        Source/Device/BCM2835_miniUART.o Source/Device/BCM2835_GPIO.o \
        Source/Device/BCM2835_BSC.o Source/Device/BCM2835_SPI.o Source/Device/BCM2835_SystemTimer.o Source/Device/BCM2835_Timer.o \
        Source/Device/BCM2835_PWM.o Source/Device/BCM2835_EMMC.o \

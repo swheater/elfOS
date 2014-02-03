@@ -2,7 +2,7 @@
 # Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-OBJS = BootHandlers.o CPUInfo.o
+OBJS = InitialHandlersSetup.o VirtualMemorySetup.o
 
 all: $(OBJS)
 

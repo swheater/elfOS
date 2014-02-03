@@ -1,10 +1,10 @@
-#ifndef _KERNEL_START
-#define _KERNEL_START 1
+#ifndef _BOOT_START
+#define _BOOT_START 1
 
 /*
  * Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
  */
 
-extern void kernel_handlerStacksSetup(void);
+extern void boot_stacksSetup(void);
 
 #endif

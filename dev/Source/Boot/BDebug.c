@@ -5,7 +5,7 @@
 // Book Debug
 
 #include <Kernel/StdTypes.h>
-#include <Kernel/BDebug.h>
+#include <Boot/BDebug.h>
 
 #define AUX_BASE                      ((volatile UnsignedWord32*) 0x20215000)
 #define AUX_INTERRUPTSTATUS_OFFSET    (0x00)

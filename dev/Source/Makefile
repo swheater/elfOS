@@ -3,6 +3,7 @@
 #
 
 all:
+	$(MAKE) -C Boot all
 	$(MAKE) -C Kernel all
 	$(MAKE) -C ELF all
 	$(MAKE) -C String all
@@ -11,6 +12,7 @@ all:
 	$(MAKE) -C Device all
 
 clean:
+	$(MAKE) -C Boot clean
 	$(MAKE) -C Kernel clean
 	$(MAKE) -C ELF clean
 	$(MAKE) -C String clean

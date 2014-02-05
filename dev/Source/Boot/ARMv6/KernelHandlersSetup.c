@@ -3,16 +3,12 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <Boot/ARM/HandlerVectors.h>
-#include <Boot/ARM/StacksSetup.h>
+#include <Boot/ARM/KernelHandlerVectors.h>
 
-void boot_handlerSetup(void)
+void boot_kernelHandlerSetup(void)
 {
-    // Setup Handlers Stacks
-    boot_stacksSetup();
-
     // Set Vector Base Address
-    asm("mcr\tp15, 0, %0, c12, c0, 0": : "r" (&boot_handlerVectors));
+    asm("mcr\tp15, 0, %0, c12, c0, 0": : "r" (&kernel_handlerVectors));
 
     // Enable interrupts
     asm("mrs\tr0, cpsr\n\t"

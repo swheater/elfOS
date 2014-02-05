@@ -4,7 +4,6 @@
 
 #include <Kernel/StdTypes.h>
 #include <Kernel/Kernel.h>
-#include <Boot/BDebug.h>
 #include <Kernel/VirtualMemory.h>
 
 extern UnsignedByte boot_bssSectionStart;
@@ -27,36 +26,7 @@ extern UnsignedByte kernel_phyStart;
 
 void boot_virtualMemorySetup(void)
 {
-    bDebugInit();
-
-    bDebugMessage("Boot BSS Start:              ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &boot_bssSectionStart);
-    bDebugNewLine();
-    bDebugMessage("Boot BSS End:                ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &boot_bssSectionEnd);
-    bDebugNewLine();
-    bDebugMessage("Kernel ZeroPage Start:       ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_zeroPagePhyStart);
-    bDebugNewLine();
-    bDebugMessage("Kernel ZeroPage End:         ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_zeroPagePhyEnd);
-    bDebugNewLine();
-    bDebugMessage("Kernel BSS Start:            ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_bssSectionStart);
-    bDebugNewLine();
-    bDebugMessage("Kernel BSS End:              ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_bssSectionEnd);
-    bDebugNewLine();
-    bDebugMessage("Container Translation Table: ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_phyContainerTranslationTable);
-    bDebugNewLine();
-    bDebugMessage("Kernel Translation Table:    ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_phyKernelTranslationTable);
-    bDebugNewLine();
-    bDebugMessage("Kernel Physical Start:       ");
-    bDebugUnsignedWord32Hex((UnsignedWord32) &kernel_phyStart);
-    bDebugNewLine();
-
+    // Init Boot BSS
     UnsignedByte *boot_bssSectionAddress = &boot_bssSectionStart;
     while (boot_bssSectionAddress < &boot_bssSectionEnd)
         *boot_bssSectionAddress++ = 0;
@@ -100,7 +70,7 @@ void boot_virtualMemorySetup(void)
     for (index = 0; index < PAGETABLESIZE; index++)
         kernel_phyKernelPageTable[index] = ((((unsigned int) &kernel_phyStart) + (index << 12)) & 0xFFFFF000) | 0x032;
 
-    kernel_phyKernelTranslationTable[0x000] = (((unsigned int) kernel_phyKernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
+    kernel_phyKernelTranslationTable[0x800] = (((unsigned int) kernel_phyKernelPageTable) & 0xFFFFFFC0) | D00_L1DESCDOMAIN | SECURE_L1DESCPERM | PAGE_L1DESCTYPE;
 
     asm("mcr\tp15, 0, %0, c2, c0, 1": : "r" (kernel_phyKernelTranslationTable));
 
@@ -116,8 +86,6 @@ void boot_virtualMemorySetup(void)
     // Invalidate Translation Look-aside Buffer
     asm("mcr\tp15, 0, %0, c8, c7, 0": : "r" (0));
 
-    bDebugMessage("1");
-
     // Enable Memory Management Unit
     asm("mrc\tp15, 0, r0, c1, c0, 0\n\t"
         "orr\tr0, r0, #0x00000001\n\t"
@@ -130,19 +98,14 @@ void boot_virtualMemorySetup(void)
         "orr\tr0, r0, #0x00001000\n\t"
         "mcr\tp15, 0, r0, c1, c0, 0": : : "r0");
 
-    bDebugMessage("2");
-
     // Copy Zero Page code to Zero Page
     UnsignedByte *zeroPageDestinationAddress = 0;
     UnsignedByte *zeroPageSourceAddress      = &kernel_zeroPagePhyStart;
     while (zeroPageSourceAddress < &kernel_zeroPagePhyEnd)
         *zeroPageDestinationAddress++ = *zeroPageSourceAddress++;
 
-    bDebugMessage("3");
-
+    // Init Kernel BSS
     UnsignedByte *kernel_bssSectionAddress = &kernel_bssSectionStart;
     while (kernel_bssSectionAddress < &kernel_bssSectionEnd)
         *kernel_bssSectionAddress++ = 0;
-
-    bDebugMessage("4");
 }

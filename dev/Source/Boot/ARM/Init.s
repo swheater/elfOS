@@ -6,8 +6,10 @@
 
 boot_start:
 	LDR	SP,=boot_stack
-	BL	boot_handlerSetup
+	BL	boot_stacksSetup
+	BL	boot_bootHandlerSetup
 	BL	boot_virtualMemorySetup
+	BL	boot_kernelHandlerSetup
 	LDR	SP,=kernel_svcStack
 	LDR	PC,=kernel_start
 

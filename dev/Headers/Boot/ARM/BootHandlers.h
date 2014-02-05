@@ -1,5 +1,5 @@
-#ifndef _BOOT_HANDLERS
-#define _BOOT_HANDLERS 1
+#ifndef _BOOT_BOOTHANDLERS
+#define _BOOT_BOOTHANDLERS 1
 
 /*                                                                                                                                                  * Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.                                                      */
 

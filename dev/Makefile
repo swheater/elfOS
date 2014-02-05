@@ -15,8 +15,9 @@ export SIZE         = arm-none-eabi-size
 export SIZEFLAGS    = 
 export RM           = rm
 
-OBJS = Source/Boot/ARM/Init.o Source/Boot/ARM/StacksSetup.o Source/Boot/ARMv6/InitialHandlersSetup.o \
-       Source/Boot/ARM/Handlers.o Source/Boot/ARMv6/VirtualMemorySetup.o \
+OBJS = Source/Boot/ARM/Init.o Source/Boot/ARM/StacksSetup.o \
+       Source/Boot/ARMv6/BootHandlersSetup.o Source/Boot/ARMv6/KernelHandlersSetup.o \
+       Source/Boot/ARMv6/VirtualMemorySetup.o Source/Boot/ARM/BootHandlers.o \
        Source/Boot/BDebug.o \
        \
        Source/Kernel/ARM/Start.o Source/Kernel/Init.o \

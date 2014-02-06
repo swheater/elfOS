@@ -82,7 +82,7 @@ void threadYield(void)
     int index = 0;
     while ((currentThreadControlBlock == 0) && (index < THREADCONTROLBLOCKS_LENGTH))
     {
-        currentThreadControlBlockIndex = (currentThreadControlBlockIndex + 1) & 0x0000000F;
+        currentThreadControlBlockIndex = (currentThreadControlBlockIndex + 1) % THREADCONTROLBLOCKS_LENGTH;
         if (threadControlBlocks[currentThreadControlBlockIndex].blockStatus == USED)
             currentThreadControlBlock = &threadControlBlocks[currentThreadControlBlockIndex];
         else

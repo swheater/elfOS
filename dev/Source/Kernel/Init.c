@@ -27,6 +27,8 @@ static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBl
 
 static void irqHandler(void)
 {
+    uartOutput('#');
+
     if (currentThreadControlBlock != 0)
         threadYield();
 
@@ -35,14 +37,13 @@ static void irqHandler(void)
 
 void kernel_start(void)
 {
-    softwareInterruptHandler    = &swHandler;
-    interruptRequestHandler     = &irqHandler;
+    softwareInterruptHandler = &swHandler;
+    interruptRequestHandler  = &irqHandler;
 
     statusInit();
-    threadsInit();
-    timerInit(127, 1000000, TRUE);
-
     uartInit();
+    threadsInit();
+    timerInit(127, 100000, TRUE);
 
     kDebugCPUState();
     logNewLine();

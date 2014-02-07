@@ -16,8 +16,16 @@ kernel_handlerVectors:
 	B	interruptRequestRedirector
 	B	fastInterruptRequestRedirector
 
+@
+@ Reset Handler
+@
+
 resetHandler:
 	LDR	PC,=kernel_phyStart
+
+@
+@ Undefined Instruction Redirector
+@
 
 undefinedInstructionRedirector:
 	PUSH	{R0,R1,LR}
@@ -31,6 +39,10 @@ undefinedInstructionRedirector:
 undefinedInstructionRedirectSkip:
 	POP	{R0,R1,LR}
 	MOVS	PC,LR
+
+@
+@ Software Interrupt Redirector
+@
 
 softwareInterruptRedirector:
 	LDR	SP,=currentThreadControlBlock
@@ -60,6 +72,10 @@ softwareInterruptRedirectorSkip:
 	NOP
 	LDMIA	SP,{PC}^
 
+@
+@ Prefetch Abort Redirector
+@
+
 prefetchAbortRedirector:
 	PUSH	{R0,LR}
 	LDR	R0,=prefetchAbortHandler
@@ -71,6 +87,10 @@ prefetchAbortRedirector:
 prefetchAbortRedirectSkip:
 	POP	{R0,LR}
 	SUBS	PC,LR,#0x04
+
+@
+@ Data Abort Redirector
+@
 
 dataAbortRedirector:
 	PUSH	{R0,LR}
@@ -84,6 +104,10 @@ dataAbortRedirectSkip:
 	POP	{R0,LR}
 	SUBS	PC,LR,#0x08
 
+@
+@ Reserved Redirector
+@
+
 reservedRedirector:
 	PUSH	{R0,LR}
 	LDR	R0,=reservedHandler
@@ -95,9 +119,16 @@ reservedRedirector:
 reservedRedirectSkip:
 	POP	{R0,LR}
 
+@
+@ Interrupt Request Redirector
+@
+
 interruptRequestRedirector:
 	LDR	SP,=currentThreadControlBlock
 	LDR	SP,[SP]
+	CMP	SP,#0x00000000
+	BEQ	interruptRequestNoCurrentThreadRedirect
+
 	STMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
 	SUB	LR,LR,#0x04
@@ -120,6 +151,24 @@ interruptRequestRedirectSkip:
 	LDMIA	SP!,{R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR}^
 	NOP
 	LDMIA	SP,{PC}^
+
+interruptRequestNoCurrentThreadRedirect:
+	LDR	SP,=kernel_irqStack
+	PUSH	{R0,LR}
+	LDR	R0,=interruptRequestHandler
+	LDR	R0,[R0]
+	CMP	R0,#0x00000000
+	BEQ	interruptRequestNoCurrentThreadRedirectSkip
+	MOV	LR,PC
+	BX	R0
+
+interruptRequestNoCurrentThreadRedirectSkip:
+	POP	{R0,LR}
+	SUBS	PC,LR,#0x04
+	
+@
+@ Fast Interrupt Request Redirector
+@
 
 fastInterruptRequestRedirector:
 	PUSH	{R0,LR}

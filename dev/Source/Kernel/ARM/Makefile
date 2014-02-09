@@ -2,7 +2,7 @@
 # Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-OBJS = Boot.o Start.o ZeroPage.o HandlerVectors.o Thread.o StartThreads.o
+OBJS = Start.o ZeroPage.o HandlerVectors.o Thread.o StartThreads.o
 
 all: $(OBJS)
 

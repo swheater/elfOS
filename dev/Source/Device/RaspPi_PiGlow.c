@@ -31,9 +31,9 @@
 
 #define SN3218_UNSPECIFIED_VALUE (0xFF)
 
-UnsignedByte enabledReg;
-UnsignedByte pwmRegs[SN3218_PWM_REGS];
-UnsignedByte controlRegs[SN3218_CONTROL_REGS];
+static UnsignedByte enabledReg;
+static UnsignedByte pwmRegs[SN3218_PWM_REGS];
+static UnsignedByte controlRegs[SN3218_CONTROL_REGS];
 
 UnsignedByte pinMapping[PIGLOW_ARMS][PIGLOW_LEDS_PER_ARM] =  { { 12, 14,  3,  2,  1,  0 }, {  9,  4,  5,  8,  7,  6 }, { 10, 11, 13, 15, 16, 17 } };
 

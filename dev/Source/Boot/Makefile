@@ -2,15 +2,16 @@
 # Copyright (c) 2012-2014, Stuart Wheater, Newcastle upon Tyne, England. All rights reserved.
 #
 
-OBJS = BootHandlers.o CPUInfo.o
+OBJS = BDebug.o
 
 all: $(OBJS)
-
-.s.o:
-	$(AS) $(ASFLAGS) -o $@ $<
+	$(MAKE) -C ARM all
+	$(MAKE) -C ARMv6 all
 
 .c.o:
 	$(CC) $(CCFLAGS) -c $<
 
 clean:
+	$(MAKE) -C ARM clean
+	$(MAKE) -C ARMv6 clean
 	$(RM) -f *~ *.o

@@ -4,17 +4,19 @@
 
 	.text
 
-kernel_boot:
+boot_start:
 	LDR	SP,=boot_stack
-	BL	kernel_boot_virtualMemorySetup
-	BL	kernel_boot_handlersSetup
+	BL	boot_stacksSetup
+	BL	boot_bootHandlerSetup
+	BL	boot_virtualMemorySetup
+	BL	boot_kernelHandlerSetup
 	LDR	SP,=kernel_svcStack
 	LDR	PC,=kernel_start
 
 	.ltorg
 
 	.align	4
-	.space	2048
+	.space	1024
 boot_stack:
 
 	.end

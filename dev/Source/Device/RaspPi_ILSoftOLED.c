@@ -122,19 +122,19 @@ UnsignedByte ilsoftoledGetSwitchStates(void)
     UnsignedByte result = 0x00;
 
     if (! gpioGetInput(SWITCH_UP_GPIO))
-	result |= SWITCH_UP;
+        result |= SWITCH_UP;
 
     if (! gpioGetInput(SWITCH_RIGHT_GPIO))
-	result |= SWITCH_RIGHT;
+        result |= SWITCH_RIGHT;
 
     if (! gpioGetInput(SWITCH_DOWN_GPIO))
-	result |= SWITCH_DOWN;
+        result |= SWITCH_DOWN;
 
     if (! gpioGetInput(SWITCH_LEFT_GPIO))
-	result |= SWITCH_LEFT;
+        result |= SWITCH_LEFT;
 
     if (! gpioGetInput(SWITCH_SELECT_GPIO))
-	result |= SWITCH_SELECT;
+        result |= SWITCH_SELECT;
 
 
     return result;

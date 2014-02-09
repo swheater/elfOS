@@ -3,14 +3,10 @@
  */
 
 #include <Kernel/StdTypes.h>
-#include <Kernel/ARM/HandlerVectors.h>
-#include <Kernel/ARM/Start.h>
+#include <Boot/ARM/KernelHandlerVectors.h>
 
-void kernel_handlersSetup(void)
+void boot_kernelHandlerSetup(void)
 {
-    // Setup Handlers Stacks
-    kernel_handlerStacksSetup();
-
     // Set Vector Base Address
     asm("mcr\tp15, 0, %0, c12, c0, 0": : "r" (&kernel_handlerVectors));
 

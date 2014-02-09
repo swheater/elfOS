@@ -14,36 +14,36 @@
 	.equ	SYS_MODE,   0x1F
 	.equ	MON_MODE,   0x16
 
-	.global	kernel_handlerStacksSetup
-	.global	kernel_fiqStack
-	.global	kernel_irqStack
-	.global	kernel_abtStack
-	.global	kernel_undefStack
-	.global	kernel_svcStack
+	.global	boot_stacksSetup
+	.global	boot_fiqStack
+	.global	boot_irqStack
+	.global	boot_abtStack
+	.global	boot_undefStack
+	.global	boot_svcStack
 
-kernel_handlerStacksSetup:
+boot_stacksSetup:
 	MRS	R1,CPSR
 	MRS	R0,CPSR
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#FIQ_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=kernel_fiqStack
+	LDR	SP,=boot_fiqStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#IRQ_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=kernel_irqStack
+	LDR	SP,=boot_irqStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#ABT_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=kernel_abtStack
+	LDR	SP,=boot_abtStack
 
 	BIC	R0,R0,#MODE_MASK
 	ORR	R0,R0,#UNDEF_MODE
 	MSR	CPSR_csfx,R0
-	LDR	SP,=kernel_undefStack
+	LDR	SP,=boot_undefStack
 
 	MSR	CPSR_csfx,R1
 
@@ -54,15 +54,15 @@ kernel_handlerStacksSetup:
 	.bss
 
 	.align	4
-	.space	4096
-kernel_fiqStack:
-	.space	4096
-kernel_irqStack:
-	.space	4096
-kernel_abtStack:
-	.space	4096
-kernel_undefStack:
-	.space	16384
-kernel_svcStack:
+	.space	256
+boot_fiqStack:
+	.space	256
+boot_irqStack:
+	.space	256
+boot_abtStack:
+	.space	256
+boot_undefStack:
+	.space	256
+boot_svcStack:
 
 	.end

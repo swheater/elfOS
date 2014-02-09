@@ -3,6 +3,7 @@
 #
 
 all:
+	$(MAKE) -e -C Boot all
 	$(MAKE) -e -C Kernel all
 	$(MAKE) -e -C String all
 	$(MAKE) -e -C ELF all
@@ -12,6 +13,7 @@ all:
 	$(MAKE) -e -C OPENflow all
 
 clean:
+	$(MAKE) -e -C Boot clean
 	$(MAKE) -e -C Kernel clean
 	$(MAKE) -e -C String clean
 	$(MAKE) -e -C ELF clean

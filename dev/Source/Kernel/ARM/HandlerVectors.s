@@ -118,6 +118,7 @@ reservedRedirector:
 	BX	R0
 reservedRedirectSkip:
 	POP	{R0,LR}
+	SUBS	PC,LR,#0x08
 
 @
 @ Interrupt Request Redirector
@@ -165,7 +166,7 @@ interruptRequestNoCurrentThreadRedirect:
 interruptRequestNoCurrentThreadRedirectSkip:
 	POP	{R0,LR}
 	SUBS	PC,LR,#0x04
-	
+
 @
 @ Fast Interrupt Request Redirector
 @

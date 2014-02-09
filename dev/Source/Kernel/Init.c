@@ -17,18 +17,14 @@
 
 static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
-    uartOutput('@');
-
-    //    if (opcode == 1)
-    //        threadYield();
-    //    else if (opcode == 2)
-    //        threadDestroy(threadControlBlock);
+    if (opcode == 1)
+       threadYield();
+    else if (opcode == 2)
+       threadDestroy(threadControlBlock);
 }
 
 static void irqHandler(void)
 {
-    uartOutput('#');
-
     if (currentThreadControlBlock != 0)
         threadYield();
 
@@ -43,7 +39,7 @@ void kernel_start(void)
     statusInit();
     uartInit();
     threadsInit();
-    timerInit(127, 100000, TRUE);
+    timerInit(127, 1000000, TRUE);
 
     kDebugCPUState();
     logNewLine();

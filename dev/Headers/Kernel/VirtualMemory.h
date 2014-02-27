@@ -16,8 +16,8 @@
 
 #define D00_L1DESCDOMAIN    (0x00000000)
 
-#define TRANSLATIONTABLE_BOUNDARYSIZE  (0x1)
-#define CONTAINER_TRANSLATIONTABLESIZE (2048)
+#define TRANSLATIONTABLE_BOUNDARYSIZE  (0x2)
+#define CONTAINER_TRANSLATIONTABLESIZE (1024)
 #define KERNEL_TRANSLATIONTABLESIZE    (4096)
 
 #define PAGETABLESIZE (256)
@@ -37,6 +37,10 @@ typedef struct
     UnsignedWord32 size;
 } VirtualMemorySegment;
 
-extern void kernel_boot_virtualMemorySetup(void);
+extern void boot_virtualMemorySetup(void);
+
+extern UnsignedWord32 phyDevice200PageTable[PAGETABLESIZE];
+extern UnsignedWord32 phyDevice202PageTable[PAGETABLESIZE];
+extern UnsignedWord32 phyDevice208PageTable[PAGETABLESIZE];
 
 #endif

@@ -11,7 +11,7 @@
 
 void pn512Init(void)
 {
-    spiSetClockRate(1000000);
+    spiSetClockRate(10000000);
 }
 
 void pn512ReadRegister(UnsignedByte chipSelect, UnsignedByte registAddr, UnsignedByte *value)
@@ -19,7 +19,7 @@ void pn512ReadRegister(UnsignedByte chipSelect, UnsignedByte registAddr, Unsigne
     UnsignedByte outputData[2];
     UnsignedByte inputData[2];
 
-    outputData[0] = (registAddr < 1) | 0x80;
+    outputData[0] = (registAddr << 1) | 0x80;
     outputData[1] = 0x00;
 
     spiTransfer(chipSelect, outputData, inputData, 2);
@@ -32,7 +32,7 @@ void pn512WriteRegister(UnsignedByte chipSelect, UnsignedByte registAddr, Unsign
     UnsignedByte outputData[2];
     UnsignedByte inputData[2];
 
-    outputData[0] = (registAddr < 1) & 0x7F;
+    outputData[0] = (registAddr << 1) & 0x7F;
     outputData[1] = value;
 
     spiTransfer(chipSelect, outputData, inputData, 2);
@@ -47,18 +47,7 @@ void pn512Test(void)
     {
         pn512ReadRegister(0, index, &value);
 
-        logMessage("Value-0: ");
-        logUnsignedByteHex(index);
-        logMessage(" = ");
-        logUnsignedByteHex(value);
-        logNewLine();
-    }
-
-    for (index = 0; index < 64; index++)
-    {
-        pn512ReadRegister(1, index, &value);
-
-        logMessage("Value-1: ");
+        logMessage("Reg: ");
         logUnsignedByteHex(index);
         logMessage(" = ");
         logUnsignedByteHex(value);

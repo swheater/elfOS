@@ -34,7 +34,7 @@ OBJS = Source/Kernel/ARM/Boot.o Source/Kernel/BDebug.o \
        Source/Device/RaspPi_Ladder.o Source/Device/RaspPi_DisplayTFT18.o \
        Source/Device/RaspPi_ILI9320.o Source/Device/RaspPi_SSD1351.o Source/Device/RaspPi_XPT2046.o \
        Source/Device/RaspPi_MotorPiTX.o Source/Device/RaspPi_elfOSDebug.o \
-       Source/Device/RaspPi_ILSoftOLED.o Source/Device/SPI_SecureDigital.o Source/Device/SPI_MCP23S17.o 
+       Source/Device/RaspPi_ILSoftOLED.o Source/Device/SPI_SecureDigital.o Source/Device/SPI_MCP23S17.o Source/Device/SPI_PN512.o
 #       Source/Kernel/Kernel/Process.o
 #       Source/Kernel/ARM/Thread.o Source/Kernel/ARM/StartThreads.o
 

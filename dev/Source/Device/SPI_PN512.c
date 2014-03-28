@@ -40,18 +40,38 @@ void pn512WriteRegister(UnsignedByte chipSelect, UnsignedByte registAddr, Unsign
 
 void pn512Test(void)
 {
-    UnsignedByte value =  0;
+    UnsignedByte value[64];
     UnsignedByte index;
 
     for (index = 0; index < 64; index++)
     {
-        pn512ReadRegister(0, index, &value);
+        pn512ReadRegister(0, index, &value[index]);
 
         logMessage("Reg: ");
         logUnsignedByteHex(index);
         logMessage(" = ");
-        logUnsignedByteHex(value);
+        logUnsignedByteHex(value[index]);
         logNewLine();
+    }
+
+    logNewLine();
+
+    UnsignedByte currentValue;
+    while (TRUE)
+    {
+        for (index = 0; index < 64; index++)
+        {
+            pn512ReadRegister(0, index, &currentValue);
+
+            if (currentValue != value[index])
+	    {
+                logMessage("Reg: ");
+                logUnsignedByteHex(index);
+                logMessage(" = ");
+                logUnsignedByteHex(currentValue);
+                logNewLine();
+	    }
+        }
     }
 }
 

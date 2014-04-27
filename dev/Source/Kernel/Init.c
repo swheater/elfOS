@@ -15,6 +15,9 @@
 #include <Device/RaspPi_Status.h>
 #include <elfOS/Thread.h>
 
+#include <Device/BCM2835_SPI.h>
+#include <Device/SPI_PN512.h>
+
 static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
     if (opcode == 1)
@@ -48,6 +51,12 @@ void kernel_start(void)
     kDebugCurrentThread();
     logNewLine();
     kDebugHandlers();
+    logNewLine();
+
+    spiInit();
+    pn512Init();
+
+    pn512Test();
 
     UnsignedWord32 reg = 0;
     while (TRUE)

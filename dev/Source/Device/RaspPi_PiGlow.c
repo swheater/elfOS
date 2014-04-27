@@ -59,9 +59,9 @@ void piglowReset(void)
 
     enabledReg = SN3218_ENABLEDREG_RESETVALUE;
     int index;
-    for (index = 0; index <= SN3218_PWM_REGS; index++)
+    for (index = 0; index < SN3218_PWM_REGS; index++)
         pwmRegs[index] = SN3218_PWMREG_RESETVALUE;
-    for (index = 0; index <= SN3218_CONTROL_REGS; index++)
+    for (index = 0; index < SN3218_CONTROL_REGS; index++)
         controlRegs[index] = SN3218_CONTROLREG_RESETVALUE;
 }
 

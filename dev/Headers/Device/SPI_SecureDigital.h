@@ -6,7 +6,7 @@
  */
 
 extern UnsignedByte securedigitalInit(void);
-
 extern UnsignedByte securedigitalReadBlock(UnsignedWord32 blockNumber, UnsignedByte block[512]);
+extern UnsignedByte securedigitalShutdown(void);
 
 #endif

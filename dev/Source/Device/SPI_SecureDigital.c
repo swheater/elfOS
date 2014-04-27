@@ -205,3 +205,8 @@ UnsignedByte securedigitalReadBlock(UnsignedWord32 blockNumber, UnsignedByte blo
     else
         return res;
 }
+
+UnsignedByte securedigitalShutdown(void)
+{
+    return 0x00;
+}

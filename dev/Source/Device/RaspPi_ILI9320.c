@@ -9,6 +9,7 @@
 #include <Device/BCM2835_GPIO.h>
 #include <Device/BCM2835_SPI.h>
 #include <Device/BCM2835_SystemTimer.h>
+#include <Device/BCM2835_PWM.h>
 #include <Device/RaspPi_ILI9320.h>
 
 #define ILI9320_GPIO_RESET     (25)
@@ -66,6 +67,7 @@
 #define ILI9320_PANELINTERFACECONTROL5_INST         (0x0097)
 #define ILI9320_PANELINTERFACECONTROL6_INST         (0x0098)
 
+/*
 static void logOutputInputData(const char *message, UnsignedByte outputData[], UnsignedWord32 outputDataLength, UnsignedByte inputData[], UnsignedWord32 inputDataLength)
 {
     logMessage(message);
@@ -75,6 +77,7 @@ static void logOutputInputData(const char *message, UnsignedByte outputData[], U
     logDataHex(inputData, inputDataLength);
     logMessage("\r\n");
 }
+*/
 
 static void ili9320SetIndexRegister(UnsignedWord16 reg)
 {

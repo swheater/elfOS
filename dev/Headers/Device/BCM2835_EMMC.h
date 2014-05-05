@@ -7,7 +7,8 @@
 
 #include <Kernel/StdTypes.h>
 
-extern void emmcInit(void);
-extern void emmcShutdown(void);
+extern UnsignedByte emmcInit(void);
+extern UnsignedByte emmcReadBlock(UnsignedWord32 blockNumber, UnsignedByte block[512]);
+extern UnsignedByte emmcShutdown(void);
 
 #endif

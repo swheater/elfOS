@@ -15,8 +15,7 @@
 #include <Device/RaspPi_Status.h>
 #include <elfOS/Thread.h>
 
-#include <Device/BCM2835_SPI.h>
-#include <Device/SPI_PN512.h>
+#include <Device/BCM2835_EMMC.h>
 
 static void swHandler(UnsignedWord32 opcode, ThreadControlBlock *threadControlBlock)
 {
@@ -53,10 +52,30 @@ void kernel_start(void)
     kDebugHandlers();
     logNewLine();
 
-    spiInit();
-    pn512Init();
+    UnsignedByte block[512];
 
-    pn512Test();
+    UnsignedByte res = emmcInit();
+    logMessage("EMMC Init: ");
+    logUnsignedByteHex(res);
+    logNewLine();
+
+    res = emmcReadBlock(0, block);
+    logMessage("Block 0:   ");
+    logUnsignedByteHex(res);
+    logNewLine();
+    int row;
+    for (row = 0; row < 16; row++)
+    {  
+        logUnsignedWord16Hex(32 * row);
+        logMessage(":");
+        int column;
+        for (column = 0; column < 32; column++)
+        {
+            logMessage(" ");
+            logUnsignedByteHex(block[(32 * row) + column]);
+        }
+        logNewLine();
+    }
 
     UnsignedWord32 reg = 0;
     while (TRUE)

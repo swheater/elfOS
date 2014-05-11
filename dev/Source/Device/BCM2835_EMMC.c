@@ -72,6 +72,8 @@
 #define EMMC_CMDTM_CMDINDEX_SHIFT          (24)
 #define EMMC_CMDTM_CMDINDEX_MASK           (0x3F000000)
 
+#define EMMC_CMDTM_STD_BITS (EMMC_CMDTM_BLOCKCOUNT_DISABLE_BIT | EMMC_CMDTM_COMPCMD_NONE_BITS | EMMC_CMDTM_DATADIR_HOSTTOCARD_BIT | EMMC_CMDTM_DATABLOCK_SINGLE_BIT | EMMC_CMDTM_CHKCRC_ENABLE_BIT | EMMC_CMDTM_CHKINDEX_ENABLE_BIT | EMMC_CMDTM_CMDTYPE_NORMAL_BITS)
+
 #define EMMC_CONTROL0_MODE_SPI_ENABLE_BIT      (0x00100000)
 #define EMMC_CONTROL0_MODE_SPI_DISABLE_BIT     (0x00000000)
 #define EMMC_CONTROL0_MODE_BOOT_ENABLE_BIT     (0x00200000)
@@ -91,12 +93,31 @@
 #define EMMC_CONTROL1_RESET_DATA_CIRCUIT_DISABLE_BIT    (0x00000000)
 #define EMMC_CONTROL1_RESET_MASK                        (0x07000000)
 
-static void emmcCommand(UnsignedWord32 command, UnsignedWord32 argument)
+static void emmcSendCommand(UnsignedWord32 command, UnsignedWord32 argument)
 {
     *(EMMC_BASE + EMMC_ARG1_OFFSET)  = argument;
     *(EMMC_BASE + EMMC_CMDTM_OFFSET) = command;
 
     // Check Response
+}
+
+static UnsignedByte emmcSendCommandR1(UnsignedByte command, UnsignedWord32 argument)
+{
+    emmcSendCommand(EMMC_CMDTM_STD_BITS | EMMC_CMDTM_RESPTYPE_NO_BITS | EMMC_CMDTM_ISDATA_NODATA_BIT | (command << EMMC_CMDTM_CMDINDEX_SHIFT), argument);
+
+    return 0x00;
+}
+
+static UnsignedByte emmcSendCommandR3(UnsignedByte command, UnsignedWord32 argument)
+{
+
+    return 0x00;
+}
+
+static UnsignedByte emmcSendCommandR7(UnsignedByte command, UnsignedWord32 argument)
+{
+
+    return 0x00;
 }
 
 UnsignedByte emmcInit(void)
@@ -110,7 +131,7 @@ UnsignedByte emmcInit(void)
 
     while (((*(EMMC_BASE + EMMC_CONTROL1_OFFSET)) & EMMC_CONTROL1_CLOCK_STABLE_MASK) == EMMC_CONTROL1_CLOCK_STABLE_YES_BIT) ;
 
-    emmcCommand(EMMC_CMDTM_BLOCKCOUNT_DISABLE_BIT | EMMC_CMDTM_COMPCMD_NONE_BITS | EMMC_CMDTM_DATADIR_HOSTTOCARD_BIT | EMMC_CMDTM_DATABLOCK_SINGLE_BIT | EMMC_CMDTM_RESPTYPE_NO_BITS | EMMC_CMDTM_CHKCRC_ENABLE_BIT | EMMC_CMDTM_CHKINDEX_ENABLE_BIT | EMMC_CMDTM_ISDATA_NODATA_BIT | EMMC_CMDTM_CMDTYPE_NORMAL_BITS | (0 << EMMC_CMDTM_CMDINDEX_SHIFT), 0x00000000);
+    emmcSendCommandR1(0x00, 0x00000000);
 
 
     // More!!
